@@ -1,7 +1,5 @@
 //! Abstraction layer on top of the LoLA socket for RoboCup SPL NAO V6 robots.  
 //!
-//! ![Nidhogg](https://static.wikia.nocookie.net/finalfantasy/images/e/ef/FFRK_Nidhogg_FFXIV.png)
-//!
 
 mod error;
 mod lola;
