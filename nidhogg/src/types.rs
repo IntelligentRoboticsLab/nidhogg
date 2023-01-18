@@ -3,6 +3,8 @@
 
 use std::marker::PhantomData;
 
+use nidhogg_derive::Builder;
+
 /// Struct containing two values of type `T`
 #[derive(Debug)]
 pub struct Vector2<T> {
@@ -39,7 +41,7 @@ pub struct State {
 }
 
 /// High level representation of the LoLA update message.
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 pub struct Update {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
@@ -142,7 +144,7 @@ pub type LeftEar = Ear<Left>;
 pub type RightEar = Ear<Right>;
 
 /// Struct representing an RGB color.
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Builder)]
 pub struct Color {
     pub red: f32,
     pub green: f32,
@@ -170,7 +172,7 @@ impl Color {
 ///    180
 /// ```  
 /// TODO: image
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Builder)]
 pub struct Eye<Side> {
     pub color_0_deg: Color,
     pub color_45_deg: Color,
@@ -181,7 +183,7 @@ pub struct Eye<Side> {
     pub color_270_deg: Color,
     pub color_315_deg: Color,
 
-    pub _marker: PhantomData<Side>,
+    _marker: PhantomData<Side>,
 }
 
 /// Type alias for the left eye of the robot.
@@ -267,7 +269,7 @@ pub struct ForceSensitiveResistorFoot {
 ///
 /// ## ⚠️ Warning:
 /// You should construct the [`SonarValues`] and [`SonarEnabled`] types instead of using [`Sonar`] directly.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Sonar<T> {
     pub left: T,
     pub right: T,
