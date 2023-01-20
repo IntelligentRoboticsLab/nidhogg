@@ -10,7 +10,7 @@ rmp-serde = "1.1.1"
 serde = { version = "1.0.150", features = ["derive"] }
 thiserror = "1.0.38"
 tracing = "0.1.37"
-nidhogg_derive = { path = "nidhogg_derive"}
+nidhogg_derive = { path = "nidhogg_derive" }
 
 [dev-dependencies]
 color-eyre = "0.6.2"
