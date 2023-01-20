@@ -78,6 +78,7 @@ impl Default for Update {
 }
 
 /// Struct representing the LEDs on top of the NAO robot's head.  
+///
 /// Each value represents the intensity of a white LED.
 #[derive(Debug, Default)]
 pub struct Skull {
