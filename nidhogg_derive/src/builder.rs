@@ -1,8 +1,9 @@
+use itertools::MultiUnzip;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::{
-    parse_macro_input, Data, DeriveInput, Fields, FieldsNamed, GenericParam, Generics, Ident, Type,
-    Visibility,
+    parse_macro_input, Data, DataStruct, DeriveInput, Fields, FieldsNamed, GenericParam, Generics,
+    Ident, Type, TypeParam, Visibility,
 };
 
 fn error(loc: &impl syn::spanned::Spanned, msg: &'static str) -> TokenStream {
@@ -20,16 +21,11 @@ pub fn derive(tokens: TokenStream) -> TokenStream {
     } = parse_macro_input!(tokens);
     let builder_name = format_ident!("{}Builder", ident);
     let docs = format!("Builder struct for [`{}`]\n", ident.to_string());
-    let generic_params = parse_generic_types(&generics);
+    let generic_params = parse_generic_types(generics.clone());
 
-    let builder_type = if generics.gt_token.is_some() {
-        quote! {
-            #builder_name::#generics
-        }
-    } else {
-        quote! {
-            #builder_name
-        }
+    let builder_type = match generics.gt_token {
+        Some(_) => quote! { #builder_name::#generics },
+        None => quote! { #builder_name },
     };
 
     parse_field_data(data).map_or(
@@ -77,48 +73,28 @@ struct ParsedFieldData {
 
 /// Extract the field names, types and visibilities from a [`Data`] struct.
 fn parse_field_data(input: Data) -> Option<ParsedFieldData> {
-    let data: Option<FieldsNamed> = match input {
-        Data::Struct(data_struct) => match data_struct.fields {
-            Fields::Named(named) => Some(named),
-            _ => None,
-        },
-        _ => None,
-    };
+    let Data::Struct(DataStruct {fields: Fields::Named(FieldsNamed { named, .. }), .. }) = input else { return None };
 
-    data.map(|field_data| ParsedFieldData {
-        field_names: field_data
-            .named
-            .iter()
-            .cloned()
-            .map(|field| field.ident.unwrap())
-            .collect(),
-        field_visibilities: field_data
-            .named
-            .iter()
-            .cloned()
-            .map(|field| field.vis)
-            .collect(),
-        field_types: field_data
-            .named
-            .iter()
-            .cloned()
-            .map(|field| field.ty)
-            .collect(),
+    let (field_names, field_visibilities, field_types): (Vec<_>, Vec<_>, Vec<_>) = named
+        .into_iter()
+        .map(|x| (x.ident.unwrap(), x.vis, x.ty))
+        .multiunzip();
+
+    Some(ParsedFieldData {
+        field_names,
+        field_visibilities,
+        field_types,
     })
 }
 
 /// Extract the generic type parameters from a [`Generics`] struct.
-fn parse_generic_types(input: &Generics) -> Vec<Ident> {
+fn parse_generic_types(input: Generics) -> Vec<Ident> {
     input
         .params
-        .iter()
-        .cloned()
-        .map(|p| match p {
-            GenericParam::Type(t) => t,
-            _ => {
-                unreachable!()
-            }
+        .into_iter()
+        .map(|param| match param {
+            GenericParam::Type(TypeParam { ident, .. }) => ident,
+            _ => unreachable!(),
         })
-        .map(|t| t.ident)
         .collect()
 }

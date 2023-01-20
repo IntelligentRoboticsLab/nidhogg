@@ -9,3 +9,4 @@ proc-macro = true
 [dependencies]
 syn = "1.0.107"
 quote = "1.0.23"
+itertools = "0.10.5"
