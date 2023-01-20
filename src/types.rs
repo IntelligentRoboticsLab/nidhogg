@@ -3,6 +3,8 @@
 
 use std::marker::PhantomData;
 
+use nidhogg_derive::Builder;
+
 /// Struct containing two values of type `T`
 #[derive(Debug)]
 pub struct Vector2<T> {
@@ -39,7 +41,7 @@ pub struct State {
 }
 
 /// High level representation of the LoLA update message.
-#[derive(Debug)]
+#[derive(Builder, Clone, Debug)]
 pub struct Update {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
@@ -80,7 +82,7 @@ impl Default for Update {
 /// Struct representing the LEDs on top of the NAO robot's head.  
 ///
 /// Each value represents the intensity of a white LED.
-#[derive(Debug, Default)]
+#[derive(Builder, Clone, Debug, Default)]
 pub struct Skull {
     pub left_front_0: f32,
     pub left_front_1: f32,
@@ -98,11 +100,11 @@ pub struct Skull {
 }
 
 /// Marker struct indicating the left side.
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Left;
 
 /// Marker struct indicating the right side.
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Right;
 
 /// Struct representing the LED intensities in the ear of the robot.
@@ -120,7 +122,7 @@ pub struct Right;
 ///    180
 /// ```  
 /// TODO: image
-#[derive(Debug, Default)]
+#[derive(Builder, Clone, Debug, Default)]
 pub struct Ear<Side> {
     pub intensity_0_deg: f32,
     pub intensity_36_deg: f32,
@@ -142,7 +144,7 @@ pub type LeftEar = Ear<Left>;
 pub type RightEar = Ear<Right>;
 
 /// Struct representing an RGB color.
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Builder)]
 pub struct Color {
     pub red: f32,
     pub green: f32,
@@ -170,7 +172,7 @@ impl Color {
 ///    180
 /// ```  
 /// TODO: image
-#[derive(Debug, Default)]
+#[derive(Builder, Clone, Debug, Default)]
 pub struct Eye<Side> {
     pub color_0_deg: Color,
     pub color_45_deg: Color,
@@ -181,7 +183,7 @@ pub struct Eye<Side> {
     pub color_270_deg: Color,
     pub color_315_deg: Color,
 
-    pub _marker: PhantomData<Side>,
+    _marker: PhantomData<Side>,
 }
 
 /// Type alias for the left eye of the robot.
@@ -200,7 +202,7 @@ pub struct HardwareInfo {
 }
 
 /// Struct containing values of type `T` for all the joints
-#[derive(Debug, Default)]
+#[derive(Builder, Clone, Debug, Default)]
 pub struct JointArray<T> {
     pub head_yaw: T,
     pub head_pitch: T,
@@ -235,7 +237,7 @@ pub struct JointArray<T> {
 }
 
 /// Struct representing the battery status of the robot.
-#[derive(Debug)]
+#[derive(Builder, Clone, Debug, Default)]
 pub struct Battery {
     /// The battery percentage
     pub charge: f32,
@@ -248,14 +250,14 @@ pub struct Battery {
 }
 
 /// Struct containing the [`ForceSensitiveResistorFoot`] value for each foot.
-#[derive(Debug)]
+#[derive(Builder, Clone, Debug, Default)]
 pub struct ForceSensitiveResistors {
     pub left_foot: ForceSensitiveResistorFoot,
     pub right_foot: ForceSensitiveResistorFoot,
 }
 
 /// Struct representing the force sensitive resistors in one of the feet.
-#[derive(Debug)]
+#[derive(Builder, Clone, Debug, Default)]
 pub struct ForceSensitiveResistorFoot {
     pub front_left: f32,
     pub front_right: f32,
@@ -267,7 +269,7 @@ pub struct ForceSensitiveResistorFoot {
 ///
 /// ## ⚠️ Warning:
 /// You should construct the [`SonarValues`] and [`SonarEnabled`] types instead of using [`Sonar`] directly.
-#[derive(Debug)]
+#[derive(Builder, Clone, Debug, Default)]
 pub struct Sonar<T> {
     pub left: T,
     pub right: T,
@@ -284,7 +286,7 @@ pub type SonarValues = Sonar<f32>;
 pub type SonarEnabled = Sonar<bool>;
 
 /// Struct containing the touch activiation value for each touch sensor on the robot.
-#[derive(Debug)]
+#[derive(Builder, Clone, Debug, Default)]
 pub struct Touch {
     pub chest_board: f32,
     pub head_front: f32,
