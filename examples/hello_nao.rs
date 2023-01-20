@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use nidhogg::types::{Color, LeftEye, RightEye};
+use nidhogg::types::{Color, LeftEye};
 use nidhogg::{Nao, Update};
 
 use color_eyre::Result;
@@ -16,9 +16,6 @@ fn main() -> Result<()> {
 
     println!("{hw_info:?}");
     println!("{state:?}");
-
-    // TODO: Make nice builder structs :);
-    let green = Color::builder().green(1.0).blue(0.0).build();
 
     let update = Update::builder()
         .left_eye(
