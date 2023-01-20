@@ -2,19 +2,23 @@ use crate::types::*;
 use serde::{Deserialize, Serialize};
 
 /// A trait that provides conversions from Nidhogg data to LoLA data
+///
 /// ## 🗒️ Note:
-/// Like [`From`] does with [`Into`], this trait does automatically provides an implementation for [`IntoLoLA`].
+/// Like [`From`] does with [`Into`], this trait automatically provides an implementation for [`IntoLoLA`].
 trait FromNidhogg<N> {
     fn from_nidhogg(value: N) -> Self;
 }
 
 /// A trait that provides conversions from Nidhogg data to LoLA data
+///
 /// ## ⚠️ Warning:
 // This trait gets automatically implemented when implementing [`FromNidhogg`], so you should prefer implementing that.
 trait IntoLoLA<L> {
     fn into_lola(self) -> L;
 }
 
+// From<T> for U implies Into<U> for T
+// See: https://doc.rust-lang.org/std/convert/trait.From.html
 impl<N, L: FromNidhogg<N>> IntoLoLA<L> for N {
     fn into_lola(self) -> L {
         L::from_nidhogg(self)
@@ -22,19 +26,23 @@ impl<N, L: FromNidhogg<N>> IntoLoLA<L> for N {
 }
 
 /// A trait that provides conversions from LoLA data to Nidhogg data
+///
 /// ## 🗒️ Note:
-/// Like [`From`] does with [`Into`], this trait does automatically provides an implementation for [`IntoLoLA`].
+/// Like [`From`] does with [`Into`], this trait automatically provides an implementation for [`IntoLoLA`].
 trait FromLoLA<L> {
     fn from_lola(value: L) -> Self;
 }
 
 /// A trait that provides conversions from LoLA data to Nidhogg data
+///
 /// ## ⚠️ Warning:
 // This trait gets automatically implemented when implementing [`FromNidhogg`], so you should prefer implementing that.
 trait IntoNidhogg<N> {
     fn into_nidhogg(self) -> N;
 }
 
+// From<T> for U implies Into<U> for T
+// See: https://doc.rust-lang.org/std/convert/trait.From.html
 impl<L, N: FromLoLA<L>> IntoNidhogg<N> for L {
     fn into_nidhogg(self) -> N {
         N::from_lola(self)
