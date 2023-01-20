@@ -3,7 +3,7 @@ use proc_macro::TokenStream;
 mod builder;
 
 /// Derive macro  to implement the [builder pattern](https://refactoring.guru/design-patterns/builder)
-/// for an arbritary struct with named fields.
+/// for an arbitrary struct with named fields.
 /// 
 /// These fields in this struct need to implement [`Default`]
 /// 
