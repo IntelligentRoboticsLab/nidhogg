@@ -41,8 +41,8 @@ trait IntoNidhogg<N> {
     fn into_nidhogg(self) -> N;
 }
 
-// From<T> for U implies Into<U> for T
-// See: https://doc.rust-lang.org/std/convert/trait.From.html
+/// From<T> for U implies Into<U> for T
+/// See: https://doc.rust-lang.org/std/convert/trait.From.html
 impl<L, N: FromLoLA<L>> IntoNidhogg<N> for L {
     fn into_nidhogg(self) -> N {
         N::from_lola(self)
