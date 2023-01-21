@@ -1,3 +1,4 @@
+#![allow(clippy::disallowed_names)]
 use color_eyre::Result;
 use nidhogg_derive::Builder;
 

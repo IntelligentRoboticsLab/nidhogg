@@ -113,7 +113,7 @@ pub struct Right;
 ///
 /// ## LED order:
 /// These LEDs are placed in the following order:
-/// ```
+/// ```text
 ///        0
 ///    324  36
 ///  288     72
@@ -164,7 +164,7 @@ impl Color {
 ///
 /// ## LED order:
 /// These LEDs are placed in the following order:
-/// ```
+/// ```text
 ///     0
 ///  45    315
 /// 90      270
