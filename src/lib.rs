@@ -36,7 +36,7 @@ impl Nao {
     /// ```no_run
     /// use nidhogg::Nao;
     ///
-    /// let nao = Nao::connect()?;
+    /// let nao = Nao::connect().expect("Failed to connect to LoLA socket!");
     /// ```
     pub fn connect() -> Result<Self> {
         let stream = UnixStream::connect(Self::ROBOCUP_PATH)?;
@@ -54,7 +54,7 @@ impl Nao {
     /// use nidhogg::Nao;
     /// use std::time::Duration;
     ///
-    /// let nao = Nao::connect_retry(10, Duration::from_secs(10)).expect("Failed to connect");
+    /// let nao = Nao::connect_retry(10, Duration::from_secs(10)).expect("Failed to connect to LoLA socket!");
     /// ```
     pub fn connect_retry(retry_count: usize, retry_interval: Duration) -> Result<Self> {
         for i in 0..retry_count {
@@ -93,10 +93,10 @@ impl Nao {
     /// ```no_run
     /// use nidhogg::{Nao, Update};
     ///
-    /// let mut nao = Nao::connect()?;
+    /// let mut nao = Nao::connect().expect("Failed to connect to LoLA socket!");
     /// let update = Update::default();
     ///
-    /// nao.write_update(update)?;
+    /// nao.write_update(update).expect("Failed to write update to LoLA socket!");
     /// ```
     pub fn write_update(&mut self, update: Update) -> Result<()> {
         let raw: RawUpdate = update.into();
