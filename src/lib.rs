@@ -54,7 +54,7 @@ impl Nao {
     /// use nidhogg::Nao;
     /// use std::time::Duration;
     ///
-    /// let nao = Nao::connect_retry(10, Duration::from_secs(10))?;
+    /// let nao = Nao::connect_retry(10, Duration::from_secs(10)).expect("Failed to connect");
     /// ```
     pub fn connect_retry(retry_count: usize, retry_interval: Duration) -> Result<Self> {
         for i in 0..retry_count {
@@ -91,7 +91,7 @@ impl Nao {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg:{Nao, Update};
+    /// use nidhogg::{Nao, Update};
     ///
     /// let mut nao = Nao::connect()?;
     /// let update = Update::default();
