@@ -7,4 +7,4 @@ on:
 
 jobs:
   cicd:
-    uses: IntelligentRoboticsLab/bondi/blob/main/.github/workflows/rust.yml@main
+    uses: IntelligentRoboticsLab/bondi/.github/workflows/rust.yml@main
