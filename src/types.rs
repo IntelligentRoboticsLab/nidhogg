@@ -6,14 +6,14 @@ use std::marker::PhantomData;
 use nidhogg_derive::Builder;
 
 /// Struct containing two values of type `T`
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Vector2<T> {
     pub x: T,
     pub y: T,
 }
 
 /// Struct containing three values of type `T`
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Vector3<T> {
     pub x: T,
     pub y: T,
@@ -21,7 +21,7 @@ pub struct Vector3<T> {
 }
 
 /// High level representation of the LoLA state message.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct State {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
