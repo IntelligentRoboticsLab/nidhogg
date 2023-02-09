@@ -109,7 +109,7 @@ impl Nao {
     /// Read a [`RawState`] from the LoLA socket.
     fn read_raw(&mut self) -> Result<RawState> {
         // TODO: Can we remove hardcoded size?
-        println!("{}", size_of::<RawState>());
+        // println!("{}", size_of::<RawState>());
 
         self.stream.read_exact(&mut self.buffer)?;
         Ok(from_slice::<RawState>(&self.buffer)?)
