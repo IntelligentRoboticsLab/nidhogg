@@ -49,7 +49,7 @@ fn builder_struct(
     generics: &Generics,
     field_data: &ParsedFieldData,
 ) -> TokenStream {
-    let docs = format_ident!("Builder struct for [`{}`]\n", ident);
+    let docs = format!("Builder struct for [`{}`]\n", ident);
     let data_name = &field_data.field_names;
     let data_type = &field_data.field_types;
     quote!(
