@@ -6,7 +6,6 @@ pub mod types;
 
 use std::{
     io::{BufWriter, Read},
-    mem::size_of,
     os::unix::net::UnixStream,
     thread,
     time::Duration,
