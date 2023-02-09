@@ -49,16 +49,16 @@ fn builder_struct(
     generics: &Generics,
     field_data: &ParsedFieldData,
 ) -> TokenStream {
-    let docs = format!("Builder struct for [`{}`]\n", ident.to_string());
+    let docs = format_ident!("Builder struct for [`{}`]\n", ident);
     let data_name = &field_data.field_names;
     let data_type = &field_data.field_types;
-    TokenStream::from(quote!(
+    quote!(
         #[doc = #docs]
         #[derive(Default)]
         #vis struct #builder_name #generics {
             #(#data_name: Option<#data_type>),*
         }
-    ))
+    )
 }
 
 fn impl_builder_struct(
@@ -86,7 +86,6 @@ fn impl_builder_struct(
             }
         }
     )
-    .into()
 }
 
 fn impl_builder_fn(ident: &Ident, builder_name: &Ident, generics: &Generics) -> TokenStream {
@@ -104,7 +103,6 @@ fn impl_builder_fn(ident: &Ident, builder_name: &Ident, generics: &Generics) -> 
             }
         }
     }
-    .into()
 }
 
 struct ParsedFieldData {
