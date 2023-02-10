@@ -68,9 +68,9 @@ fn impl_builder_struct(
     generics: &Generics,
 ) -> TokenStream {
     let generic_params = parse_generic_types(generics);
-    let data_name = &field_data.field_names;
-    let data_vis = &field_data.field_visibilities;
-    let data_type = &field_data.field_types;
+    let data_name = field_data.field_names.as_slice();
+    let data_vis = field_data.field_visibilities.as_slice();
+    let data_type = field_data.field_types.as_slice();
 
     quote!(
         impl <#(#generic_params: Default)*> #builder_name #generics {
@@ -128,14 +128,13 @@ fn parse_field_data(input: Data) -> Option<ParsedFieldData> {
 }
 
 /// Extract the generic type parameters from a [`Generics`] struct.
-fn parse_generic_types(input: &Generics) -> Vec<Ident> {
+fn parse_generic_types(input: &Generics) -> Vec<&Ident> {
     input
-        .clone()
         .params
-        .into_iter()
-        .map(|param| match param {
-            GenericParam::Type(TypeParam { ident, .. }) => ident,
-            _ => unreachable!(),
+        .iter()
+        .flat_map(|p| match p {
+            GenericParam::Type(TypeParam { ident, .. }) => Some(ident),
+            _ => None,
         })
         .collect()
 }
