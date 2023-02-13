@@ -17,10 +17,8 @@ mod builder;
 ///     baz: Vec<u8>
 /// }
 ///
-/// fn main() {
-///     let foo = Foo::builder().bar(42).baz(vec![4, 2]).build();
-///     assert_eq!(foo, Foo { bar: 42, baz: vec![4, 2]})
-/// }
+/// let foo = Foo::builder().bar(42).baz(vec![4, 2]).build();
+/// assert_eq!(foo, Foo { bar: 42, baz: vec![4, 2]})
 /// ```
 #[proc_macro_derive(Builder)]
 pub fn derive_builder(input: TokenStream) -> TokenStream {
