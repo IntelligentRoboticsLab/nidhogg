@@ -107,6 +107,10 @@ pub struct Left;
 #[derive(Clone, Debug, Default)]
 pub struct Right;
 
+pub trait Sided {}
+impl Sided for Left {}
+impl Sided for Right {}
+
 /// Struct representing the LED intensities in the ear of the robot.
 /// ## ⚠️ Warning:
 /// You should construct the [`LeftEar`] and [`RightEar`] types instead of using [`Ear`] directly.
@@ -123,7 +127,7 @@ pub struct Right;
 /// ```  
 /// TODO: image
 #[derive(Builder, Clone, Debug, Default)]
-pub struct Ear<Side> {
+pub struct Ear<S: Sided> {
     pub intensity_0_deg: f32,
     pub intensity_36_deg: f32,
     pub intensity_72_deg: f32,
@@ -135,7 +139,7 @@ pub struct Ear<Side> {
     pub intensity_288_deg: f32,
     pub intensity_324_deg: f32,
 
-    pub _marker: PhantomData<Side>,
+    pub _marker: PhantomData<S>,
 }
 
 /// Type alias for the left ear of the robot.
@@ -173,7 +177,7 @@ impl Color {
 /// ```  
 /// TODO: image
 #[derive(Builder, Clone, Debug, Default)]
-pub struct Eye<Side> {
+pub struct Eye<S: Sided> {
     pub color_0_deg: Color,
     pub color_45_deg: Color,
     pub color_90_deg: Color,
@@ -183,7 +187,7 @@ pub struct Eye<Side> {
     pub color_270_deg: Color,
     pub color_315_deg: Color,
 
-    _marker: PhantomData<Side>,
+    _marker: PhantomData<S>,
 }
 
 /// Type alias for the left eye of the robot.
@@ -302,4 +306,84 @@ pub struct Touch {
     pub right_hand_back: f32,
     pub right_hand_left: f32,
     pub right_hand_right: f32,
+}
+
+#[derive(Builder, Clone, Debug, Default)]
+pub struct LeftLegJoints<T> {
+    pub hip_yaw_pitch: T,
+    pub hip_roll: T,
+    pub hip_pitch: T,
+    pub knee_pitch: T,
+    pub ankle_pitch: T,
+    pub ankle_roll: T,
+}
+
+#[derive(Builder, Clone, Debug, Default)]
+pub struct RightLegJoints<T> {
+    // This value does not exist
+    // pub hip_yaw_pitch: T,
+    pub hip_roll: T,
+    pub hip_pitch: T,
+    pub knee_pitch: T,
+    pub ankle_pitch: T,
+    pub ankle_roll: T,
+}
+
+pub struct LeftArmJoints<T> {
+    pub shoulder_pitch: T,
+    pub shoulder_roll: T,
+    pub elbow_yaw: T,
+    pub elbow_roll: T,
+    pub wrist_yaw: T,
+    pub hand: T,
+}
+
+pub struct RightArmJoints<T> {
+    pub shoulder_pitch: T,
+    pub shoulder_roll: T,
+    pub elbow_yaw: T,
+    pub elbow_roll: T,
+    pub wrist_yaw: T,
+    pub hand: T,
+}
+
+impl<T> JointArrayBuilder<T> {
+    pub fn left_leg_joints(mut self, joints: LeftLegJoints<T>) -> Self {
+        self.left_hip_yaw_pitch = Some(joints.hip_yaw_pitch);
+        self.left_hip_roll = Some(joints.hip_roll);
+        self.left_hip_pitch = Some(joints.hip_pitch);
+        self.left_knee_pitch = Some(joints.knee_pitch);
+        self.left_ankle_pitch = Some(joints.ankle_pitch);
+        self.left_ankle_roll = Some(joints.ankle_roll);
+        self
+    }
+
+    pub fn right_leg_joints(mut self, joints: RightLegJoints<T>) -> Self {
+        self.right_hip_roll = Some(joints.hip_roll);
+        self.right_hip_pitch = Some(joints.hip_pitch);
+        self.right_knee_pitch = Some(joints.knee_pitch);
+        self.right_ankle_pitch = Some(joints.ankle_pitch);
+        self.right_ankle_roll = Some(joints.ankle_roll);
+        self
+    }
+
+    pub fn left_arm_joints(mut self, joints: RightArmJoints<T>) -> Self {
+        self.left_shoulder_pitch = Some(joints.shoulder_pitch);
+        self.left_shoulder_roll = Some(joints.shoulder_roll);
+        self.left_elbow_yaw = Some(joints.elbow_yaw);
+        self.left_elbow_roll = Some(joints.elbow_roll);
+        self.left_wrist_yaw = Some(joints.wrist_yaw);
+        self.left_hand = Some(joints.hand);
+        self
+    }
+
+    pub fn right_arm_joints(mut self, joints: RightArmJoints<T>) -> Self {
+        self.right_shoulder_pitch = Some(joints.shoulder_pitch);
+        self.right_shoulder_roll = Some(joints.shoulder_roll);
+        self.right_elbow_yaw = Some(joints.elbow_yaw);
+        self.right_elbow_roll = Some(joints.elbow_roll);
+        self.right_wrist_yaw = Some(joints.wrist_yaw);
+        self.right_hand = Some(joints.hand);
+        self
+    }
 }
