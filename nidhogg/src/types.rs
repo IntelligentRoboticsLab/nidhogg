@@ -107,6 +107,7 @@ pub struct Left;
 #[derive(Clone, Debug, Default)]
 pub struct Right;
 
+/// Marker trait to denote side of the robot
 pub trait Sided {}
 impl Sided for Left {}
 impl Sided for Right {}
