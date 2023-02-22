@@ -2,8 +2,8 @@ use itertools::MultiUnzip;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use syn::{
-    parse_macro_input, Data, DataStruct, DeriveInput, Fields, FieldsNamed, GenericParam, Generics,
-    Ident, Type, TypeParam, Visibility,
+    parse_macro_input, Data, DataStruct, DeriveInput, Fields, FieldsNamed, Generics, Ident, Type,
+    Visibility,
 };
 
 fn error(loc: &impl syn::spanned::Spanned, msg: &'static str) -> proc_macro::TokenStream {
@@ -67,19 +67,21 @@ fn impl_builder_struct(
     field_data: &ParsedFieldData,
     generics: &Generics,
 ) -> TokenStream {
-    let generic_params = parse_generic_types(generics);
     let data_name = field_data.field_names.as_slice();
     let data_vis = field_data.field_visibilities.as_slice();
     let data_type = field_data.field_types.as_slice();
 
+    let generics_no_type_bounds = generic_types(generics);
+    let generic_type_params = generic_type_params_with_default(generics);
+
     quote!(
-        impl <#(#generic_params: Default)*> #builder_name #generics {
+        impl <#(#generic_type_params)*> #builder_name <#(#generics_no_type_bounds),*> {
             #(#data_vis fn #data_name (mut self, #data_name: #data_type) -> Self {
                 self.#data_name = Some(#data_name);
                 self
             })*
 
-            pub fn build (self) -> #ident #generics {
+            pub fn build (self) -> #ident<#(#generics_no_type_bounds),*> {
                 #ident {
                     #(#data_name: self.#data_name.unwrap_or_default()),*
                 }
@@ -89,20 +91,41 @@ fn impl_builder_struct(
 }
 
 fn impl_builder_fn(ident: &Ident, builder_name: &Ident, generics: &Generics) -> TokenStream {
-    let generic_params = parse_generic_types(generics);
+    let generic_type_params = generic_type_params_with_default(generics);
+    let generics_no_type_bounds = generic_types(generics);
 
     let builder_type = match generics.gt_token {
-        Some(_) => quote! { #builder_name::#generics },
+        Some(_) => quote! { #builder_name::<#(#generics_no_type_bounds),*> },
         None => quote! { #builder_name },
     };
 
     quote! {
-        impl <#(#generic_params: Default)*> #ident #generics {
+        impl <#(#generic_type_params)*> #ident <#(#generics_no_type_bounds),*> {
             pub fn builder() -> #builder_type {
                 #builder_type::default()
             }
         }
     }
+}
+
+fn generic_types(generics: &Generics) -> Vec<Ident> {
+    generics.type_params().map(|x| x.ident.to_owned()).collect()
+}
+
+fn generic_type_params_with_default(generics: &Generics) -> Vec<TokenStream> {
+    generics
+        .type_params()
+        .map(|x| {
+            let id = &x.ident;
+            let bounds = x.bounds.iter();
+
+            if bounds.len() > 0 {
+                quote! { #id: #(#bounds)+* + Default }
+            } else {
+                quote! { #id: Default }
+            }
+        })
+        .collect()
 }
 
 struct ParsedFieldData {
@@ -125,16 +148,4 @@ fn parse_field_data(input: Data) -> Option<ParsedFieldData> {
         field_visibilities,
         field_types,
     })
-}
-
-/// Extract the generic type parameters from a [`Generics`] struct.
-fn parse_generic_types(input: &Generics) -> Vec<&Ident> {
-    input
-        .params
-        .iter()
-        .flat_map(|p| match p {
-            GenericParam::Type(TypeParam { ident, .. }) => Some(ident),
-            _ => None,
-        })
-        .collect()
 }
