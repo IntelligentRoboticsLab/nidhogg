@@ -309,6 +309,11 @@ pub struct Touch {
     pub right_hand_right: f32,
 }
 
+pub struct HeadJoints<T> {
+    pub yaw: T,
+    pub pitch: T,
+}
+
 #[derive(Builder, Clone, Debug, Default)]
 pub struct LeftLegJoints<T> {
     pub hip_yaw_pitch: T,
@@ -349,6 +354,12 @@ pub struct RightArmJoints<T> {
 }
 
 impl<T> JointArrayBuilder<T> {
+    pub fn head_joints(mut self, joints: HeadJoints<T>) -> Self {
+        self.head_pitch = Some(joints.pitch);
+        self.head_yaw = Some(joints.yaw);
+        self
+    }
+
     pub fn left_leg_joints(mut self, joints: LeftLegJoints<T>) -> Self {
         self.left_hip_yaw_pitch = Some(joints.hip_yaw_pitch);
         self.left_hip_roll = Some(joints.hip_roll);
