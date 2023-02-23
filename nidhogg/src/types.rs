@@ -118,15 +118,8 @@ impl Sided for Right {}
 ///
 /// ## LED order:
 /// These LEDs are placed in the following order:
-/// ```text
-///        0
-///    324  36
-///  288     72
-/// 252     108
-///  216  144
-///    180
-/// ```  
-/// TODO: image
+///
+/// ![alt](https://i.imgur.com/vBja7D5.png)
 #[derive(Builder, Clone, Debug, Default)]
 pub struct Ear<S: Sided> {
     pub intensity_0_deg: f32,
