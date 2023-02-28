@@ -392,7 +392,7 @@ impl<T> JointArrayBuilder<T> {
         self
     }
 
-    pub fn left_arm_joints(mut self, joints: RightArmJoints<T>) -> Self {
+    pub fn left_arm_joints(mut self, joints: LeftArmJoints<T>) -> Self {
         self.left_shoulder_pitch = Some(joints.shoulder_pitch);
         self.left_shoulder_roll = Some(joints.shoulder_roll);
         self.left_elbow_yaw = Some(joints.elbow_yaw);
