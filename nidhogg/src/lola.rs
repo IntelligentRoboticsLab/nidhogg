@@ -49,8 +49,8 @@ impl<L, N: FromLoLA<L>> IntoNidhogg<N> for L {
     }
 }
 
-impl FromNidhogg<Ear<Left>> for [f32; 10] {
-    fn from_nidhogg(value: Ear<Left>) -> Self {
+impl FromNidhogg<LeftEar> for [f32; 10] {
+    fn from_nidhogg(value: LeftEar) -> Self {
         [
             value.intensity_0_deg,
             value.intensity_36_deg,
@@ -66,8 +66,8 @@ impl FromNidhogg<Ear<Left>> for [f32; 10] {
     }
 }
 
-impl FromNidhogg<Ear<Right>> for [f32; 10] {
-    fn from_nidhogg(value: Ear<Right>) -> Self {
+impl FromNidhogg<RightEar> for [f32; 10] {
+    fn from_nidhogg(value: RightEar) -> Self {
         [
             value.intensity_324_deg,
             value.intensity_288_deg,
@@ -89,8 +89,8 @@ impl FromNidhogg<Color> for [f32; 3] {
     }
 }
 
-impl FromNidhogg<Eye<Left>> for [f32; 24] {
-    fn from_nidhogg(value: Eye<Left>) -> Self {
+impl FromNidhogg<LeftEye> for [f32; 24] {
+    fn from_nidhogg(value: LeftEye) -> Self {
         [
             value.color_45_deg.red,
             value.color_0_deg.red,
@@ -122,8 +122,8 @@ impl FromNidhogg<Eye<Left>> for [f32; 24] {
     }
 }
 
-impl FromNidhogg<Eye<Right>> for [f32; 24] {
-    fn from_nidhogg(value: Eye<Right>) -> Self {
+impl FromNidhogg<RightEye> for [f32; 24] {
+    fn from_nidhogg(value: RightEye) -> Self {
         [
             value.color_0_deg.red,
             value.color_45_deg.red,
