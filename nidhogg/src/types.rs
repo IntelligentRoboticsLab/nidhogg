@@ -1,8 +1,6 @@
 //! Types used to make interacting with the LoLA socket more convenient.
 //!
 
-use std::marker::PhantomData;
-
 use nidhogg_derive::Builder;
 
 /// Struct containing two values of type `T`
@@ -99,22 +97,7 @@ pub struct Skull {
     pub right_rear_2: f32,
 }
 
-/// Marker struct indicating the left side.
-#[derive(Clone, Debug, Default)]
-pub struct Left;
-
-/// Marker struct indicating the right side.
-#[derive(Clone, Debug, Default)]
-pub struct Right;
-
-/// Marker trait to denote side of the robot
-pub trait Sided {}
-impl Sided for Left {}
-impl Sided for Right {}
-
-/// Struct representing the LED intensities in the ear of the robot.
-/// ## ⚠️ Warning:
-/// You should construct the [`LeftEar`] and [`RightEar`] types instead of using [`Ear`] directly.
+/// Struct representing the LED intensities in the left ear of the robot.
 ///
 /// ## LED order:
 /// These LEDs are placed in the following order:
@@ -126,9 +109,8 @@ impl Sided for Right {}
 ///  216  144
 ///    180
 /// ```  
-/// TODO: image
 #[derive(Builder, Clone, Debug, Default)]
-pub struct Ear<S: Sided> {
+pub struct LeftEar {
     pub intensity_0_deg: f32,
     pub intensity_36_deg: f32,
     pub intensity_72_deg: f32,
@@ -139,14 +121,33 @@ pub struct Ear<S: Sided> {
     pub intensity_252_deg: f32,
     pub intensity_288_deg: f32,
     pub intensity_324_deg: f32,
-
-    pub _marker: PhantomData<S>,
 }
 
-/// Type alias for the left ear of the robot.
-pub type LeftEar = Ear<Left>;
-/// Type alias for the right ear of the robot
-pub type RightEar = Ear<Right>;
+/// Struct representing the LED intensities in the right ear of the robot.
+///
+/// ## LED order:
+/// These LEDs are placed in the following order:
+/// ```text
+///        0
+///    324  36
+///  288     72
+/// 252     108
+///  216  144
+///    180
+/// ```  
+#[derive(Builder, Clone, Debug, Default)]
+pub struct RightEar {
+    pub intensity_0_deg: f32,
+    pub intensity_36_deg: f32,
+    pub intensity_72_deg: f32,
+    pub intensity_108_deg: f32,
+    pub intensity_144_deg: f32,
+    pub intensity_180_deg: f32,
+    pub intensity_216_deg: f32,
+    pub intensity_252_deg: f32,
+    pub intensity_288_deg: f32,
+    pub intensity_324_deg: f32,
+}
 
 /// Struct representing an RGB color.
 #[derive(Debug, Default, Clone, Copy, Builder)]
@@ -162,11 +163,7 @@ impl Color {
     }
 }
 
-/// Struct representing the RGB LEDs in the eye of the robot.
-///
-/// ## ⚠️ Warning:
-/// You should construct the [`LeftEye`] and [`RightEye`] types instead of using [`Eye`] directly.
-///
+/// Struct representing the RGB LEDs in the left eye of the robot.
 /// ## LED order:
 /// These LEDs are placed in the following order:
 /// ```text
@@ -176,9 +173,8 @@ impl Color {
 ///  135   225
 ///    180
 /// ```  
-/// TODO: image
 #[derive(Builder, Clone, Debug, Default)]
-pub struct Eye<S: Sided> {
+pub struct LeftEye {
     pub color_0_deg: Color,
     pub color_45_deg: Color,
     pub color_90_deg: Color,
@@ -187,15 +183,29 @@ pub struct Eye<S: Sided> {
     pub color_225_deg: Color,
     pub color_270_deg: Color,
     pub color_315_deg: Color,
-
-    _marker: PhantomData<S>,
 }
 
-/// Type alias for the left eye of the robot.
-pub type LeftEye = Eye<Left>;
-
-/// Type alias for the right eye of the robot.
-pub type RightEye = Eye<Right>;
+/// Struct representing the RGB LEDs in the left eye of the robot.
+/// ## LED order:
+/// These LEDs are placed in the following order:
+/// ```text
+///     0
+///  45    315
+/// 90      270
+///  135   225
+///    180
+/// ```  
+#[derive(Builder, Clone, Debug, Default)]
+pub struct RightEye {
+    pub color_0_deg: Color,
+    pub color_45_deg: Color,
+    pub color_90_deg: Color,
+    pub color_135_deg: Color,
+    pub color_180_deg: Color,
+    pub color_225_deg: Color,
+    pub color_270_deg: Color,
+    pub color_315_deg: Color,
+}
 
 /// Struct containing the hardware identifiers for the NAO 6 robot.
 #[derive(Debug)]
@@ -242,7 +252,7 @@ pub struct JointArray<T> {
 }
 
 /// Struct representing the battery status of the robot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Battery {
     /// The battery percentage
     pub charge: f32,
@@ -255,14 +265,14 @@ pub struct Battery {
 }
 
 /// Struct containing the [`ForceSensitiveResistorFoot`] value for each foot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct ForceSensitiveResistors {
     pub left_foot: ForceSensitiveResistorFoot,
     pub right_foot: ForceSensitiveResistorFoot,
 }
 
 /// Struct representing the force sensitive resistors in one of the feet.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct ForceSensitiveResistorFoot {
     pub front_left: f32,
     pub front_right: f32,
@@ -291,7 +301,7 @@ pub type SonarValues = Sonar<f32>;
 pub type SonarEnabled = Sonar<bool>;
 
 /// Struct containing the touch activiation value for each touch sensor on the robot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Touch {
     pub chest_board: f32,
     pub head_front: f32,
@@ -309,6 +319,7 @@ pub struct Touch {
     pub right_hand_right: f32,
 }
 
+#[derive(Builder, Clone, Debug, Default)]
 pub struct HeadJoints<T> {
     pub yaw: T,
     pub pitch: T,
@@ -335,6 +346,7 @@ pub struct RightLegJoints<T> {
     pub ankle_roll: T,
 }
 
+#[derive(Builder, Clone, Debug, Default)]
 pub struct LeftArmJoints<T> {
     pub shoulder_pitch: T,
     pub shoulder_roll: T,
@@ -344,6 +356,7 @@ pub struct LeftArmJoints<T> {
     pub hand: T,
 }
 
+#[derive(Builder, Clone, Debug, Default)]
 pub struct RightArmJoints<T> {
     pub shoulder_pitch: T,
     pub shoulder_roll: T,
