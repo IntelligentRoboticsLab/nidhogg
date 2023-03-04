@@ -1,7 +1,10 @@
+#[cfg(feature = "lola")]
 use std::time::Duration;
 
+use nidhogg::backend::lola::LoLACommunicator;
 use nidhogg::types::{Color, LeftEye};
-use nidhogg::{Nao, Update};
+use nidhogg::NaoRobot;
+use nidhogg::Update;
 
 use color_eyre::Result;
 
@@ -9,7 +12,7 @@ fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
     color_eyre::install()?;
 
-    let mut nao = Nao::connect_retry(10, Duration::from_millis(500))?;
+    let mut nao = LoLACommunicator::connect_retry(10, Duration::from_millis(500))?;
 
     let state = nao.read_state()?;
     let hw_info = nao.read_hardware_info()?;
