@@ -3,6 +3,7 @@ use zmq_remote_api::{RemoteApiClient, RemoteApiClientParams};
 
 // todo: need to add references to all joints most likely, could maybe use `JointArray<Joint>` for this
 // todo: and then write values to each joint when writing update
+#[allow(missing_debug_implementations)]
 pub struct CopelliaBackend {
     #[allow(dead_code)]
     client: RemoteApiClient,

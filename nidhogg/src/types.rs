@@ -18,65 +18,6 @@ pub struct Vector3<T> {
     pub z: T,
 }
 
-/// High level representation of the LoLA state message.
-#[derive(Debug, Clone)]
-pub struct NaoState {
-    pub position: JointArray<f32>,
-    pub stiffness: JointArray<f32>,
-
-    // Inertial measurement unit
-    pub accelerometer: Vector3<f32>,
-    pub gyroscope: Vector3<f32>,
-    pub angles: Vector2<f32>,
-
-    pub sonar: SonarValues,
-    pub force_sensitive_resistors: ForceSensitiveResistors,
-    pub touch: Touch,
-    pub battery: Battery,
-    pub temperature: JointArray<f32>,
-    pub current: JointArray<f32>,
-    pub status: JointArray<i32>,
-}
-
-/// High level representation of the LoLA update message.
-#[derive(Builder, Clone, Debug)]
-pub struct NaoControlMsg {
-    pub position: JointArray<f32>,
-    pub stiffness: JointArray<f32>,
-    pub sonar: SonarEnabled,
-
-    // LEDs
-    pub left_ear: LeftEar,
-    pub right_ear: RightEar,
-    pub chest: Color,
-    pub left_eye: LeftEye,
-    pub right_eye: RightEye,
-    pub left_foot: Color,
-    pub right_foot: Color,
-    pub skull: Skull,
-}
-
-impl Default for NaoControlMsg {
-    fn default() -> Self {
-        Self {
-            position: Default::default(),
-            stiffness: Default::default(),
-            sonar: Sonar {
-                left: true,
-                right: true,
-            },
-            left_ear: Default::default(),
-            right_ear: Default::default(),
-            chest: Default::default(),
-            left_eye: Default::default(),
-            right_eye: Default::default(),
-            left_foot: Default::default(),
-            right_foot: Default::default(),
-            skull: Default::default(),
-        }
-    }
-}
-
 /// Struct representing the LEDs on top of the NAO robot's head.  
 ///
 /// Each value represents the intensity of a white LED.
@@ -207,15 +148,6 @@ pub struct RightEye {
     pub color_315_deg: Color,
 }
 
-/// Struct containing the hardware identifiers for the NAO V6 robot.
-#[derive(Debug)]
-pub struct HardwareInfo {
-    pub body_id: String,
-    pub body_version: String,
-    pub head_id: String,
-    pub head_version: String,
-}
-
 /// Struct containing values of type `T` for all the joints
 #[derive(Builder, Clone, Debug, Default)]
 pub struct JointArray<T> {
@@ -284,7 +216,7 @@ pub struct ForceSensitiveResistorFoot {
 ///
 /// ## ⚠️ Warning:
 /// You should construct the [`SonarValues`] and [`SonarEnabled`] types instead of using [`Sonar`] directly.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug)]
 pub struct Sonar<T> {
     pub left: T,
     pub right: T,
@@ -295,10 +227,28 @@ pub struct Sonar<T> {
 /// **Because this is a type alias, the fields aren't on this page**. To view them see [`Sonar`].
 pub type SonarValues = Sonar<f32>;
 
+impl Default for SonarValues {
+    fn default() -> Self {
+        Self {
+            left: f32::default(),
+            right: f32::default(),
+        }
+    }
+}
+
 /// Enabled state of the left and right sonar.
 ///
 /// **Because this is a type alias, the fields aren't on this page**. To view them see [`Sonar`].
 pub type SonarEnabled = Sonar<bool>;
+
+impl Default for SonarEnabled {
+    fn default() -> Self {
+        Self {
+            left: true,
+            right: true,
+        }
+    }
+}
 
 /// Struct containing the touch activiation value for each touch sensor on the robot.
 #[derive(Clone, Debug, Default)]

@@ -8,9 +8,9 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
     #[cfg(feature = "lola")]
     #[error("Could not connect to LoLA socket")]
-    #[diagnostic(help(
-        "Are you using `LoLABackend::connect_retry`? You might not always get a connection the first time!"
-    ))]
+    #[diagnostic(help("- Are you trying to connect to the simulation? This backend only supports real NAOs!
+- Are you running the code locally? Connecting with LoLA only works when ran from a NAO!
+- Are you using `LoLABackend::connect_with_retry` instead of `LoLABackend::connect`? You might not always get a connection the first time!"))]
     NoLoLAConnection(#[from] std::io::Error),
 
     #[cfg(feature = "lola")]
