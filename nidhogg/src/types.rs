@@ -1,4 +1,4 @@
-//! Types used to make interacting with the LoLA socket more convenient.
+//! Convenience types used to make interacting with the NAO more convenient.
 //!
 
 use nidhogg_derive::Builder;
@@ -20,7 +20,7 @@ pub struct Vector3<T> {
 
 /// High level representation of the LoLA state message.
 #[derive(Debug, Clone)]
-pub struct State {
+pub struct NaoState {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
 
@@ -40,7 +40,7 @@ pub struct State {
 
 /// High level representation of the LoLA update message.
 #[derive(Builder, Clone, Debug)]
-pub struct Update {
+pub struct NaoControlMsg {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
     pub sonar: SonarEnabled,
@@ -56,7 +56,7 @@ pub struct Update {
     pub skull: Skull,
 }
 
-impl Default for Update {
+impl Default for NaoControlMsg {
     fn default() -> Self {
         Self {
             position: Default::default(),
@@ -207,7 +207,7 @@ pub struct RightEye {
     pub color_315_deg: Color,
 }
 
-/// Struct containing the hardware identifiers for the NAO 6 robot.
+/// Struct containing the hardware identifiers for the NAO V6 robot.
 #[derive(Debug)]
 pub struct HardwareInfo {
     pub body_id: String,

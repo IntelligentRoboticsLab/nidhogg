@@ -1,14 +1,13 @@
-use color_eyre::Result;
+use miette::Result;
 use nidhogg::{
     types::{Color, JointArray, LeftEye, LeftLegJoints},
-    Update,
+    NaoControlMsg,
 };
 
 fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
-    color_eyre::install()?;
 
-    let crazy_update = Update::builder()
+    let crazy_update = NaoControlMsg::builder()
         .stiffness(
             JointArray::builder()
                 .head_pitch(0.25)

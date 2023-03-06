@@ -1,47 +1,31 @@
-//! Abstraction layer on top of the LoLA socket for RoboCup SPL NAO V6 robots.  
+//! Abstraction layer for interfacing with RoboCup SPL NAO V6 robots.  
 //!
-pub mod backend;
+pub mod backends;
 mod error;
-mod lola;
 pub mod types;
 
-use std::{
-    io::{BufWriter, Read},
-    os::unix::net::UnixStream,
-    thread,
-    time::Duration,
-};
-
-use lola::{RawState, RawUpdate};
-
 pub use error::{Error, Result};
-pub use types::{HardwareInfo, State, Update};
+pub use types::{HardwareInfo, NaoControlMsg, NaoState};
 
-pub trait NaoRobot {
-    // todo: don't think this is the way to go...
-    type Backend;
+/// Generic backend trait used for implementing your own NAO interface
+pub trait NaoBackend: Sized {
+    /// Connects to the Nao backend
+    fn connect() -> Result<Self>;
 
-    fn connect() -> Result<Self::Backend>;
+    /// Converts update to the format required by the backend and writes it to that backend.
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use nidhogg::{backends::LolaBackend, NaoBackend, Update};
+    ///
+    /// let mut nao = LolaBackend::connect().expect("Failed to connect to LoLA socket!");
+    ///
+    /// // create a new update
+    /// let update = Update::default();
+    /// nao.write_update(update).expect("Failed to write update to LoLA socket!");
+    /// ```
+    fn send_control_msg(&mut self, update: NaoControlMsg) -> Result<()>;
 
-    fn connect_retry(retry_count: usize, retry_interval: Duration) -> Result<Self::Backend> {
-        for i in 0..retry_count {
-            let try_number = i + 1;
-
-            match Self::connect() {
-                sock if sock.is_ok() => {
-                    return sock;
-                }
-                // return the last error if we didn't connect succesfully
-                Err(e) if try_number == retry_count => return Err(e),
-                _ => (),
-            }
-
-            thread::sleep(retry_interval);
-        }
-
-        unreachable!()
-    }
-
-    fn write_update(&mut self, update: Update) -> Result<()>;
-    fn read_state(&mut self) -> Result<State>;
+    /// Reads the current [`NaoState`] from the chosen backend
+    fn read_nao_state(&mut self) -> Result<NaoState>;
 }

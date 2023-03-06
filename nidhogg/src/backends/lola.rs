@@ -1,5 +1,72 @@
-use crate::types::*;
+//! LoLA backend that communicates through the socket at `/tmp/robocup`.  
+//!
+
+use crate::{types::*, Error, NaoBackend, Result};
+use std::{io::Read, mem, os::unix::net::UnixStream, thread, time};
+
+use rmp_serde::{encode, from_slice};
 use serde::{Deserialize, Serialize};
+use tracing::info;
+
+const ROBOCUP_SOCKET_PATH: &str = "/tmp/robocup";
+
+/// LoLA backend that communicates with a real NAO V6 through the socket at `/tmp/robocup`
+pub struct LolaBackend {
+    stream: UnixStream,
+    buffer: [u8; std::mem::size_of::<LolaNaoState>()],
+}
+
+impl NaoBackend for LolaBackend {
+    fn connect() -> Result<Self> {
+        let stream = UnixStream::connect(ROBOCUP_SOCKET_PATH).map_err(Error::NoLoLAConnection)?;
+
+        Ok(LolaBackend {
+            stream,
+            buffer: [0; mem::size_of::<LolaNaoState>()],
+        })
+    }
+
+    fn send_control_msg(&mut self, control_msg: NaoControlMsg) -> Result<()> {
+        let raw: LolaControlMsg = control_msg.into();
+
+        // convert to MessagePack and write to the socket
+        encode::write_named(&mut self.stream, &raw).map_err(Error::MsgPackEncodeError)
+    }
+
+    fn read_nao_state(&mut self) -> Result<NaoState> {
+        Ok(self.read_lola_nao_state()?.into())
+    }
+}
+
+impl LolaBackend {
+    /// Try to connect multiple times with an interval in between.
+    pub fn connect_retry(retry_count: usize, retry_interval: time::Duration) -> Result<Self> {
+        for i in 0..retry_count {
+            info!("[{}/{}] Connecting to LoLA socket", i + 1, retry_count);
+
+            let maybe_backend = Self::connect();
+
+            if maybe_backend.is_ok() || i + 1 == retry_count {
+                return maybe_backend;
+            }
+
+            thread::sleep(retry_interval);
+        }
+
+        unreachable!()
+    }
+
+    /// Reads the [`HardwareInfo`] of the NAO
+    pub fn read_hardware_info(&mut self) -> Result<HardwareInfo> {
+        Ok(self.read_lola_nao_state()?.into())
+    }
+
+    /// Read a [`LolaNaoState`] from the LoLA socket.
+    fn read_lola_nao_state(&mut self) -> Result<LolaNaoState> {
+        self.stream.read_exact(&mut self.buffer).unwrap();
+        Ok(from_slice::<LolaNaoState>(&self.buffer)?)
+    }
+}
 
 /// A trait that provides conversions from Nidhogg data to LoLA data
 ///
@@ -336,7 +403,7 @@ impl FromLoLA<[f32; 3]> for Vector3<f32> {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
-pub struct RawState<'a> {
+pub struct LolaNaoState<'a> {
     pub stiffness: [f32; 25],
     pub position: [f32; 25],
     pub temperature: [f32; 25],
@@ -353,8 +420,8 @@ pub struct RawState<'a> {
     pub robot_config: [&'a str; 4],
 }
 
-impl From<RawState<'_>> for State {
-    fn from(value: RawState) -> Self {
+impl From<LolaNaoState<'_>> for NaoState {
+    fn from(value: LolaNaoState) -> Self {
         Self {
             stiffness: value.stiffness.into_nidhogg(),
             position: value.position.into_nidhogg(),
@@ -372,8 +439,8 @@ impl From<RawState<'_>> for State {
     }
 }
 
-impl<'a> From<RawState<'a>> for HardwareInfo {
-    fn from(value: RawState<'a>) -> Self {
+impl<'a> From<LolaNaoState<'a>> for HardwareInfo {
+    fn from(value: LolaNaoState<'a>) -> Self {
         Self {
             body_id: value.robot_config[0].to_string(),
             body_version: value.robot_config[1].to_string(),
@@ -385,7 +452,7 @@ impl<'a> From<RawState<'a>> for HardwareInfo {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "PascalCase")]
-pub struct RawUpdate {
+pub struct LolaControlMsg {
     pub position: [f32; 25],
     pub stiffness: [f32; 25],
     pub r_ear: [f32; 10],
@@ -399,8 +466,8 @@ pub struct RawUpdate {
     pub sonar: [bool; 2],
 }
 
-impl From<Update> for RawUpdate {
-    fn from(value: Update) -> Self {
+impl From<NaoControlMsg> for LolaControlMsg {
+    fn from(value: NaoControlMsg) -> Self {
         Self {
             position: value.position.into_lola(),
             stiffness: value.stiffness.into_lola(),
