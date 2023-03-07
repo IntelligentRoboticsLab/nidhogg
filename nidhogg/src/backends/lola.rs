@@ -2,7 +2,11 @@
 //!
 
 use crate::{types::*, Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result};
-use std::{io::Read, os::unix::net::UnixStream, thread, time};
+use std::{
+    io::{BufWriter, Read},
+    os::unix::net::UnixStream,
+    thread, time,
+};
 
 use rmp_serde::{encode, from_slice};
 use serde::{Deserialize, Serialize};
@@ -15,7 +19,7 @@ const LOLA_BUFFER_SIZE: usize = 896;
 #[derive(Debug)]
 pub struct LolaBackend {
     stream: UnixStream,
-    buffer: [u8; LOLA_BUFFER_SIZE],
+    read_buffer: [u8; LOLA_BUFFER_SIZE],
 }
 
 impl NaoBackend for LolaBackend {
@@ -33,7 +37,7 @@ impl NaoBackend for LolaBackend {
 
         Ok(LolaBackend {
             stream,
-            buffer: [0; LOLA_BUFFER_SIZE],
+            read_buffer: [0; LOLA_BUFFER_SIZE],
         })
     }
 
@@ -53,9 +57,9 @@ impl NaoBackend for LolaBackend {
     /// ```
     fn send_control_msg(&mut self, control_msg: NaoControlMessage) -> Result<()> {
         let raw: LolaControlMsg = control_msg.into();
-
         // convert to MessagePack and write to the socket
-        encode::write_named(&mut self.stream, &raw).map_err(Error::MsgPackEncodeError)
+        let mut buf = BufWriter::new(&mut self.stream);
+        encode::write_named(&mut buf, &raw).map_err(Error::MsgPackEncodeError)
     }
 
     /// Reads the current sensor data from the chosen backend
@@ -121,8 +125,8 @@ impl LolaBackend {
 
     /// Read a [`LolaNaoState`] from the LoLA socket.
     fn read_lola_nao_state(&mut self) -> Result<LolaNaoState<'_>> {
-        self.stream.read_exact(&mut self.buffer).unwrap();
-        from_slice::<LolaNaoState<'_>>(&self.buffer).map_err(Error::MsgPackDecodeError)
+        self.stream.read_exact(&mut self.read_buffer).unwrap();
+        from_slice::<LolaNaoState<'_>>(&self.read_buffer).map_err(Error::MsgPackDecodeError)
     }
 }
 
