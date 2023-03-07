@@ -18,7 +18,10 @@ impl NaoBackend for CopelliaBackend {
         Ok(CopelliaBackend { client })
     }
 
-    fn send_control_msg(&mut self, #[allow(unused_variables)] update: NaoControlMessage) -> Result<()> {
+    fn send_control_msg(
+        &mut self,
+        #[allow(unused_variables)] update: NaoControlMessage,
+    ) -> Result<()> {
         todo!("implement writing to coppelia")
     }
 
