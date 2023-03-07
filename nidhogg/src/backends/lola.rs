@@ -93,7 +93,7 @@ impl LolaBackend {
 
             let maybe_backend = Self::connect();
 
-            // We connected or this is the last try
+            // We connected or this was the last try
             if maybe_backend.is_ok() || i == retry_count {
                 return maybe_backend;
             }
