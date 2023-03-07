@@ -13,7 +13,7 @@ impl NaoBackend for CoppeliaBackend {
             host: "localhost".to_string(),
             ..RemoteApiClientParams::default()
         })
-        .map_err(|e| Error::CoppelliaConnectError(e.show()))?;
+        .map_err(|e| Error::CoppeliaConnectError(e.show()))?;
 
         Ok(CoppeliaBackend { client })
     }
