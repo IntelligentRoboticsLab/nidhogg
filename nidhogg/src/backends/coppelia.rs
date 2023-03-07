@@ -2,12 +2,12 @@ use crate::{Error, NaoBackend, NaoControlMessage, NaoState, Result};
 use zmq_remote_api::{RemoteApiClient, RemoteApiClientParams};
 
 #[allow(missing_debug_implementations)]
-pub struct CopelliaBackend {
+pub struct CoppeliaBackend {
     #[allow(dead_code)]
     client: RemoteApiClient,
 }
 
-impl NaoBackend for CopelliaBackend {
+impl NaoBackend for CoppeliaBackend {
     fn connect() -> Result<Self> {
         let client = RemoteApiClient::new(RemoteApiClientParams {
             host: "localhost".to_string(),
@@ -15,7 +15,7 @@ impl NaoBackend for CopelliaBackend {
         })
         .map_err(|e| Error::CoppelliaConnectError(e.show()))?;
 
-        Ok(CopelliaBackend { client })
+        Ok(CoppeliaBackend { client })
     }
 
     fn send_control_msg(

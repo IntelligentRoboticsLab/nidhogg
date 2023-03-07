@@ -49,7 +49,7 @@ fn builder_struct(
     generics: &Generics,
     field_data: &ParsedFieldData,
 ) -> TokenStream {
-    let docs = format!("Builder struct for [`{}`]\n", ident);
+    let docs = format!("Builder struct for [`{ident}`]\n");
     let data_name = &field_data.field_names;
     let data_type = &field_data.field_types;
     quote!(
@@ -94,9 +94,10 @@ fn impl_builder_fn(ident: &Ident, builder_name: &Ident, generics: &Generics) -> 
     let generic_type_params = generic_type_params_with_default(generics);
     let generics_no_type_bounds = generic_types(generics);
 
-    let builder_type = match generics.gt_token {
-        Some(_) => quote! { #builder_name::<#(#generics_no_type_bounds),*> },
-        None => quote! { #builder_name },
+    let builder_type = if generics.gt_token.is_some() {
+        quote! { #builder_name::<#(#generics_no_type_bounds),*> }
+    } else {
+        quote! { #builder_name }
     };
 
     quote! {
@@ -109,7 +110,7 @@ fn impl_builder_fn(ident: &Ident, builder_name: &Ident, generics: &Generics) -> 
 }
 
 fn generic_types(generics: &Generics) -> Vec<Ident> {
-    generics.type_params().map(|x| x.ident.to_owned()).collect()
+    generics.type_params().map(|x| x.ident.clone()).collect()
 }
 
 fn generic_type_params_with_default(generics: &Generics) -> Vec<TokenStream> {

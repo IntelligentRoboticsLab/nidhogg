@@ -5,7 +5,7 @@
 mod coppelia;
 
 #[cfg(feature = "coppelia")]
-pub use coppelia::CopelliaBackend;
+pub use coppelia::CoppeliaBackend;
 
 #[cfg(feature = "lola")]
 mod lola;
