@@ -2,16 +2,17 @@
 //!
 
 use nidhogg_derive::Builder;
+use serde::Serialize;
 
 /// Struct containing two values of type `T`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Vector2<T> {
     pub x: T,
     pub y: T,
 }
 
 /// Struct containing three values of type `T`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Vector3<T> {
     pub x: T,
     pub y: T,
@@ -149,7 +150,7 @@ pub struct RightEye {
 }
 
 /// Struct containing values of type `T` for all the joints
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Serialize, Builder, Clone, Debug, Default)]
 pub struct JointArray<T> {
     pub head_yaw: T,
     pub head_pitch: T,
@@ -184,7 +185,7 @@ pub struct JointArray<T> {
 }
 
 /// Struct representing the battery status of the robot.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Serialize)]
 pub struct Battery {
     /// The battery percentage
     pub charge: f32,
@@ -197,14 +198,14 @@ pub struct Battery {
 }
 
 /// Struct containing the [`ForceSensitiveResistorFoot`] value for each foot.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Serialize)]
 pub struct ForceSensitiveResistors {
     pub left_foot: ForceSensitiveResistorFoot,
     pub right_foot: ForceSensitiveResistorFoot,
 }
 
 /// Struct representing the force sensitive resistors in one of the feet.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Serialize)]
 pub struct ForceSensitiveResistorFoot {
     pub front_left: f32,
     pub front_right: f32,
@@ -215,7 +216,7 @@ pub struct ForceSensitiveResistorFoot {
 /// Values read by the left and right sonar.
 ///
 /// **Because this is a type alias, the fields aren't on this page**. To view them see [`Sonar`].
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Serialize)]
 pub struct SonarValues {
     pub left: f32,
     pub right: f32,
@@ -240,7 +241,7 @@ impl Default for SonarEnabled {
 }
 
 /// Struct containing the touch activiation value for each touch sensor on the robot.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Serialize)]
 pub struct Touch {
     pub chest_board: f32,
     pub head_front: f32,

@@ -40,6 +40,7 @@ pub mod types;
 
 pub use error::*;
 use nidhogg_derive::Builder;
+use serde::Serialize;
 use types::{
     Battery, Color, ForceSensitiveResistors, JointArray, LeftEar, LeftEye, RightEar, RightEye,
     Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
@@ -89,7 +90,7 @@ pub trait NaoBackend: Sized {
 }
 
 /// High level representation of the LoLA state message.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct NaoState {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
