@@ -1,8 +1,6 @@
 use crate::{NaoBackend, NaoControlMsg, NaoState, Result};
 use zmq_remote_api::{RemoteApiClient, RemoteApiClientParams};
 
-// todo: need to add references to all joints most likely, could maybe use `JointArray<Joint>` for this
-// todo: and then write values to each joint when writing update
 #[allow(missing_debug_implementations)]
 pub struct CopelliaBackend {
     #[allow(dead_code)]
@@ -15,10 +13,9 @@ impl NaoBackend for CopelliaBackend {
             host: "localhost".to_string(),
             ..RemoteApiClientParams::default()
         })
-        // XXX: probably want to fork this project so we can get rid of this atrocity.
         .map_err(|e| crate::error::Error::CoppelliaConnectError(e.show()))?;
 
-        Ok(CopelliaBackend { client: client })
+        Ok(CopelliaBackend { client })
     }
 
     fn send_control_msg(&mut self, #[allow(unused_variables)] update: NaoControlMsg) -> Result<()> {

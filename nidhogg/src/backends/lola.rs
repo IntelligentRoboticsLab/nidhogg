@@ -405,15 +405,28 @@ impl FromLoLA<[f32; 4]> for ForceSensitiveResistorFoot {
     }
 }
 
-impl<T> FromLoLA<[T; 2]> for Sonar<T> {
-    fn from_lola(value: [T; 2]) -> Self {
+impl FromLoLA<[f32; 2]> for SonarValues {
+    fn from_lola(value: [f32; 2]) -> Self {
         let [left, right] = value;
-        Sonar { left, right }
+        SonarValues { left, right }
     }
 }
 
-impl<T> FromNidhogg<Sonar<T>> for [T; 2] {
-    fn from_nidhogg(value: Sonar<T>) -> Self {
+impl FromNidhogg<SonarValues> for [f32; 2] {
+    fn from_nidhogg(value: SonarValues) -> Self {
+        [value.left, value.right]
+    }
+}
+
+impl FromLoLA<[bool; 2]> for SonarEnabled {
+    fn from_lola(value: [bool; 2]) -> Self {
+        let [left, right] = value;
+        SonarEnabled { left, right }
+    }
+}
+
+impl FromNidhogg<SonarEnabled> for [bool; 2] {
+    fn from_nidhogg(value: SonarEnabled) -> Self {
         [value.left, value.right]
     }
 }

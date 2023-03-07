@@ -212,34 +212,23 @@ pub struct ForceSensitiveResistorFoot {
     pub rear_right: f32,
 }
 
-/// Struct containing values of type `T` for the left and the right sonar.
-///
-/// ## ⚠️ Warning:
-/// You should construct the [`SonarValues`] and [`SonarEnabled`] types instead of using [`Sonar`] directly.
-#[derive(Builder, Clone, Debug)]
-pub struct Sonar<T> {
-    pub left: T,
-    pub right: T,
-}
-
 /// Values read by the left and right sonar.
 ///
 /// **Because this is a type alias, the fields aren't on this page**. To view them see [`Sonar`].
-pub type SonarValues = Sonar<f32>;
-
-impl Default for SonarValues {
-    fn default() -> Self {
-        Self {
-            left: f32::default(),
-            right: f32::default(),
-        }
-    }
+#[derive(Builder, Clone, Debug, Default)]
+pub struct SonarValues {
+    pub left: f32,
+    pub right: f32,
 }
 
 /// Enabled state of the left and right sonar.
 ///
 /// **Because this is a type alias, the fields aren't on this page**. To view them see [`Sonar`].
-pub type SonarEnabled = Sonar<bool>;
+#[derive(Builder, Clone, Debug)]
+pub struct SonarEnabled {
+    pub left: bool,
+    pub right: bool,
+}
 
 impl Default for SonarEnabled {
     fn default() -> Self {
