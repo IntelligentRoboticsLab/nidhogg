@@ -1,7 +1,7 @@
 //! LoLA backend that communicates through the socket at `/tmp/robocup`.  
 //!
 
-use crate::{types::*, Error, HardwareInfo, NaoBackend, NaoControlMsg, NaoState, Result};
+use crate::{types::*, Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result};
 use std::{io::Read, mem, os::unix::net::UnixStream, thread, time};
 
 use rmp_serde::{encode, from_slice};
@@ -40,17 +40,17 @@ impl NaoBackend for LolaBackend {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, NaoControlMsg, backends::LolaBackend, types::Color};
+    /// use nidhogg::{NaoBackend, NaoControlMessage, backends::LolaBackend, types::Color};
     ///
     /// let mut nao = LolaBackend::connect().unwrap();
     ///
     /// // First, create a new control message where we set the chest color
-    /// let msg = NaoControlMsg::builder().chest(Color::new(0.8, 0.2, 0.5)).build();
+    /// let msg = NaoControlMessage::builder().chest(Color::new(0.8, 0.2, 0.5)).build();
     ///
     /// // Now we send it to the NAO!
     /// nao.send_control_msg(msg).expect("Failed to write control message to backend!");
     /// ```
-    fn send_control_msg(&mut self, control_msg: NaoControlMsg) -> Result<()> {
+    fn send_control_msg(&mut self, control_msg: NaoControlMessage) -> Result<()> {
         let raw: LolaControlMsg = control_msg.into();
 
         // convert to MessagePack and write to the socket
@@ -536,8 +536,8 @@ struct LolaControlMsg {
     sonar: [bool; 2],
 }
 
-impl From<NaoControlMsg> for LolaControlMsg {
-    fn from(value: NaoControlMsg) -> Self {
+impl From<NaoControlMessage> for LolaControlMsg {
+    fn from(value: NaoControlMessage) -> Self {
         Self {
             position: value.position.into_lola(),
             stiffness: value.stiffness.into_lola(),

@@ -63,17 +63,17 @@ pub trait NaoBackend: Sized {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, NaoControlMsg, backends::LolaBackend, types::Color};
+    /// use nidhogg::{NaoBackend, NaoControlMessage, backends::LolaBackend, types::Color};
     ///
     /// let mut nao = LolaBackend::connect().unwrap();
     ///
     /// // First, create a new control message where we set the chest color
-    /// let msg = NaoControlMsg::builder().chest(Color::new(0.8, 0.2, 0.5)).build();
+    /// let msg = NaoControlMessage::builder().chest(Color::new(0.8, 0.2, 0.5)).build();
     ///
     /// // Now we send it to the NAO!
     /// nao.send_control_msg(msg).expect("Failed to write control message to backend!");
     /// ```
-    fn send_control_msg(&mut self, update: NaoControlMsg) -> Result<()>;
+    fn send_control_msg(&mut self, update: NaoControlMessage) -> Result<()>;
 
     /// Reads the current sensor data from the chosen backend
     ///
@@ -110,7 +110,7 @@ pub struct NaoState {
 
 /// High level representation of the LoLA update message.
 #[derive(Builder, Clone, Debug, Default)]
-pub struct NaoControlMsg {
+pub struct NaoControlMessage {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
     pub sonar: SonarEnabled,

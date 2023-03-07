@@ -3,7 +3,7 @@ use std::time::Duration;
 use nidhogg::{
     backends::LolaBackend,
     types::{Color, LeftEye},
-    NaoBackend, NaoControlMsg,
+    NaoBackend, NaoControlMessage,
 };
 
 use miette::Result;
@@ -19,7 +19,7 @@ fn main() -> Result<()> {
     println!("{hw_info:?}");
     println!("{state:?}");
 
-    let update = NaoControlMsg::builder()
+    let update = NaoControlMessage::builder()
         .left_eye(
             LeftEye::builder()
                 .color_0_deg(Color::builder().red(1.0).green(1.0).build())

@@ -1,4 +1,4 @@
-use crate::{NaoBackend, NaoControlMsg, NaoState, Result};
+use crate::{NaoBackend, NaoControlMessage, NaoState, Result};
 use zmq_remote_api::{RemoteApiClient, RemoteApiClientParams};
 
 #[allow(missing_debug_implementations)]
@@ -18,7 +18,7 @@ impl NaoBackend for CopelliaBackend {
         Ok(CopelliaBackend { client })
     }
 
-    fn send_control_msg(&mut self, #[allow(unused_variables)] update: NaoControlMsg) -> Result<()> {
+    fn send_control_msg(&mut self, #[allow(unused_variables)] update: NaoControlMessage) -> Result<()> {
         todo!("implement writing to coppelia")
     }
 
