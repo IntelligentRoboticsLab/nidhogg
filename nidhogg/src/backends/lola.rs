@@ -17,10 +17,7 @@ const LOLA_BUFFER_SIZE: usize = 896;
 
 /// LoLA backend that communicates with a real NAO V6 through the socket at `/tmp/robocup`
 #[derive(Debug)]
-pub struct LolaBackend {
-    stream: UnixStream,
-    read_buffer: [u8; LOLA_BUFFER_SIZE],
-}
+pub struct LolaBackend(UnixStream);
 
 impl NaoBackend for LolaBackend {
     /// Connects to a NAO backend
@@ -35,10 +32,7 @@ impl NaoBackend for LolaBackend {
     fn connect() -> Result<Self> {
         let stream = UnixStream::connect(ROBOCUP_SOCKET_PATH).map_err(Error::NoLoLAConnection)?;
 
-        Ok(LolaBackend {
-            stream,
-            read_buffer: [0; LOLA_BUFFER_SIZE],
-        })
+        Ok(LolaBackend(stream))
     }
 
     /// Converts a control message to the format required by the backend and writes it to that backend.
@@ -57,8 +51,9 @@ impl NaoBackend for LolaBackend {
     /// ```
     fn send_control_msg(&mut self, control_msg: NaoControlMessage) -> Result<()> {
         let raw: LolaControlMsg = control_msg.into();
-        // convert to MessagePack and write to the socket
-        let mut buf = BufWriter::new(&mut self.stream);
+
+        // convert to MessagePack and write to the socket in a buffer
+        let mut buf = BufWriter::new(&mut self.0);
         encode::write_named(&mut buf, &raw).map_err(Error::MsgPackEncodeError)
     }
 
@@ -74,7 +69,9 @@ impl NaoBackend for LolaBackend {
     /// let state = nao.read_nao_state().expect("Failed to retrieve sensor data!");
     /// ```
     fn read_nao_state(&mut self) -> Result<NaoState> {
-        Ok(self.read_lola_nao_state()?.into())
+        let mut buf = [0; LOLA_BUFFER_SIZE];
+
+        Ok(self.read_lola_nao_state(&mut buf)?.into())
     }
 }
 
@@ -86,17 +83,18 @@ impl LolaBackend {
     /// use nidhogg::{NaoBackend, backends::LolaBackend};
     /// use std::time::Duration;
     ///
-    /// // Try to connect 10 times, with a 1 second interval
+    /// // Try to connect, potentially retrying 10 times, with a 1 second interval
     /// let mut nao = LolaBackend::connect_with_retry(10, Duration::from_secs(1))
     ///     .expect("Could not connect to the NAO! 😪");
     /// ```
     pub fn connect_with_retry(retry_count: u32, retry_interval: time::Duration) -> Result<Self> {
-        for i in 0..retry_count {
-            info!("[{}/{}] Connecting to LoLA socket", i + 1, retry_count);
+        for i in 0..=retry_count {
+            info!("[{}/{}] Connecting to LoLA socket", i + 1, retry_count + 1);
 
             let maybe_backend = Self::connect();
 
-            if maybe_backend.is_ok() || i + 1 == retry_count {
+            // We connected or this is the last try
+            if maybe_backend.is_ok() || i == retry_count {
                 return maybe_backend;
             }
 
@@ -119,14 +117,19 @@ impl LolaBackend {
     ///
     /// nao.read_hardware_info().expect("Failed to get hardware info!");
     /// ```
-    pub fn read_hardware_info(&mut self) -> Result<HardwareInfo<'_>> {
-        self.read_lola_nao_state().map(LolaNaoState::into)
+    pub fn read_hardware_info(&mut self) -> Result<HardwareInfo> {
+        let mut buf = [0; LOLA_BUFFER_SIZE];
+
+        self.read_lola_nao_state(&mut buf).map(LolaNaoState::into)
     }
 
     /// Read a [`LolaNaoState`] from the LoLA socket.
-    fn read_lola_nao_state(&mut self) -> Result<LolaNaoState<'_>> {
-        self.stream.read_exact(&mut self.read_buffer).unwrap();
-        from_slice::<LolaNaoState<'_>>(&self.read_buffer).map_err(Error::MsgPackDecodeError)
+    fn read_lola_nao_state<'a>(
+        &mut self,
+        buf: &'a mut [u8; LOLA_BUFFER_SIZE],
+    ) -> Result<LolaNaoState<'a>> {
+        self.0.read_exact(buf).unwrap();
+        from_slice::<LolaNaoState<'_>>(buf).map_err(Error::MsgPackDecodeError)
     }
 }
 
@@ -514,13 +517,13 @@ impl From<LolaNaoState<'_>> for NaoState {
     }
 }
 
-impl<'a> From<LolaNaoState<'a>> for HardwareInfo<'a> {
-    fn from(value: LolaNaoState<'a>) -> Self {
+impl From<LolaNaoState<'_>> for HardwareInfo {
+    fn from(value: LolaNaoState<'_>) -> Self {
         Self {
-            body_id: value.robot_config[0],
-            body_version: value.robot_config[1],
-            head_id: value.robot_config[2],
-            head_version: value.robot_config[3],
+            body_id: value.robot_config[0].to_string(),
+            body_version: value.robot_config[1].to_string(),
+            head_id: value.robot_config[2].to_string(),
+            head_version: value.robot_config[3].to_string(),
         }
     }
 }
