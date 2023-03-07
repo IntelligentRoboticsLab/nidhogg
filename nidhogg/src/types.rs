@@ -213,18 +213,14 @@ pub struct ForceSensitiveResistorFoot {
     pub rear_right: f32,
 }
 
-/// Values read by the left and right sonar.
-///
-/// **Because this is a type alias, the fields aren't on this page**. To view them see [`Sonar`].
+/// Values read by the left and right sonar sensor.
 #[derive(Builder, Clone, Debug, Default, Serialize)]
 pub struct SonarValues {
     pub left: f32,
     pub right: f32,
 }
 
-/// Enabled state of the left and right sonar.
-///
-/// **Because this is a type alias, the fields aren't on this page**. To view them see [`Sonar`].
+/// Enabled state of the left and right sonar sensor.
 #[derive(Builder, Clone, Debug)]
 pub struct SonarEnabled {
     pub left: bool,
