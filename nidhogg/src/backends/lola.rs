@@ -2,19 +2,20 @@
 //!
 
 use crate::{types::*, Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result};
-use std::{io::Read, mem, os::unix::net::UnixStream, thread, time};
+use std::{io::Read, os::unix::net::UnixStream, thread, time};
 
 use rmp_serde::{encode, from_slice};
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
 const ROBOCUP_SOCKET_PATH: &str = "/tmp/robocup";
+const LOLA_BUFFER_SIZE: usize = 896;
 
 /// LoLA backend that communicates with a real NAO V6 through the socket at `/tmp/robocup`
 #[derive(Debug)]
 pub struct LolaBackend {
     stream: UnixStream,
-    buffer: [u8; std::mem::size_of::<LolaNaoState<'_>>()],
+    buffer: [u8; LOLA_BUFFER_SIZE],
 }
 
 impl NaoBackend for LolaBackend {
@@ -32,7 +33,7 @@ impl NaoBackend for LolaBackend {
 
         Ok(LolaBackend {
             stream,
-            buffer: [0; mem::size_of::<LolaNaoState<'_>>()],
+            buffer: [0; LOLA_BUFFER_SIZE],
         })
     }
 
