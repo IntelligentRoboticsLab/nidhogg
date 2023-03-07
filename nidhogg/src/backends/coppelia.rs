@@ -1,4 +1,4 @@
-use crate::{NaoBackend, NaoControlMessage, NaoState, Result};
+use crate::{Error, NaoBackend, NaoControlMessage, NaoState, Result};
 use zmq_remote_api::{RemoteApiClient, RemoteApiClientParams};
 
 #[allow(missing_debug_implementations)]
@@ -13,7 +13,7 @@ impl NaoBackend for CopelliaBackend {
             host: "localhost".to_string(),
             ..RemoteApiClientParams::default()
         })
-        .map_err(|e| crate::error::Error::CoppelliaConnectError(e.show()))?;
+        .map_err(|e| Error::CoppelliaConnectError(e.show()))?;
 
         Ok(CopelliaBackend { client })
     }
