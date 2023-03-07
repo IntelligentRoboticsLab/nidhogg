@@ -25,5 +25,5 @@ pub enum Error {
     // todo: transparant
     #[cfg(feature = "coppelia")]
     #[error("Failed to connect to Coppelia simulator!")]
-    CoppelliaConnectError(String),
+    CoppeliaConnectError(String),
 }
