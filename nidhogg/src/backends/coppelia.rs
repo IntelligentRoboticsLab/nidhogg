@@ -103,16 +103,23 @@ impl NaoBackend for CoppeliaBackend {
 
 impl CoppeliaBackend {
     fn set_joint_position(&self, joint_handle: i64, target_position: f32) -> Result<()> {
-        // TODO: add proper error mapping
-        self.sim.set_joint_target_position(joint_handle, target_position as f64, None).unwrap();
+        self.sim
+            .set_joint_target_position(joint_handle, target_position as f64, None)
+            .map_err(|e| Error::CoppeliaSetValueError(e.show()))
+    }
+
+    fn set_joint_stiffness(&self, joint_handle: i64, target_stiffness: f32) -> Result<()> {
+        // TODO: apply error mapping in the same way as `set_joint_position`
+        self.sim.set_joint_target_force(joint_handle, target_stiffness as f64, None).unwrap();
 
         Ok(())
     }
 
-    #[allow(dead_code)] // we doen nu niks hiermee dus we suppressen ff de error
-    fn set_joint_stiffness(&self, joint_handle: i64, target_stiffness: f32) -> Result<()> {
-        // TODO: add proper error mapping
-        self.sim.set_joint_target_force(joint_handle, target_stiffness as f64, None).unwrap();
+    // TODO: make a function for getting the object
+    fn get_object(&self, path: impl Into<String>) -> Result<()> {
+        let path: String = path.into();
+        // TODO: also needs the error mapping (you can use Error::CoppeliaGetObjectError)
+        
 
         Ok(())
     }

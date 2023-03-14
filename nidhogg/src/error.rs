@@ -29,4 +29,8 @@ pub enum Error {
     #[cfg(feature = "coppelia")]
     #[error("Failed to get object from Coppelia!")]
     CoppeliaGetObjectError(String),
+
+    #[cfg(feature = "coppelia")]
+    #[error("Failed to set value in Coppelia!")]
+    CoppeliaSetValueError(String),
 }
