@@ -92,6 +92,33 @@ impl NaoBackend for CoppeliaBackend {
         self.set_joint_position(self.joint_handles.right_ankle_pitch, update.position.right_ankle_pitch)?;
         self.set_joint_position(self.joint_handles.right_ankle_roll, update.position.right_ankle_roll)?;
 
+        self.set_joint_stiffness(self.joint_handles.head_pitch, update.stiffness.head_pitch)?;
+        self.set_joint_stiffness(self.joint_handles.head_yaw, update.stiffness.head_yaw)?;
+
+        self.set_joint_stiffness(self.joint_handles.left_shoulder_pitch, update.stiffness.left_shoulder_pitch)?;
+        self.set_joint_stiffness(self.joint_handles.left_shoulder_roll, update.stiffness.left_shoulder_roll)?;
+        self.set_joint_stiffness(self.joint_handles.left_elbow_yaw, update.stiffness.left_elbow_yaw)?;
+        self.set_joint_stiffness(self.joint_handles.left_elbow_roll, update.stiffness.left_elbow_roll)?;
+        self.set_joint_stiffness(self.joint_handles.left_wrist_yaw, update.stiffness.left_wrist_yaw)?;
+        self.set_joint_stiffness(self.joint_handles.left_hip_yaw_pitch, update.stiffness.left_hip_yaw_pitch)?;
+        self.set_joint_stiffness(self.joint_handles.left_hip_roll, update.stiffness.left_hip_roll)?;
+        self.set_joint_stiffness(self.joint_handles.left_hip_pitch, update.stiffness.left_hip_pitch)?;
+        self.set_joint_stiffness(self.joint_handles.left_knee_pitch, update.stiffness.left_knee_pitch)?;
+        self.set_joint_stiffness(self.joint_handles.left_ankle_pitch, update.stiffness.left_ankle_pitch)?;
+        self.set_joint_stiffness(self.joint_handles.left_ankle_roll, update.stiffness.left_ankle_roll)?;
+
+        self.set_joint_stiffness(self.joint_handles.right_shoulder_pitch, update.stiffness.right_shoulder_pitch)?;
+        self.set_joint_stiffness(self.joint_handles.right_shoulder_roll, update.stiffness.right_shoulder_roll)?;
+        self.set_joint_stiffness(self.joint_handles.right_elbow_yaw, update.stiffness.right_elbow_yaw)?;
+        self.set_joint_stiffness(self.joint_handles.right_elbow_roll, update.stiffness.right_elbow_roll)?;
+        self.set_joint_stiffness(self.joint_handles.right_wrist_yaw, update.stiffness.right_wrist_yaw)?;
+        // self.set_joint_stiffness(self.joint_handles.right_hip_yaw_pitch, update.stiffness.left_hip_yaw_pitch)?;
+        self.set_joint_stiffness(self.joint_handles.right_hip_roll, update.stiffness.right_hip_roll)?;
+        self.set_joint_stiffness(self.joint_handles.right_hip_pitch, update.stiffness.right_hip_pitch)?;
+        self.set_joint_stiffness(self.joint_handles.right_knee_pitch, update.stiffness.right_knee_pitch)?;
+        self.set_joint_stiffness(self.joint_handles.right_ankle_pitch, update.stiffness.right_ankle_pitch)?;
+        self.set_joint_stiffness(self.joint_handles.right_ankle_roll, update.stiffness.right_ankle_roll)?;
+
         self.client.to_owned().step(true).unwrap();
         Ok(())
     }
@@ -109,17 +136,16 @@ impl CoppeliaBackend {
     }
 
     fn set_joint_stiffness(&self, joint_handle: i64, target_stiffness: f32) -> Result<()> {
-        // TODO: apply error mapping in the same way as `set_joint_position`
-        self.sim.set_joint_target_force(joint_handle, target_stiffness as f64, None).unwrap();
-
-        Ok(())
+        self.sim
+            .set_joint_target_force(joint_handle, target_stiffness as f64, None)
+            .map_err(| e | Error::CoppeliaSetValueError(e.show()))
     }
 
     // TODO: make a function for getting the object
     fn get_object(&self, path: impl Into<String>) -> Result<()> {
         let path: String = path.into();
         // TODO: also needs the error mapping (you can use Error::CoppeliaGetObjectError)
-        
+
 
         Ok(())
     }
