@@ -1,12 +1,12 @@
 use crate::{types::JointArray, Error, NaoBackend, NaoControlMessage, NaoState, Result};
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 use zmq_remote_api::{sim::Sim, RemoteApiClient, RemoteApiClientParams};
 
 #[allow(missing_debug_implementations)]
 pub struct CoppeliaBackend {
     #[allow(dead_code)]
-    client: Rc<RemoteApiClient>,
-    sim: Sim,
+    // client: Arc<RemoteApiClient>,
+    sim: Arc<Sim>,
     joint_handles: JointArray<i64>, //Option?
 }
 
@@ -19,17 +19,12 @@ impl NaoBackend for CoppeliaBackend {
             })
             .map_err(|e| Error::CoppeliaConnectError(e.show()))?,
         );
-
-        let sim = Sim::new(client.clone());
+        let sim = Arc::new(Sim::new(client.clone()));
         let joint_handles = get_joint_handles(&sim)?;
         client.to_owned().set_stepping(false).unwrap();
         sim.start_simulation().unwrap();
         // let joint_handles = get_joint_handles(&sim);
-        Ok(CoppeliaBackend {
-            client,
-            sim,
-            joint_handles,
-        })
+        Ok(CoppeliaBackend { sim, joint_handles })
     }
 
     fn send_control_msg(&mut self, update: NaoControlMessage) -> Result<()> {
