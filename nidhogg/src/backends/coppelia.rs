@@ -22,7 +22,7 @@ impl NaoBackend for CoppeliaBackend {
 
         let sim = Sim::new(client.clone());
         let joint_handles = get_joint_handles(&sim)?;
-        client.to_owned().set_stepping(true).unwrap();
+        client.to_owned().set_stepping(false).unwrap();
         sim.start_simulation().unwrap();
         // let joint_handles = get_joint_handles(&sim);
         Ok(CoppeliaBackend {
@@ -212,8 +212,6 @@ impl NaoBackend for CoppeliaBackend {
             self.joint_handles.right_ankle_roll,
             update.stiffness.right_ankle_roll,
         )?;
-
-        self.client.to_owned().step(false).unwrap();
         Ok(())
     }
 

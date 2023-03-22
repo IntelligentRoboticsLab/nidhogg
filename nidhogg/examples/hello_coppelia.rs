@@ -46,6 +46,6 @@ fn main() -> Result<()> {
 
     loop {
         nao.send_control_msg(update.clone())?;
-        std::thread::sleep(Duration::from_millis(300));
+        println!("sent message");
     }
 }
