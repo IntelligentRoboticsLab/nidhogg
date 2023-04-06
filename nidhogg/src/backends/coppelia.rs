@@ -4,9 +4,7 @@ use zmq_remote_api::{sim::Sim, RemoteApiClient, RemoteApiClientParams};
 
 #[allow(missing_debug_implementations)]
 pub struct CoppeliaBackend {
-    #[allow(dead_code)]
-    // client: Arc<RemoteApiClient>,
-    sim: Sim,
+    sim: Arc<Sim>,
     joint_handles: JointArray<i64>, //Option?
 }
 
@@ -19,7 +17,7 @@ impl NaoBackend for CoppeliaBackend {
             })
             .map_err(|e| Error::CoppeliaConnectError(e.show()))?,
         );
-        let sim = Sim::new(client.clone());
+        let sim =  Arc::new(Sim::new(client.clone()));
         let joint_handles = get_joint_handles(&sim)?;
         client.to_owned().set_stepping(false).unwrap();
         sim.start_simulation().unwrap();
