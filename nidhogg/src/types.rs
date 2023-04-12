@@ -282,6 +282,13 @@ pub struct RightLegJoints<T> {
     pub ankle_roll: T,
 }
 
+/// Wrapper struct containing joint values for both legs of the robot.
+#[derive(Builder, Clone, Debug, Default)]
+pub struct LegJoints<T> {
+    pub left_leg: LeftLegJoints<T>,
+    pub right_leg: RightLegJoints<T>,
+}
+
 #[derive(Builder, Clone, Debug, Default)]
 pub struct LeftArmJoints<T> {
     pub shoulder_pitch: T,
@@ -325,6 +332,22 @@ impl<T> JointArrayBuilder<T> {
         self.right_knee_pitch = Some(joints.knee_pitch);
         self.right_ankle_pitch = Some(joints.ankle_pitch);
         self.right_ankle_roll = Some(joints.ankle_roll);
+        self
+    }
+
+    /// Set the [`LegJoints`] in this [`JointArray`].
+    pub fn leg_joints(mut self, joints: LegJoints<T>) -> Self {
+        self.left_hip_yaw_pitch = Some(joints.left_leg.hip_yaw_pitch);
+        self.left_hip_roll = Some(joints.left_leg.hip_roll);
+        self.left_hip_pitch = Some(joints.left_leg.hip_pitch);
+        self.left_knee_pitch = Some(joints.left_leg.knee_pitch);
+        self.left_ankle_pitch = Some(joints.left_leg.ankle_pitch);
+        self.left_ankle_roll = Some(joints.left_leg.ankle_roll);
+        self.right_hip_roll = Some(joints.right_leg.hip_roll);
+        self.right_hip_pitch = Some(joints.right_leg.hip_pitch);
+        self.right_knee_pitch = Some(joints.right_leg.knee_pitch);
+        self.right_ankle_pitch = Some(joints.right_leg.ankle_pitch);
+        self.right_ankle_roll = Some(joints.right_leg.ankle_roll);
         self
     }
 
