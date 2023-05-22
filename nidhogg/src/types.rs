@@ -2,7 +2,7 @@
 //!
 
 use nidhogg_derive::Builder;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
 /// Struct containing two values of type `T`
 #[derive(Debug, Clone, Serialize)]
@@ -150,7 +150,7 @@ pub struct RightEye {
 }
 
 /// Struct containing values of type `T` for all the joints
-#[derive(Serialize, Builder, Clone, Debug, Default)]
+#[derive(Serialize, Deserialize, Builder, Clone, Debug, Default)]
 pub struct JointArray<T> {
     pub head_yaw: T,
     pub head_pitch: T,
