@@ -31,6 +31,10 @@ pub enum Error {
     CoppeliaGetObjectError(String),
 
     #[cfg(feature = "coppelia")]
+    #[error("Failed to sget joint position in Coppelia!")]
+    CoppeliaGetPositionError(String),
+
+    #[cfg(feature = "coppelia")]
     #[error("Failed to set value in Coppelia!")]
     CoppeliaSetValueError(String),
 }

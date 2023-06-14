@@ -1,6 +1,8 @@
 use crate::{types::JointArray, Error, NaoBackend, NaoControlMessage, NaoState, Result};
-use std::{sync::Arc};
 use zmq_remote_api::{sim::Sim, RemoteApiClient, RemoteApiClientParams};
+use crate::{types::{JointArray, JointArrayBuilder, Vector2, Vector3}, Error, NaoBackend, NaoControlMessage, NaoState, Result};
+use std::{rc::Rc, sync::Arc};
+use zmq_remote_api::{sim::Sim, RemoteApiClient, RemoteApiClientParams, RemoteAPIError};
 
 #[allow(missing_debug_implementations)]
 pub struct CoppeliaBackend {
@@ -209,7 +211,21 @@ impl NaoBackend for CoppeliaBackend {
     }
 
     fn read_nao_state(&mut self) -> Result<NaoState> {
-        todo!("implement reading from coppelia")
+        let state: NaoState = NaoState {
+            position: get_joint_positions(&self.sim)?,
+            stiffness: get_joint_stiffnesses(&self.sim)?,
+            accelerometer: Vector3 { x: 0.0, y: 0.0, z: 0.0 },
+            gyroscope: Vector3 { x: 0.0, y: 0.0, z: 0.0 },
+            angles: Vector2 { x: 0.0, y: 0.0 },
+            sonar: Default::default(),
+            force_sensitive_resistors: Default::default(),
+            touch: Default::default(),
+            battery: Default::default(),
+            temperature: Default::default(),
+            current: Default::default(),
+            status: Default::default()
+        };
+        Ok(state)
     }
 }
 
@@ -270,4 +286,110 @@ fn get_joint_handles(sim: &Sim) -> Result<JointArray<i64>> {
         right_hand: get_object(&sim, "/NAO/RWristYaw")?,
     };
     Ok(joint_handles)
+}
+
+// TODO: zou beter kunnen door joint handles te gebruiken want die hebben we al
+// wanneer we deze functie nodig hebben
+fn get_position(sim: &Sim, path: impl Into<String>) -> Result<f64> {
+    let path: String = path.into();
+    let object = get_object(sim, path)?;
+    let position =  sim
+        .get_joint_position(object)
+        .map_err(|e| Error::CoppeliaGetPositionError(e.show()));
+
+    return position;
+}
+
+// Deze zou ook met joint handles kunnen ipv path denk ik
+fn get_stiffness(sim: &Sim, path: impl Into<String>) -> Result<f64> {
+    let path: String = path.into();
+    let object = get_object(sim, path)?;
+    let position =  sim
+        .get_joint_force(object)
+        .map_err(|e| Error::CoppeliaGetPositionError(e.show()));
+
+    return position;
+}
+
+// Deze zou ook met joint handles kunnen ipv path denk ik
+// fn get_stiffness(sim: &Sim, path: impl Into<String>) -> Result<f64> {
+//     let path: String = path.into();
+//     let object = get_object(sim, path)?;
+//     let position =  sim
+//         .get_velocity(object)
+//         .map_err(|e| Error::CoppeliaGetPositionError(e.show()));
+
+//     return position;
+// }
+
+fn get_joint_positions(sim: &Sim)  -> Result<JointArray<f32>>{
+    let joint_positions: JointArray<f32> = JointArray {
+        head_yaw: get_position(&sim, "/NAO/HeadYaw")? as f32,
+        head_pitch: get_position(&sim, "/NAO/HeadPitch")? as f32,
+
+        left_shoulder_pitch: get_position(&sim, "/NAO/LShoulderPitch")? as f32,
+        left_shoulder_roll: get_position(&sim, "/NAO/LShoulderRoll")? as f32,
+        left_elbow_yaw: get_position(&sim, "/NAO/LElbowYaw")? as f32,
+        left_elbow_roll: get_position(&sim, "/NAO/LElbowRoll")? as f32,
+        left_wrist_yaw: get_position(&sim, "/NAO/LWristYaw")? as f32,
+        left_hip_yaw_pitch: get_position(&sim, "/NAO/LHipYawPitch")? as f32,
+        left_hip_roll: get_position(&sim, "/NAO/LHipRoll")? as f32,
+        left_hip_pitch: get_position(&sim, "/NAO/LHipPitch")? as f32,
+        left_knee_pitch: get_position(&sim, "/NAO/LKneePitch")? as f32,
+        left_ankle_pitch: get_position(&sim, "/NAO/LAnklePitch")? as f32,
+        left_ankle_roll: get_position(&sim, "/NAO/LAnkleRoll")? as f32,
+
+        right_shoulder_pitch: get_position(&sim, "/NAO/RShoulderPitch")? as f32,
+        right_shoulder_roll: get_position(&sim, "/NAO/RShoulderRoll")? as f32,
+        right_elbow_yaw: get_position(&sim, "/NAO/RElbowYaw")? as f32,
+        right_elbow_roll: get_position(&sim, "/NAO/RElbowRoll")? as f32,
+        right_wrist_yaw: get_position(&sim, "/NAO/RWristYaw")? as f32,
+        // right_hip_yaw_pitch: self.get_object("/NAO/RHipYawPitch")?; // heeft LoLa niet,
+        right_hip_roll: get_position(&sim, "/NAO/RHipRoll")? as f32,
+        right_hip_pitch: get_position(&sim, "/NAO/RHipPitch")? as f32,
+        right_knee_pitch: get_position(&sim, "/NAO/RKneePitch")? as f32,
+        right_ankle_pitch: get_position(&sim, "/NAO/RAnklePitch")? as f32,
+        right_ankle_roll: get_position(&sim, "/NAO/RAnkleRoll")? as f32,
+
+        // handen heeft coppelia niet dus nog een keer wrist als placeholder
+        left_hand: get_position(&sim, "/NAO/LWristYaw")? as f32,
+        right_hand: get_position(&sim, "/NAO/RWristYaw")? as f32,
+    };
+    Ok(joint_positions)
+}
+
+fn get_joint_stiffnesses(sim: &Sim)  -> Result<JointArray<f32>>{
+    let joint_positions: JointArray<f32> = JointArray {
+        head_yaw: get_stiffness(&sim, "/NAO/HeadYaw")? as f32,
+        head_pitch: get_stiffness(&sim, "/NAO/HeadPitch")? as f32,
+
+        left_shoulder_pitch: get_stiffness(&sim, "/NAO/LShoulderPitch")? as f32,
+        left_shoulder_roll: get_stiffness(&sim, "/NAO/LShoulderRoll")? as f32,
+        left_elbow_yaw: get_stiffness(&sim, "/NAO/LElbowYaw")? as f32,
+        left_elbow_roll: get_stiffness(&sim, "/NAO/LElbowRoll")? as f32,
+        left_wrist_yaw: get_stiffness(&sim, "/NAO/LWristYaw")? as f32,
+        left_hip_yaw_pitch: get_stiffness(&sim, "/NAO/LHipYawPitch")? as f32,
+        left_hip_roll: get_stiffness(&sim, "/NAO/LHipRoll")? as f32,
+        left_hip_pitch: get_stiffness(&sim, "/NAO/LHipPitch")? as f32,
+        left_knee_pitch: get_stiffness(&sim, "/NAO/LKneePitch")? as f32,
+        left_ankle_pitch: get_stiffness(&sim, "/NAO/LAnklePitch")? as f32,
+        left_ankle_roll: get_stiffness(&sim, "/NAO/LAnkleRoll")? as f32,
+
+        right_shoulder_pitch: get_stiffness(&sim, "/NAO/RShoulderPitch")? as f32,
+        right_shoulder_roll: get_stiffness(&sim, "/NAO/RShoulderRoll")? as f32,
+        right_elbow_yaw: get_stiffness(&sim, "/NAO/RElbowYaw")? as f32,
+        right_elbow_roll: get_stiffness(&sim, "/NAO/RElbowRoll")? as f32,
+        right_wrist_yaw: get_stiffness(&sim, "/NAO/RWristYaw")? as f32,
+        // right_hip_yaw_pitch: self.get_object("/NAO/RHipYawPitch")?; // heeft LoLa niet,
+        right_hip_roll: get_stiffness(&sim, "/NAO/RHipRoll")? as f32,
+        right_hip_pitch: get_stiffness(&sim, "/NAO/RHipPitch")? as f32,
+        right_knee_pitch: get_stiffness(&sim, "/NAO/RKneePitch")? as f32,
+        right_ankle_pitch: get_stiffness(&sim, "/NAO/RAnklePitch")? as f32,
+        right_ankle_roll: get_stiffness(&sim, "/NAO/RAnkleRoll")? as f32,
+
+        // handen heeft coppelia niet dus nog een keer wrist als placeholder
+        left_hand: get_stiffness(&sim, "/NAO/LWristYaw")? as f32,
+        right_hand: get_stiffness(&sim, "/NAO/RWristYaw")? as f32,
+    };
+    Ok(joint_positions)
 }
