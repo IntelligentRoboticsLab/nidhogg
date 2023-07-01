@@ -2,7 +2,7 @@
 //!
 
 use nidhogg_derive::Builder;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// Struct containing two values of type `T`
 #[derive(Debug, Clone, Serialize)]
@@ -100,6 +100,7 @@ pub struct Color {
 }
 
 impl Color {
+    #[must_use]
     pub fn new(red: f32, green: f32, blue: f32) -> Self {
         Self { red, green, blue }
     }
@@ -310,12 +311,14 @@ pub struct RightArmJoints<T> {
 }
 
 impl<T> JointArrayBuilder<T> {
+    #[must_use]
     pub fn head_joints(mut self, joints: HeadJoints<T>) -> Self {
         self.head_pitch = Some(joints.pitch);
         self.head_yaw = Some(joints.yaw);
         self
     }
 
+    #[must_use]
     pub fn left_leg_joints(mut self, joints: LeftLegJoints<T>) -> Self {
         self.left_hip_yaw_pitch = Some(joints.hip_yaw_pitch);
         self.left_hip_roll = Some(joints.hip_roll);
@@ -326,6 +329,7 @@ impl<T> JointArrayBuilder<T> {
         self
     }
 
+    #[must_use]
     pub fn right_leg_joints(mut self, joints: RightLegJoints<T>) -> Self {
         self.right_hip_roll = Some(joints.hip_roll);
         self.right_hip_pitch = Some(joints.hip_pitch);
@@ -336,6 +340,7 @@ impl<T> JointArrayBuilder<T> {
     }
 
     /// Set the [`LegJoints`] in this [`JointArray`].
+    #[must_use]
     pub fn leg_joints(mut self, joints: LegJoints<T>) -> Self {
         self.left_hip_yaw_pitch = Some(joints.left_leg.hip_yaw_pitch);
         self.left_hip_roll = Some(joints.left_leg.hip_roll);
@@ -351,6 +356,7 @@ impl<T> JointArrayBuilder<T> {
         self
     }
 
+    #[must_use]
     pub fn left_arm_joints(mut self, joints: LeftArmJoints<T>) -> Self {
         self.left_shoulder_pitch = Some(joints.shoulder_pitch);
         self.left_shoulder_roll = Some(joints.shoulder_roll);
@@ -361,6 +367,7 @@ impl<T> JointArrayBuilder<T> {
         self
     }
 
+    #[must_use]
     pub fn right_arm_joints(mut self, joints: RightArmJoints<T>) -> Self {
         self.right_shoulder_pitch = Some(joints.shoulder_pitch);
         self.right_shoulder_roll = Some(joints.shoulder_roll);

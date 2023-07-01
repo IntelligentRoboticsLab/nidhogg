@@ -13,8 +13,8 @@
 //!
 //! | Backend | Supported | Feature name |
 //! |-|-|-|
-//! | LoLA | ✅ | `lola` |
-//! | CoppeliaSim | 🚧 | `coppelia` |
+//! | `LoLA` | ✅ | `lola` |
+//! | `CoppeliaSim` | 🚧 | `coppelia` |
 //!
 //! ✅: Fully supported!  
 //! 🚧: Work in progress
@@ -89,7 +89,7 @@ pub trait NaoBackend: Sized {
     fn read_nao_state(&mut self) -> Result<NaoState>;
 }
 
-/// High level representation of the LoLA state message.
+/// High level representation of the `LoLA` state message.
 #[derive(Debug, Clone, Serialize)]
 pub struct NaoState {
     pub position: JointArray<f32>,
@@ -108,7 +108,7 @@ pub struct NaoState {
     pub status: JointArray<i32>,
 }
 
-/// High level representation of the LoLA update message.
+/// High level representation of the `LoLA` update message.
 #[derive(Builder, Clone, Debug, Default)]
 pub struct NaoControlMessage {
     pub position: JointArray<f32>,

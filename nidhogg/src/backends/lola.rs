@@ -1,7 +1,13 @@
-//! LoLA backend that communicates through the socket at `/tmp/robocup`.  
+//! `LoLA` backend that communicates through the socket at `/tmp/robocup`.  
 //!
 
-use crate::{types::*, Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result};
+use crate::{
+    types::{
+        Battery, Color, ForceSensitiveResistorFoot, ForceSensitiveResistors, JointArray, LeftEar,
+        LeftEye, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
+    },
+    Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
+};
 use std::{
     io::{BufWriter, Read},
     os::unix::net::UnixStream,
@@ -15,7 +21,7 @@ use tracing::info;
 const ROBOCUP_SOCKET_PATH: &str = "/tmp/robocup";
 const LOLA_BUFFER_SIZE: usize = 896;
 
-/// LoLA backend that communicates with a real NAO V6 through the socket at `/tmp/robocup`
+/// `LoLA` backend that communicates with a real NAO V6 through the socket at `/tmp/robocup`
 #[derive(Debug)]
 pub struct LolaBackend(UnixStream);
 
@@ -26,7 +32,7 @@ impl NaoBackend for LolaBackend {
     /// ```no_run
     /// use nidhogg::{NaoBackend, backends::LolaBackend};
     ///
-    /// // We connect to a real NAO using the LoLA backend
+    /// // We connect to a real NAO using the `LoLA` backend
     /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
     /// ```
     fn connect() -> Result<Self> {
@@ -123,7 +129,7 @@ impl LolaBackend {
         self.read_lola_nao_state(&mut buf).map(LolaNaoState::into)
     }
 
-    /// Read a [`LolaNaoState`] from the LoLA socket.
+    /// Read a [`LolaNaoState`] from the `LoLA` socket.
     fn read_lola_nao_state<'a>(
         &mut self,
         buf: &'a mut [u8; LOLA_BUFFER_SIZE],
@@ -133,7 +139,7 @@ impl LolaBackend {
     }
 }
 
-/// A trait that provides conversions from Nidhogg data to LoLA data
+/// A trait that provides conversions from nidhogg data to `LoLA` data
 ///
 /// ## 🗒️ Note:
 /// Like [`From`] does with [`Into`], this trait automatically provides an implementation for [`IntoLoLA`].
@@ -141,7 +147,7 @@ trait FromNidhogg<N> {
     fn from_nidhogg(value: N) -> Self;
 }
 
-/// A trait that provides conversions from Nidhogg data to LoLA data
+/// A trait that provides conversions from `nihogg` data to `LoLA` data
 ///
 /// ## ⚠️ Warning:
 // This trait gets automatically implemented when implementing [`FromNidhogg`], so you should prefer implementing that.
@@ -150,14 +156,14 @@ trait IntoLoLA<L> {
 }
 
 /// From<T> for U implies Into<U> for T
-/// See: https://doc.rust-lang.org/std/convert/trait.From.html
+/// See: <https://doc.rust-lang.org/std/convert/trait.From.html>
 impl<N, L: FromNidhogg<N>> IntoLoLA<L> for N {
     fn into_lola(self) -> L {
         L::from_nidhogg(self)
     }
 }
 
-/// A trait that provides conversions from LoLA data to Nidhogg data
+/// A trait that provides conversions from `LoLA` data to nidhogg data
 ///
 /// ## 🗒️ Note:
 /// Like [`From`] does with [`Into`], this trait automatically provides an implementation for [`IntoLoLA`].
@@ -165,7 +171,7 @@ trait FromLoLA<L> {
     fn from_lola(value: L) -> Self;
 }
 
-/// A trait that provides conversions from LoLA data to Nidhogg data
+/// A trait that provides conversions from `LoLA` data to nidhogg data
 ///
 /// ## ⚠️ Warning:
 // This trait gets automatically implemented when implementing [`FromNidhogg`], so you should prefer implementing that.
@@ -174,7 +180,7 @@ trait IntoNidhogg<N> {
 }
 
 /// From<T> for U implies Into<U> for T
-/// See: https://doc.rust-lang.org/std/convert/trait.From.html
+/// See: <https://doc.rust-lang.org/std/convert/trait.From.html>
 impl<L, N: FromLoLA<L>> IntoNidhogg<N> for L {
     fn into_nidhogg(self) -> N {
         N::from_lola(self)
