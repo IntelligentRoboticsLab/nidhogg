@@ -72,14 +72,8 @@ fn impl_builder_struct(
     let data_vis = field_data.field_visibilities.as_slice();
     let data_type = field_data.field_types.as_slice();
     let data_doc: Vec<_> = data_name
-        .clone()
         .iter()
-        .map(|ident| {
-            format!(
-                "Set the `{}` value to the provided value.",
-                ident.to_string()
-            )
-        })
+        .map(|ident| format!("Set the `{}` value to the provided value.", ident))
         .collect();
     let build_fn_doc = format!("Use the provided values to build a new instance of [`{}`].\n\nNot explicitly defined fields will use their [`Default`] value. ", ident);
 
