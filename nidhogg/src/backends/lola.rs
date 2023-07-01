@@ -329,6 +329,7 @@ impl<T> FromLoLA<[T; 25]> for JointArray<T> {
             left_elbow_yaw,
             left_elbow_roll,
             left_wrist_yaw,
+
             left_hip_yaw_pitch,
             left_hip_roll,
             left_hip_pitch,
@@ -336,16 +337,17 @@ impl<T> FromLoLA<[T; 25]> for JointArray<T> {
             left_ankle_pitch,
             left_ankle_roll,
 
-            right_hip_roll,
-            right_hip_pitch,
-            right_knee_pitch,
-            right_ankle_pitch,
-            right_ankle_roll,
             right_shoulder_pitch,
             right_shoulder_roll,
             right_elbow_yaw,
             right_elbow_roll,
             right_wrist_yaw,
+
+            right_hip_roll,
+            right_hip_pitch,
+            right_knee_pitch,
+            right_ankle_pitch,
+            right_ankle_roll,
 
             left_hand,
             right_hand,

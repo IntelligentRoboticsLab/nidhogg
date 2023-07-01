@@ -54,6 +54,7 @@ fn builder_struct(
     let data_type = &field_data.field_types;
     quote!(
         #[doc = #docs]
+        #[must_use]
         #[derive(Default)]
         #vis struct #builder_name #generics {
             #(#data_name: Option<#data_type>),*

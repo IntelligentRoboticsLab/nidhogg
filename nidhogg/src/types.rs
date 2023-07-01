@@ -2,17 +2,19 @@
 //!
 
 use nidhogg_derive::Builder;
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 /// Struct containing two values of type `T`
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Vector2<T> {
     pub x: T,
     pub y: T,
 }
 
 /// Struct containing three values of type `T`
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Vector3<T> {
     pub x: T,
     pub y: T,
@@ -23,6 +25,7 @@ pub struct Vector3<T> {
 ///
 /// Each value represents the intensity of a white LED.
 #[derive(Builder, Clone, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Skull {
     pub left_front_0: f32,
     pub left_front_1: f32,
@@ -52,6 +55,7 @@ pub struct Skull {
 ///    180
 /// ```  
 #[derive(Builder, Clone, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct LeftEar {
     pub intensity_0_deg: f32,
     pub intensity_36_deg: f32,
@@ -78,6 +82,7 @@ pub struct LeftEar {
 ///    180
 /// ```  
 #[derive(Builder, Clone, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct RightEar {
     pub intensity_0_deg: f32,
     pub intensity_36_deg: f32,
@@ -93,6 +98,7 @@ pub struct RightEar {
 
 /// Struct representing an RGB color.
 #[derive(Debug, Default, Clone, Copy, Builder)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Color {
     pub red: f32,
     pub green: f32,
@@ -117,6 +123,7 @@ impl Color {
 ///    180
 /// ```  
 #[derive(Builder, Clone, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct LeftEye {
     pub color_0_deg: Color,
     pub color_45_deg: Color,
@@ -139,6 +146,7 @@ pub struct LeftEye {
 ///    180
 /// ```  
 #[derive(Builder, Clone, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct RightEye {
     pub color_0_deg: Color,
     pub color_45_deg: Color,
@@ -151,42 +159,88 @@ pub struct RightEye {
 }
 
 /// Struct containing values of type `T` for all the joints
-#[derive(Serialize, Deserialize, Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct JointArray<T> {
+    /// The yaw joint of the robot's head, allowing rotation horizontally.
     pub head_yaw: T,
+
+    /// The pitch joint of the robot's head, allowing tilting up and down.
     pub head_pitch: T,
 
+    /// The pitch joint of the left shoulder, controlling its vertical movement.
     pub left_shoulder_pitch: T,
+
+    /// The roll joint of the left shoulder, controlling its horizontal movement.
     pub left_shoulder_roll: T,
+
+    /// The yaw joint of the left elbow, allowing rotation.
     pub left_elbow_yaw: T,
+
+    /// The roll joint of the left elbow, controlling its horizontal movement.
     pub left_elbow_roll: T,
+
+    /// The yaw joint of the left wrist, allowing rotation.
     pub left_wrist_yaw: T,
+
+    /// The yaw-pitch joint of the left hip, controlling horizontal and vertical movement.
     pub left_hip_yaw_pitch: T,
+
+    /// The roll joint of the left hip, controlling its horizontal movement.
     pub left_hip_roll: T,
+
+    /// The pitch joint of the left hip, controlling its vertical movement.
     pub left_hip_pitch: T,
+
+    /// The pitch joint of the left knee, controlling its bending movement.
     pub left_knee_pitch: T,
+
+    /// The pitch joint of the left ankle, controlling its bending movement.
     pub left_ankle_pitch: T,
+
+    /// The roll joint of the left ankle, controlling its horizontal movement.
     pub left_ankle_roll: T,
 
-    // There is no `right_hip_yaw_pitch` in LoLA
-    // can't have shit in Ohio
-    pub right_hip_roll: T,
-    pub right_hip_pitch: T,
-    pub right_knee_pitch: T,
-    pub right_ankle_pitch: T,
-    pub right_ankle_roll: T,
+    /// The pitch joint of the right shoulder, controlling its vertical movement.
     pub right_shoulder_pitch: T,
+
+    /// The roll joint of the right shoulder, controlling its horizontal movement.
     pub right_shoulder_roll: T,
+
+    /// The yaw joint of the right elbow, allowing rotation.
     pub right_elbow_yaw: T,
+
+    /// The roll joint of the right elbow, controlling its horizontal movement.
     pub right_elbow_roll: T,
+
+    /// The yaw joint of the right wrist, allowing rotation.
     pub right_wrist_yaw: T,
 
+    /// The roll joint of the right hip, controlling its horizontal movement.
+    pub right_hip_roll: T,
+
+    /// The pitch joint of the right hip, controlling its vertical movement.
+    pub right_hip_pitch: T,
+
+    /// The pitch joint of the right knee, controlling its bending movement.
+    pub right_knee_pitch: T,
+
+    /// The pitch joint of the right ankle, controlling its bending movement.
+    pub right_ankle_pitch: T,
+
+    /// The roll joint of the right ankle, controlling its horizontal movement.
+    pub right_ankle_roll: T,
+
+    /// The joint representing the left hand.
     pub left_hand: T,
+
+    /// The joint representing the right hand.
     pub right_hand: T,
 }
 
 /// Struct representing the battery status of the robot.
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Battery {
     /// The battery percentage
     pub charge: f32,
@@ -199,14 +253,16 @@ pub struct Battery {
 }
 
 /// Struct containing the [`ForceSensitiveResistorFoot`] value for each foot.
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct ForceSensitiveResistors {
     pub left_foot: ForceSensitiveResistorFoot,
     pub right_foot: ForceSensitiveResistorFoot,
 }
 
 /// Struct representing the force sensitive resistors in one of the feet.
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct ForceSensitiveResistorFoot {
     pub front_left: f32,
     pub front_right: f32,
@@ -215,7 +271,8 @@ pub struct ForceSensitiveResistorFoot {
 }
 
 /// Values read by the left and right sonar sensor.
-#[derive(Builder, Clone, Debug, Default, Serialize)]
+#[derive(Builder, Clone, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct SonarValues {
     pub left: f32,
     pub right: f32,
@@ -223,6 +280,7 @@ pub struct SonarValues {
 
 /// Enabled state of the left and right sonar sensor.
 #[derive(Builder, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct SonarEnabled {
     pub left: bool,
     pub right: bool,
@@ -238,7 +296,8 @@ impl Default for SonarEnabled {
 }
 
 /// Struct containing the touch activiation value for each touch sensor on the robot.
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Touch {
     pub chest_board: f32,
     pub head_front: f32,
@@ -311,14 +370,12 @@ pub struct RightArmJoints<T> {
 }
 
 impl<T> JointArrayBuilder<T> {
-    #[must_use]
     pub fn head_joints(mut self, joints: HeadJoints<T>) -> Self {
         self.head_pitch = Some(joints.pitch);
         self.head_yaw = Some(joints.yaw);
         self
     }
 
-    #[must_use]
     pub fn left_leg_joints(mut self, joints: LeftLegJoints<T>) -> Self {
         self.left_hip_yaw_pitch = Some(joints.hip_yaw_pitch);
         self.left_hip_roll = Some(joints.hip_roll);
@@ -329,7 +386,6 @@ impl<T> JointArrayBuilder<T> {
         self
     }
 
-    #[must_use]
     pub fn right_leg_joints(mut self, joints: RightLegJoints<T>) -> Self {
         self.right_hip_roll = Some(joints.hip_roll);
         self.right_hip_pitch = Some(joints.hip_pitch);
@@ -340,7 +396,6 @@ impl<T> JointArrayBuilder<T> {
     }
 
     /// Set the [`LegJoints`] in this [`JointArray`].
-    #[must_use]
     pub fn leg_joints(mut self, joints: LegJoints<T>) -> Self {
         self.left_hip_yaw_pitch = Some(joints.left_leg.hip_yaw_pitch);
         self.left_hip_roll = Some(joints.left_leg.hip_roll);
@@ -350,13 +405,12 @@ impl<T> JointArrayBuilder<T> {
         self.left_ankle_roll = Some(joints.left_leg.ankle_roll);
         self.right_hip_roll = Some(joints.right_leg.hip_roll);
         self.right_hip_pitch = Some(joints.right_leg.hip_pitch);
-        self.right_knee_pitch = Some(joints.right_leg.knee_pitch);
         self.right_ankle_pitch = Some(joints.right_leg.ankle_pitch);
+        self.right_knee_pitch = Some(joints.right_leg.knee_pitch);
         self.right_ankle_roll = Some(joints.right_leg.ankle_roll);
         self
     }
 
-    #[must_use]
     pub fn left_arm_joints(mut self, joints: LeftArmJoints<T>) -> Self {
         self.left_shoulder_pitch = Some(joints.shoulder_pitch);
         self.left_shoulder_roll = Some(joints.shoulder_roll);
@@ -367,7 +421,6 @@ impl<T> JointArrayBuilder<T> {
         self
     }
 
-    #[must_use]
     pub fn right_arm_joints(mut self, joints: RightArmJoints<T>) -> Self {
         self.right_shoulder_pitch = Some(joints.shoulder_pitch);
         self.right_shoulder_roll = Some(joints.shoulder_roll);

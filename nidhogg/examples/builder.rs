@@ -7,6 +7,8 @@ fn main() -> Result<()> {
     let cool_bool = false;
     let cool_color = Color::new(0.42, 0.42, 0.42);
 
+    let _build = JointArray::<f32>::builder().leg_joints(LegJoints::default());
+
     let _msg = NaoControlMessage::builder()
         .position(
             JointArray::builder()

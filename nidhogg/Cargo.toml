@@ -19,7 +19,8 @@ zmq_remote_api = { git = "https://github.com/samuel-cavalcanti/rust_zmqRemoteApi
 tracing-subscriber = "0.3.16"
 
 [features]
-default = ["lola"]
+default = ["serde", "lola"]
 
+serde = []
 lola = ["dep:rmp-serde"]
 coppelia = ["dep:zmq_remote_api"]
