@@ -7,7 +7,7 @@
 //! ## About
 //!
 //! ## Backends
-//! Nidhogg works by connecting to a backend that implements the [`NaoBackend`] trait
+//! nidhogg works by connecting to a backend that implements the [`NaoBackend`] trait.
 //!
 //! Backends can be enabled with features, by default the `lola` feature is enabled.
 //!
