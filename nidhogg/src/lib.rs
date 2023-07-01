@@ -46,7 +46,7 @@ use types::{
     Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
 };
 
-/// Generic backend trait used for implementing your own NAO interface
+/// Generic backend trait used for implementing a NAO interface.
 pub trait NaoBackend: Sized {
     /// Connects to a NAO backend
     ///

@@ -247,6 +247,7 @@ pub struct Battery {
     /// Current emitted by battery
     pub current: f32,
     /// Unknown field
+    // todo: test whether this is charging state
     pub status: f32,
     /// Temperature of the battery
     pub temperature: f32,
