@@ -49,7 +49,7 @@ fn builder_struct(
     generics: &Generics,
     field_data: &ParsedFieldData,
 ) -> TokenStream {
-    let docs = format!("Builder struct for [`{ident}`]\n");
+    let docs = format!("Builder struct for [`{ident}`].");
     let data_name = &field_data.field_names;
     let data_type = &field_data.field_types;
     quote!(
@@ -71,17 +71,30 @@ fn impl_builder_struct(
     let data_name = field_data.field_names.as_slice();
     let data_vis = field_data.field_visibilities.as_slice();
     let data_type = field_data.field_types.as_slice();
+    let data_doc: Vec<_> = data_name
+        .clone()
+        .iter()
+        .map(|ident| {
+            format!(
+                "Set the `{}` value to the provided value.",
+                ident.to_string()
+            )
+        })
+        .collect();
+    let build_fn_doc = format!("Use the provided values to build a new instance of [`{}`].\n\nNot explicitly defined fields will use their [`Default`] value. ", ident);
 
     let generics_no_type_bounds = generic_types(generics);
     let generic_type_params = generic_type_params_with_default(generics);
 
     quote!(
         impl <#(#generic_type_params)*> #builder_name <#(#generics_no_type_bounds),*> {
-            #(#data_vis fn #data_name (mut self, #data_name: #data_type) -> Self {
+            #(#[doc = #data_doc]
+            #data_vis fn #data_name (mut self, #data_name: #data_type) -> Self {
                 self.#data_name = Some(#data_name);
                 self
             })*
 
+            #[doc = #build_fn_doc]
             pub fn build (self) -> #ident<#(#generics_no_type_bounds),*> {
                 #ident {
                     #(#data_name: self.#data_name.unwrap_or_default()),*
