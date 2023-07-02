@@ -1,6 +1,6 @@
 //! # Supported NAO backends
 //!
-//! This module provides support for various NAO backends. 
+//! This module provides support for various NAO backends.
 //! It also includes several extension traits that enhance the functionality of a [`NaoBackend`] object.
 
 #[cfg(feature = "coppelia")]
