@@ -6,7 +6,8 @@ use nidhogg_derive::Builder;
 use serde::{Deserialize, Serialize};
 
 /// Struct containing two values of type `T`
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Vector2<T> {
     pub x: T,
     pub y: T,

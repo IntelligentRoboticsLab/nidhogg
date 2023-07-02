@@ -16,7 +16,7 @@ use std::{
 use rmp_serde::{encode, from_slice};
 use serde::{Deserialize, Serialize};
 
-use super::ConnectWithRetryExt;
+use super::{ConnectWithRetryExt, ReadHardwareInfoExt};
 
 const ROBOCUP_SOCKET_PATH: &str = "/tmp/robocup";
 const LOLA_BUFFER_SIZE: usize = 896;
@@ -83,26 +83,15 @@ impl NaoBackend for LolaBackend {
 
 impl ConnectWithRetryExt for LolaBackend {}
 
-impl LolaBackend {
-    /// Reads the [`HardwareInfo`] of the NAO
-    ///
-    /// The hardware info includes serial numbers and versions of the physical parts, which can be useful for finding out which robot you're connected to!
-    ///
-    /// # Examples
-    /// ```no_run
-    /// use nidhogg::{NaoBackend, backend::LolaBackend};
-    /// use std::time::Duration;
-    ///
-    /// let mut nao = LolaBackend::connect().unwrap();
-    ///
-    /// nao.read_hardware_info().expect("Failed to get hardware info!");
-    /// ```
-    pub fn read_hardware_info(&mut self) -> Result<HardwareInfo> {
+impl ReadHardwareInfoExt for LolaBackend {
+    fn read_hardware_info(&mut self) -> Result<HardwareInfo> {
         let mut buf = [0; LOLA_BUFFER_SIZE];
 
         self.read_lola_nao_state(&mut buf).map(LolaNaoState::into)
     }
+}
 
+impl LolaBackend {
     /// Read a [`LolaNaoState`] from the `LoLA` socket.
     fn read_lola_nao_state<'a>(
         &mut self,
