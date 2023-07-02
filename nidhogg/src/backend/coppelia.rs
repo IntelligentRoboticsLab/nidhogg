@@ -1,6 +1,8 @@
 use crate::{Error, NaoBackend, NaoControlMessage, NaoState, Result};
 use zmq_remote_api::{RemoteApiClient, RemoteApiClientParams};
 
+use super::ConnectWithDelayExt;
+
 #[allow(missing_debug_implementations)]
 pub struct CoppeliaBackend {
     #[allow(dead_code)]

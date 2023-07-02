@@ -11,12 +11,12 @@ use crate::{
 use std::{
     io::{BufWriter, Read},
     os::unix::net::UnixStream,
-    thread, time,
 };
 
 use rmp_serde::{encode, from_slice};
 use serde::{Deserialize, Serialize};
-use tracing::info;
+
+use super::ConnectWithDelayExt;
 
 const ROBOCUP_SOCKET_PATH: &str = "/tmp/robocup";
 const LOLA_BUFFER_SIZE: usize = 896;
@@ -82,34 +82,6 @@ impl NaoBackend for LolaBackend {
 }
 
 impl LolaBackend {
-    /// Connects to a NAO by trying multiple times with an interval in between.
-    ///
-    /// # Examples
-    /// ```no_run
-    /// use nidhogg::{NaoBackend, backends::LolaBackend};
-    /// use std::time::Duration;
-    ///
-    /// // Try to connect, potentially retrying 10 times, with a 1 second interval
-    /// let mut nao = LolaBackend::connect_with_retry(10, Duration::from_secs(1))
-    ///     .expect("Could not connect to the NAO! 😪");
-    /// ```
-    pub fn connect_with_retry(retry_count: u32, retry_interval: time::Duration) -> Result<Self> {
-        for i in 0..=retry_count {
-            info!("[{}/{}] Connecting to LoLA socket", i + 1, retry_count + 1);
-
-            let maybe_backend = Self::connect();
-
-            // We connected or this was the last try
-            if maybe_backend.is_ok() || i == retry_count {
-                return maybe_backend;
-            }
-
-            thread::sleep(retry_interval);
-        }
-
-        unreachable!()
-    }
-
     /// Reads the [`HardwareInfo`] of the NAO
     ///
     /// The hardware info includes serial numbers and versions of the physical parts, which can be useful for finding out which robot you're connected to!

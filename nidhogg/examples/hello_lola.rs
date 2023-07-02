@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use nidhogg::{
-    backends::LolaBackend,
+    backend::LolaBackend,
     types::{Color, LeftEye},
     NaoBackend, NaoControlMessage,
 };

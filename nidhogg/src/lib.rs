@@ -34,7 +34,7 @@
 //! ```
 //!
 
-pub mod backends;
+pub mod backend;
 mod error;
 pub mod types;
 
@@ -88,6 +88,7 @@ pub trait NaoBackend: Sized {
     /// ```
     fn read_nao_state(&mut self) -> Result<NaoState>;
 }
+
 
 /// High level representation of the `LoLA` state message.
 #[derive(Debug, Clone, Serialize)]
