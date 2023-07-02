@@ -16,7 +16,7 @@ use std::{
 use rmp_serde::{encode, from_slice};
 use serde::{Deserialize, Serialize};
 
-use super::ConnectWithDelayExt;
+use super::ConnectWithRetryExt;
 
 const ROBOCUP_SOCKET_PATH: &str = "/tmp/robocup";
 const LOLA_BUFFER_SIZE: usize = 896;
@@ -30,7 +30,7 @@ impl NaoBackend for LolaBackend {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, backends::LolaBackend};
+    /// use nidhogg::{NaoBackend, backend::LolaBackend};
     ///
     /// // We connect to a real NAO using the `LoLA` backend
     /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
@@ -45,7 +45,7 @@ impl NaoBackend for LolaBackend {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, NaoControlMessage, backends::LolaBackend, types::Color};
+    /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::Color};
     ///
     /// let mut nao = LolaBackend::connect().unwrap();
     ///
@@ -67,7 +67,7 @@ impl NaoBackend for LolaBackend {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, backends::LolaBackend};
+    /// use nidhogg::{NaoBackend, backend::LolaBackend};
     ///
     /// let mut nao = LolaBackend::connect().unwrap();
     ///
@@ -81,7 +81,7 @@ impl NaoBackend for LolaBackend {
     }
 }
 
-impl ConnectWithDelayExt for LolaBackend {}
+impl ConnectWithRetryExt for LolaBackend {}
 
 impl LolaBackend {
     /// Reads the [`HardwareInfo`] of the NAO
@@ -90,7 +90,7 @@ impl LolaBackend {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, backends::LolaBackend};
+    /// use nidhogg::{NaoBackend, backend::LolaBackend};
     /// use std::time::Duration;
     ///
     /// let mut nao = LolaBackend::connect().unwrap();

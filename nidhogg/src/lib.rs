@@ -22,7 +22,7 @@
 //! # Example
 //! ```no_run
 //! use nidhogg::{
-//!     backends::LolaBackend,
+//!     backend::LolaBackend,
 //!     NaoBackend,
 //! };
 //!
@@ -52,7 +52,7 @@ pub trait NaoBackend: Sized {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, backends::LolaBackend};
+    /// use nidhogg::{NaoBackend, backend::LolaBackend};
     ///
     /// // We connect to a real NAO using the LoLA backend
     /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
@@ -63,7 +63,7 @@ pub trait NaoBackend: Sized {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, NaoControlMessage, backends::LolaBackend, types::Color};
+    /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::Color};
     ///
     /// let mut nao = LolaBackend::connect().unwrap();
     ///
@@ -79,7 +79,7 @@ pub trait NaoBackend: Sized {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, backends::LolaBackend};
+    /// use nidhogg::{NaoBackend, backend::LolaBackend};
     ///
     /// let mut nao = LolaBackend::connect().unwrap();
     ///

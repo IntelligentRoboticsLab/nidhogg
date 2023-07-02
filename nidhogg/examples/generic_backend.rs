@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use nidhogg::{
-    backend::{ConnectWithDelayExt, LolaBackend},
+    backend::{ConnectWithRetryExt, LolaBackend},
     types::{Color, LeftEye},
     NaoBackend, NaoControlMessage, NaoState,
 };
@@ -14,7 +14,7 @@ struct App<B: NaoBackend> {
     state: NaoState,
 }
 
-// These methods will work with all backends
+// These methods will work with all backends.
 impl<B: NaoBackend> App<B> {
     #[allow(dead_code)]
     pub fn init() -> Result<Self> {

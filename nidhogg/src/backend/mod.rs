@@ -23,12 +23,12 @@ use crate::error::Result;
 use crate::NaoBackend;
 
 /// Trait that introduces [`ConnectWithDelay::connect_with_retry`] to a [`NaoBackend`].
-pub trait ConnectWithDelayExt: NaoBackend {
+pub trait ConnectWithRetryExt: NaoBackend {
     /// Connects to a NAO by trying multiple times with an interval in between.
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, backends::LolaBackend};
+    /// use nidhogg::{NaoBackend, backend::{LolaBackend, ConnectWithRetryExt}};
     /// use std::time::Duration;
     ///
     /// // Try to connect, potentially retrying 10 times, with a 1 second interval
