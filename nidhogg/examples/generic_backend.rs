@@ -29,7 +29,7 @@ impl<B: NaoBackend> App<B> {
     }
 }
 
-// These methods will only work with the LoLA backend
+/// These methods will only work with a backend that implements [`nidhogg::backend::ConnectWithRetryExt`]
 impl App<LolaBackend> {
     pub fn init_with_retry(retry_count: u32, retry_interval: Duration) -> Result<Self> {
         let mut backend = LolaBackend::connect_with_retry(retry_count, retry_interval)?;
