@@ -81,6 +81,8 @@ impl NaoBackend for LolaBackend {
     }
 }
 
+impl ConnectWithDelayExt for LolaBackend {}
+
 impl LolaBackend {
     /// Reads the [`HardwareInfo`] of the NAO
     ///

@@ -89,7 +89,6 @@ pub trait NaoBackend: Sized {
     fn read_nao_state(&mut self) -> Result<NaoState>;
 }
 
-
 /// High level representation of the `LoLA` state message.
 #[derive(Debug, Clone, Serialize)]
 pub struct NaoState {

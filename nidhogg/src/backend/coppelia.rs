@@ -31,3 +31,5 @@ impl NaoBackend for CoppeliaBackend {
         todo!("implement reading from coppelia")
     }
 }
+
+impl ConnectWithDelayExt for CoppeliaBackend {}
