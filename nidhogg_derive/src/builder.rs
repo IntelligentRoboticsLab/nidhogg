@@ -83,13 +83,13 @@ fn impl_builder_struct(
     quote!(
         impl <#(#ty_generics_with_default)*> #builder_name #ty_generics #where_clause {
             #(#[doc = #data_doc]
-            #data_vis fn #data_name (mut self, #data_name: #data_type) -> Self {
+            #data_vis fn #data_name(mut self, #data_name: #data_type) -> Self {
                 self.#data_name = Some(#data_name);
                 self
             })*
 
             #[doc = #build_fn_doc]
-            pub fn build (self) -> #ident #ty_generics {
+            pub fn build(self) -> #ident #ty_generics {
                 #ident {
                     #(#data_name: self.#data_name.unwrap_or_default()),*
                 }
