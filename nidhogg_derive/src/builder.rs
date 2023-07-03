@@ -49,11 +49,12 @@ fn builder_struct(
     generics: &Generics,
     field_data: &ParsedFieldData,
 ) -> TokenStream {
-    let docs = format!("Builder struct for [`{}`]\n", ident);
+    let docs = format!("Builder struct for [`{ident}`].");
     let data_name = &field_data.field_names;
     let data_type = &field_data.field_types;
     quote!(
         #[doc = #docs]
+        #[must_use]
         #[derive(Default)]
         #vis struct #builder_name #generics {
             #(#data_name: Option<#data_type>),*
@@ -70,17 +71,24 @@ fn impl_builder_struct(
     let data_name = field_data.field_names.as_slice();
     let data_vis = field_data.field_visibilities.as_slice();
     let data_type = field_data.field_types.as_slice();
+    let data_doc: Vec<_> = data_name
+        .iter()
+        .map(|ident| format!("Set the `{ident}` value to the provided value."))
+        .collect();
+    let build_fn_doc = format!("Use the provided values to build a new instance of [`{ident}`].\n\nNot explicitly defined fields will use their [`Default`] value.");
 
     let generics_no_type_bounds = generic_types(generics);
     let generic_type_params = generic_type_params_with_default(generics);
 
     quote!(
         impl <#(#generic_type_params)*> #builder_name <#(#generics_no_type_bounds),*> {
-            #(#data_vis fn #data_name (mut self, #data_name: #data_type) -> Self {
+            #(#[doc = #data_doc]
+            #data_vis fn #data_name (mut self, #data_name: #data_type) -> Self {
                 self.#data_name = Some(#data_name);
                 self
             })*
 
+            #[doc = #build_fn_doc]
             pub fn build (self) -> #ident<#(#generics_no_type_bounds),*> {
                 #ident {
                     #(#data_name: self.#data_name.unwrap_or_default()),*
@@ -94,9 +102,10 @@ fn impl_builder_fn(ident: &Ident, builder_name: &Ident, generics: &Generics) -> 
     let generic_type_params = generic_type_params_with_default(generics);
     let generics_no_type_bounds = generic_types(generics);
 
-    let builder_type = match generics.gt_token {
-        Some(_) => quote! { #builder_name::<#(#generics_no_type_bounds),*> },
-        None => quote! { #builder_name },
+    let builder_type = if generics.gt_token.is_some() {
+        quote! { #builder_name::<#(#generics_no_type_bounds),*> }
+    } else {
+        quote! { #builder_name }
     };
 
     quote! {
@@ -109,7 +118,7 @@ fn impl_builder_fn(ident: &Ident, builder_name: &Ident, generics: &Generics) -> 
 }
 
 fn generic_types(generics: &Generics) -> Vec<Ident> {
-    generics.type_params().map(|x| x.ident.to_owned()).collect()
+    generics.type_params().map(|x| x.ident.clone()).collect()
 }
 
 fn generic_type_params_with_default(generics: &Generics) -> Vec<TokenStream> {
