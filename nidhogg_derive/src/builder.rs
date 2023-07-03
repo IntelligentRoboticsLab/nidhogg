@@ -124,11 +124,7 @@ fn generic_type_params_with_default(generics: &Generics) -> Vec<TokenStream> {
             let id = &x.ident;
             let bounds = x.bounds.iter();
 
-            if bounds.len() > 0 {
-                quote! { #id: #(#bounds)+* + Default }
-            } else {
-                quote! { #id: Default }
-            }
+            quote! { #id: #(#bounds +)* Default } 
         })
         .collect()
 }
