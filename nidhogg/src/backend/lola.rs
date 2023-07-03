@@ -16,7 +16,7 @@ use std::{
 use rmp_serde::{encode, from_slice};
 use serde::{Deserialize, Serialize};
 
-use super::{ConnectWithRetryExt, ReadHardwareInfoExt};
+use super::{ConnectWithRetry, ReadHardwareInfo};
 
 const ROBOCUP_SOCKET_PATH: &str = "/tmp/robocup";
 const LOLA_BUFFER_SIZE: usize = 896;
@@ -81,9 +81,9 @@ impl NaoBackend for LolaBackend {
     }
 }
 
-impl ConnectWithRetryExt for LolaBackend {}
+impl ConnectWithRetry for LolaBackend {}
 
-impl ReadHardwareInfoExt for LolaBackend {
+impl ReadHardwareInfo for LolaBackend {
     fn read_hardware_info(&mut self) -> Result<HardwareInfo> {
         let mut buf = [0; LOLA_BUFFER_SIZE];
 

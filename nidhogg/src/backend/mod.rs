@@ -1,7 +1,7 @@
 //! # Supported NAO backends
 //!
 //! This module provides support for various NAO backends.
-//! It also includes several extension traits that enhance the functionality of a [`NaoBackend`] object.
+//! It also includes several traits that enhance the functionality of types that implement [`NaoBackend`].
 
 #[cfg(feature = "coppelia")]
 mod coppelia;
@@ -24,13 +24,13 @@ use tracing::info;
 use crate::error::Result;
 use crate::{HardwareInfo, NaoBackend};
 
-/// Trait that introduces [`ConnectWithRetryExt::connect_with_retry`] to a [`NaoBackend`].
-pub trait ConnectWithRetryExt: NaoBackend {
+/// Trait that introduces [`ConnectWithRetry::connect_with_retry`] to a type that implements [`NaoBackend`].
+pub trait ConnectWithRetry: NaoBackend {
     /// Connects to a NAO by trying multiple times with an interval in between.
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, backend::{LolaBackend, ConnectWithRetryExt}};
+    /// use nidhogg::{NaoBackend, backend::{LolaBackend, ConnectWithRetry}};
     /// use std::time::Duration;
     ///
     /// // Try to connect, potentially retrying 10 times, with a 1 second interval
@@ -60,15 +60,15 @@ pub trait ConnectWithRetryExt: NaoBackend {
     }
 }
 
-/// Trait that introduces [`ReadHardwareInfoExt::read_hardware_info`] to a [`NaoBackend`].
-pub trait ReadHardwareInfoExt: NaoBackend {
+/// Trait that introduces [`ReadHardwareInfo::read_hardware_info`] to a type that implements [`NaoBackend`].
+pub trait ReadHardwareInfo: NaoBackend {
     /// Reads the [`HardwareInfo`] of the NAO.
     ///
     /// The hardware info includes serial numbers and versions of the physical parts, which can be useful for finding out which robot you're connected to!
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, backend::{LolaBackend, ReadHardwareInfoExt}};
+    /// use nidhogg::{NaoBackend, backend::{LolaBackend, ReadHardwareInfo}};
     /// use std::time::Duration;
     ///
     /// let mut nao = LolaBackend::connect().unwrap();

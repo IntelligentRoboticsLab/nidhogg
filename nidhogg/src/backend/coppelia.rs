@@ -1,7 +1,7 @@
 use crate::{Error, NaoBackend, NaoControlMessage, NaoState, Result};
 use zmq_remote_api::{RemoteApiClient, RemoteApiClientParams};
 
-use super::ConnectWithRetryExt;
+use super::ConnectWithRetry;
 
 #[allow(missing_debug_implementations)]
 pub struct CoppeliaBackend {
@@ -32,4 +32,4 @@ impl NaoBackend for CoppeliaBackend {
     }
 }
 
-impl ConnectWithRetryExt for CoppeliaBackend {}
+impl ConnectWithRetry for CoppeliaBackend {}

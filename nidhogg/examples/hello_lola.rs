@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use nidhogg::{
-    backend::{ConnectWithRetryExt, LolaBackend, ReadHardwareInfoExt},
+    backend::{ConnectWithRetry, LolaBackend, ReadHardwareInfo},
     types::{Color, LeftEye},
     NaoBackend, NaoControlMessage,
 };

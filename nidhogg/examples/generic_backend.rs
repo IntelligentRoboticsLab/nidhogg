@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use nidhogg::{
-    backend::{ConnectWithRetryExt, LolaBackend},
+    backend::{ConnectWithRetry, LolaBackend},
     types::{Color, LeftEye},
     NaoBackend, NaoControlMessage, NaoState,
 };
@@ -29,10 +29,10 @@ impl<B: NaoBackend> App<B> {
     }
 }
 
-/// These methods will only work with a backend that implements [`nidhogg::backend::ConnectWithRetryExt`]
-impl App<LolaBackend> {
+/// These methods will only work with a backend that implements [`nidhogg::backend::ConnectWithRetry`]
+impl<B: ConnectWithRetry> App<B> {
     pub fn init_with_retry(retry_count: u32, retry_interval: Duration) -> Result<Self> {
-        let mut backend = LolaBackend::connect_with_retry(retry_count, retry_interval)?;
+        let mut backend = B::connect_with_retry(retry_count, retry_interval)?;
         let state = backend.read_nao_state()?;
         Ok(Self { backend, state })
     }
