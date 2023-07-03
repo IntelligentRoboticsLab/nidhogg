@@ -75,7 +75,7 @@ fn impl_builder_struct(
         .iter()
         .map(|ident| format!("Set the `{ident}` value to the provided value."))
         .collect();
-    let build_fn_doc = format!("Use the provided values to build a new instance of [`{ident}`].\n\nNot explicitly defined fields will use their [`Default`] value. ");
+    let build_fn_doc = format!("Use the provided values to build a new instance of [`{ident}`].\n\nNot explicitly defined fields will use their [`Default`] value.");
 
     let generics_no_type_bounds = generic_types(generics);
     let generic_type_params = generic_type_params_with_default(generics);
