@@ -97,7 +97,7 @@ impl LolaBackend {
         &mut self,
         buf: &'a mut [u8; LOLA_BUFFER_SIZE],
     ) -> Result<LolaNaoState<'a>> {
-        self.0.read_exact(buf).unwrap();
+        self.0.read_exact(buf)?;
         from_slice::<LolaNaoState<'_>>(buf).map_err(Error::MsgPackDecodeError)
     }
 }
