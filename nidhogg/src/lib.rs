@@ -127,7 +127,6 @@ pub struct NaoControlMessage {
 }
 
 /// Struct containing the hardware identifiers for the NAO V6 robot.
-#[cfg(feature = "lola")]
 #[derive(Debug)]
 pub struct HardwareInfo {
     pub body_id: String,
