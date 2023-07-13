@@ -25,4 +25,8 @@ pub enum Error {
     #[cfg(feature = "coppelia")]
     #[error("Failed to connect to Coppelia simulator!")]
     CoppeliaConnectError(String),
+
+    #[cfg(feature = "bullet")]
+    #[error("Bullet error!")]
+    BulletError(#[from] rubullet::Error),
 }

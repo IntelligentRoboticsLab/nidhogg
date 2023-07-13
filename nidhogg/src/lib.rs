@@ -15,6 +15,7 @@
 //! |-|-|-|
 //! | `LoLA` | ✅ | `lola` |
 //! | `CoppeliaSim` | 🚧 | `coppelia` |
+//! | `Bullet` | 🚧 | `bullet` |
 //!
 //! ✅: Fully supported!  
 //! 🚧: Work in progress

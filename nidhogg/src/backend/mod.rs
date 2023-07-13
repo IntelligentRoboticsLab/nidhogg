@@ -3,6 +3,12 @@
 //! This module provides support for various NAO backends.
 //! It also includes several traits that enhance the functionality of types that implement [`NaoBackend`].
 
+#[cfg(feature = "bullet")]
+mod bullet;
+
+#[cfg(feature = "bullet")]
+pub use bullet::BulletBackend;
+
 #[cfg(feature = "coppelia")]
 mod coppelia;
 
