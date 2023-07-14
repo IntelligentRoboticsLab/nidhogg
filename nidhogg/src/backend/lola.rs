@@ -50,7 +50,7 @@ impl NaoBackend for LolaBackend {
     /// let mut nao = LolaBackend::connect().unwrap();
     ///
     /// // First, create a new control message where we set the chest color
-    /// let msg = NaoControlMessage::builder().chest(Color::new(0.8, 0.2, 0.5)).build();
+    /// let msg = NaoControlMessage::builder().chest(Color::MAGENTA).build();
     ///
     /// // Now we send it to the NAO!
     /// nao.send_control_msg(msg).expect("Failed to write control message to backend!");
