@@ -22,11 +22,6 @@ pub struct Vector3<T> {
     pub z: T,
 }
 
-/// Fills all fields of the struct with the provided color.
-pub trait FillIntensity {
-    fn fill(intensity: f32);
-}
-
 /// Struct representing the LEDs on top of the NAO robot's head.  
 ///
 /// Each value represents the intensity of a white LED.
@@ -48,8 +43,9 @@ pub struct Skull {
     pub right_rear_2: f32,
 }
 
-impl FillIntensity for Skull {
-    fn fill(intensity: f32) {
+impl Skull {
+    /// Fill in all values with the same intensity
+    pub fn fill(intensity: f32) -> Skull {
         Skull {
             left_front_0: intensity,
             left_front_1: intensity,
@@ -63,7 +59,7 @@ impl FillIntensity for Skull {
             right_rear_0: intensity,
             right_rear_1: intensity,
             right_rear_2: intensity,
-        };
+        }
     }
 }
 
@@ -94,8 +90,9 @@ pub struct LeftEar {
     pub intensity_324_deg: f32,
 }
 
-impl FillIntensity for LeftEar {
-    fn fill(intensity: f32) {
+impl LeftEar {
+    /// Fill in all values with the same intensity
+    pub fn fill(intensity: f32) -> LeftEar {
         LeftEar {
             intensity_0_deg: intensity,
             intensity_36_deg: intensity,
@@ -107,7 +104,7 @@ impl FillIntensity for LeftEar {
             intensity_252_deg: intensity,
             intensity_288_deg: intensity,
             intensity_324_deg: intensity,
-        };
+        }
     }
 }
 
@@ -138,8 +135,9 @@ pub struct RightEar {
     pub intensity_324_deg: f32,
 }
 
-impl FillIntensity for RightEar {
-    fn fill(intensity: f32) {
+impl RightEar {
+    /// Fill in all values with the same intensity
+    pub fn fill(intensity: f32) -> RightEar {
         RightEar {
             intensity_0_deg: intensity,
             intensity_36_deg: intensity,
@@ -151,7 +149,7 @@ impl FillIntensity for RightEar {
             intensity_252_deg: intensity,
             intensity_288_deg: intensity,
             intensity_324_deg: intensity,
-        };
+        }
     }
 }
 
@@ -170,6 +168,7 @@ impl Color {
         Self { red, green, blue }
     }
 
+    /// Create a new color from three `u8` values.
     pub fn new_u8(red: u8, green: u8, blue: u8) -> Self {
         Self {
             red: f32::from(red) / 255.0,
@@ -260,11 +259,6 @@ impl Color {
     };
 }
 
-/// Fills all fields of the struct with the provided color.
-pub trait FillColor {
-    fn fill(color: Color);
-}
-
 /// Struct representing the RGB LEDs in the left eye of the robot.
 /// ## LED order:
 /// These LEDs are placed in the following order:
@@ -288,8 +282,9 @@ pub struct LeftEye {
     pub color_315_deg: Color,
 }
 
-impl FillColor for LeftEye {
-    fn fill(color: Color) {
+impl LeftEye {
+    /// Fill in all values with the same color
+    pub fn fill(color: Color) -> LeftEye {
         LeftEye {
             color_0_deg: color,
             color_45_deg: color,
@@ -299,7 +294,7 @@ impl FillColor for LeftEye {
             color_225_deg: color,
             color_270_deg: color,
             color_315_deg: color,
-        };
+        }
     }
 }
 
@@ -326,8 +321,9 @@ pub struct RightEye {
     pub color_315_deg: Color,
 }
 
-impl FillColor for RightEye {
-    fn fill(color: Color) {
+impl RightEye {
+    /// Fill in all values with the same color
+    pub fn fill(color: Color) -> RightEye {
         RightEye {
             color_0_deg: color,
             color_45_deg: color,
@@ -337,7 +333,7 @@ impl FillColor for RightEye {
             color_225_deg: color,
             color_270_deg: color,
             color_315_deg: color,
-        };
+        }
     }
 }
 
