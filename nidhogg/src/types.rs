@@ -22,6 +22,11 @@ pub struct Vector3<T> {
     pub z: T,
 }
 
+/// Fills all fields of the struct with the provided color.
+pub trait FillIntensity {
+    fn fill(intensity: f32);
+}
+
 /// Struct representing the LEDs on top of the NAO robot's head.  
 ///
 /// Each value represents the intensity of a white LED.
@@ -41,6 +46,25 @@ pub struct Skull {
     pub right_rear_0: f32,
     pub right_rear_1: f32,
     pub right_rear_2: f32,
+}
+
+impl FillIntensity for Skull {
+    fn fill(intensity: f32) {
+        Skull {
+            left_front_0: intensity,
+            left_front_1: intensity,
+            left_middle_0: intensity,
+            left_rear_0: intensity,
+            left_rear_1: intensity,
+            left_rear_2: intensity,
+            right_front_0: intensity,
+            right_front_1: intensity,
+            right_middle_0: intensity,
+            right_rear_0: intensity,
+            right_rear_1: intensity,
+            right_rear_2: intensity,
+        };
+    }
 }
 
 /// Struct representing the LED intensities in the left ear of the robot.
@@ -70,6 +94,23 @@ pub struct LeftEar {
     pub intensity_324_deg: f32,
 }
 
+impl FillIntensity for LeftEar {
+    fn fill(intensity: f32) {
+        LeftEar {
+            intensity_0_deg: intensity,
+            intensity_36_deg: intensity,
+            intensity_72_deg: intensity,
+            intensity_108_deg: intensity,
+            intensity_144_deg: intensity,
+            intensity_180_deg: intensity,
+            intensity_216_deg: intensity,
+            intensity_252_deg: intensity,
+            intensity_288_deg: intensity,
+            intensity_324_deg: intensity,
+        };
+    }
+}
+
 /// Struct representing the LED intensities in the right ear of the robot.
 ///
 /// ## LED order:
@@ -97,6 +138,23 @@ pub struct RightEar {
     pub intensity_324_deg: f32,
 }
 
+impl FillIntensity for RightEar {
+    fn fill(intensity: f32) {
+        RightEar {
+            intensity_0_deg: intensity,
+            intensity_36_deg: intensity,
+            intensity_72_deg: intensity,
+            intensity_108_deg: intensity,
+            intensity_144_deg: intensity,
+            intensity_180_deg: intensity,
+            intensity_216_deg: intensity,
+            intensity_252_deg: intensity,
+            intensity_288_deg: intensity,
+            intensity_324_deg: intensity,
+        };
+    }
+}
+
 /// Struct representing an RGB color.
 #[derive(Debug, Default, Clone, Copy, Builder)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -111,6 +169,100 @@ impl Color {
     pub fn new(red: f32, green: f32, blue: f32) -> Self {
         Self { red, green, blue }
     }
+
+    pub fn new_u8(red: u8, green: u8, blue: u8) -> Self {
+        Self {
+            red: f32::from(red) / 255.0,
+            green: f32::from(green) / 255.0,
+            blue: f32::from(blue) / 255.0,
+        }
+    }
+
+    pub const BLUE: Color = Color {
+        red: 0.0,
+        green: 0.0,
+        blue: 1.0,
+    };
+    pub const CYAN: Color = Color {
+        red: 0.0,
+        green: 1.0,
+        blue: 1.0,
+    };
+    pub const EMPTY: Color = Color {
+        red: 0.0,
+        green: 0.0,
+        blue: 0.0,
+    };
+    pub const GRAY: Color = Color {
+        red: 0.5,
+        green: 0.5,
+        blue: 0.5,
+    };
+    pub const GREEN: Color = Color {
+        red: 0.0,
+        green: 0.5,
+        blue: 0.0,
+    };
+    pub const LIME: Color = Color {
+        red: 0.0,
+        green: 1.0,
+        blue: 0.0,
+    };
+    pub const MAGENTA: Color = Color {
+        red: 1.0,
+        green: 0.0,
+        blue: 1.0,
+    };
+    pub const MAROON: Color = Color {
+        red: 0.5,
+        green: 0.0,
+        blue: 0.0,
+    };
+    pub const NAVY: Color = Color {
+        red: 0.0,
+        green: 0.0,
+        blue: 0.5,
+    };
+    pub const OLIVE: Color = Color {
+        red: 0.5,
+        green: 0.5,
+        blue: 0.0,
+    };
+    pub const PURPLE: Color = Color {
+        red: 0.5,
+        green: 0.0,
+        blue: 0.5,
+    };
+    pub const RED: Color = Color {
+        red: 1.0,
+        green: 0.0,
+        blue: 0.0,
+    };
+    pub const SILVER: Color = Color {
+        red: 0.75,
+        green: 0.75,
+        blue: 0.75,
+    };
+    pub const TEAL: Color = Color {
+        red: 0.0,
+        green: 0.5,
+        blue: 0.5,
+    };
+    pub const WHITE: Color = Color {
+        red: 1.0,
+        green: 1.0,
+        blue: 1.0,
+    };
+    pub const YELLOW: Color = Color {
+        red: 1.0,
+        green: 1.0,
+        blue: 0.0,
+    };
+}
+
+/// Fills all fields of the struct with the provided color.
+pub trait FillColor {
+    fn fill(color: Color);
 }
 
 /// Struct representing the RGB LEDs in the left eye of the robot.
@@ -136,6 +288,21 @@ pub struct LeftEye {
     pub color_315_deg: Color,
 }
 
+impl FillColor for LeftEye {
+    fn fill(color: Color) {
+        LeftEye {
+            color_0_deg: color,
+            color_45_deg: color,
+            color_90_deg: color,
+            color_135_deg: color,
+            color_180_deg: color,
+            color_225_deg: color,
+            color_270_deg: color,
+            color_315_deg: color,
+        };
+    }
+}
+
 /// Struct representing the RGB LEDs in the left eye of the robot.
 /// ## LED order:
 /// These LEDs are placed in the following order:
@@ -157,6 +324,21 @@ pub struct RightEye {
     pub color_225_deg: Color,
     pub color_270_deg: Color,
     pub color_315_deg: Color,
+}
+
+impl FillColor for RightEye {
+    fn fill(color: Color) {
+        RightEye {
+            color_0_deg: color,
+            color_45_deg: color,
+            color_90_deg: color,
+            color_135_deg: color,
+            color_180_deg: color,
+            color_225_deg: color,
+            color_270_deg: color,
+            color_315_deg: color,
+        };
+    }
 }
 
 /// Struct containing values of type `T` for all the joints
