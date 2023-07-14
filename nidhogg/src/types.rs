@@ -50,7 +50,6 @@ pub struct Skull {
 }
 
 impl FillExt<f32> for Skull {
-    /// Fill in all values with the same intensity.
     fn fill(intensity: f32) -> Skull {
         Skull {
             left_front_0: intensity,
@@ -97,7 +96,6 @@ pub struct LeftEar {
 }
 
 impl FillExt<f32> for LeftEar {
-    /// Fill in all values with the same intensity.
     fn fill(intensity: f32) -> LeftEar {
         LeftEar {
             intensity_0_deg: intensity,
@@ -142,7 +140,6 @@ pub struct RightEar {
 }
 
 impl FillExt<f32> for RightEar {
-    /// Fill in all values with the same intensity.
     fn fill(intensity: f32) -> RightEar {
         RightEar {
             intensity_0_deg: intensity,
@@ -331,7 +328,6 @@ pub struct LeftEye {
 }
 
 impl FillExt<Color> for LeftEye {
-    /// Fill in all values with the same color
     fn fill(color: Color) -> LeftEye {
         LeftEye {
             color_0_deg: color,
@@ -370,7 +366,6 @@ pub struct RightEye {
 }
 
 impl FillExt<Color> for RightEye {
-    /// Fill in all values with the same color
     fn fill(color: Color) -> RightEye {
         RightEye {
             color_0_deg: color,
@@ -583,7 +578,6 @@ pub struct HeadJoints<T> {
 }
 
 impl<T: Clone> FillExt<T> for HeadJoints<T> {
-    /// Fill in all values with the same value.
     fn fill(value: T) -> HeadJoints<T> {
         HeadJoints {
             yaw: value.clone(),
@@ -604,7 +598,6 @@ pub struct LeftLegJoints<T> {
 }
 
 impl<T: Clone> FillExt<T> for LeftLegJoints<T> {
-    /// Fill in all values with the same value.
     fn fill(value: T) -> LeftLegJoints<T> {
         LeftLegJoints {
             hip_yaw_pitch: value.clone(),
@@ -630,7 +623,6 @@ pub struct RightLegJoints<T> {
 }
 
 impl<T: Clone> FillExt<T> for RightLegJoints<T> {
-    /// Fill in all values with the same value.
     fn fill(value: T) -> RightLegJoints<T> {
         RightLegJoints {
             // hip_yaw_pitch: value.clone(),
@@ -651,7 +643,6 @@ pub struct LegJoints<T> {
 }
 
 impl<T: Clone> FillExt<T> for LegJoints<T> {
-    /// Fill in all values with the same value.
     fn fill(value: T) -> LegJoints<T> {
         LegJoints {
             left_leg: LeftLegJoints::fill(value.clone()),
@@ -672,7 +663,6 @@ pub struct SingleArmJoints<T> {
 }
 
 impl<T: Clone> FillExt<T> for SingleArmJoints<T> {
-    /// Fill in all values with the same value.
     fn fill(value: T) -> SingleArmJoints<T> {
         SingleArmJoints {
             shoulder_pitch: value.clone(),
