@@ -185,7 +185,11 @@ impl Color {
 
     /// Create a new color from a u32 value.
     pub fn new_u32(color: u32) -> Self {
-        Color::new_u8((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF)
+        Color::new_u8(
+            ((color >> 16) & 0xFF) as u8,
+            ((color >> 8) & 0xFF) as u8,
+            (color & 0xFF) as u8,
+        )
     }
 
     /// The color blue
@@ -462,7 +466,6 @@ pub struct JointArray<T> {
 }
 
 impl<T: Clone> FillExt<T> for JointArray<T> {
-    /// Fill in all values with the same value.
     fn fill(value: T) -> JointArray<T> {
         JointArray {
             head_yaw: value.clone(),
