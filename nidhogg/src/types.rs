@@ -22,6 +22,11 @@ pub struct Vector3<T> {
     pub z: T,
 }
 
+/// Fills all fields of the struct with the provided type.
+pub trait FillExt<T> {
+    fn fill(value: T) -> Self;
+}
+
 /// Struct representing the LEDs on top of the NAO robot's head.  
 ///
 /// Each value represents the intensity of a white LED.
@@ -43,9 +48,9 @@ pub struct Skull {
     pub right_rear_2: f32,
 }
 
-impl Skull {
+impl FillExt<f32> for Skull {
     /// Fill in all values with the same intensity.
-    pub fn fill(intensity: f32) -> Skull {
+    fn fill(intensity: f32) -> Skull {
         Skull {
             left_front_0: intensity,
             left_front_1: intensity,
@@ -90,9 +95,9 @@ pub struct LeftEar {
     pub intensity_324_deg: f32,
 }
 
-impl LeftEar {
+impl FillExt<f32> for LeftEar {
     /// Fill in all values with the same intensity.
-    pub fn fill(intensity: f32) -> LeftEar {
+    fn fill(intensity: f32) -> LeftEar {
         LeftEar {
             intensity_0_deg: intensity,
             intensity_36_deg: intensity,
@@ -135,9 +140,9 @@ pub struct RightEar {
     pub intensity_324_deg: f32,
 }
 
-impl RightEar {
+impl FillExt<f32> for RightEar {
     /// Fill in all values with the same intensity.
-    pub fn fill(intensity: f32) -> RightEar {
+    fn fill(intensity: f32) -> RightEar {
         RightEar {
             intensity_0_deg: intensity,
             intensity_36_deg: intensity,
@@ -323,9 +328,9 @@ pub struct LeftEye {
     pub color_315_deg: Color,
 }
 
-impl LeftEye {
+impl FillExt<Color> for LeftEye {
     /// Fill in all values with the same color
-    pub fn fill(color: Color) -> LeftEye {
+    fn fill(color: Color) -> LeftEye {
         LeftEye {
             color_0_deg: color,
             color_45_deg: color,
@@ -362,9 +367,9 @@ pub struct RightEye {
     pub color_315_deg: Color,
 }
 
-impl RightEye {
+impl FillExt<Color> for RightEye {
     /// Fill in all values with the same color
-    pub fn fill(color: Color) -> RightEye {
+    fn fill(color: Color) -> RightEye {
         RightEye {
             color_0_deg: color,
             color_45_deg: color,
