@@ -22,8 +22,9 @@ pub struct Vector3<T> {
     pub z: T,
 }
 
-/// Fills all fields of the struct with the provided type.
+/// Trait that introduces the [`fill`](`FillExt::fill`) method for a type, which allows filling in all fields with the same value.
 pub trait FillExt<T> {
+    /// Return a new instance of the type, with all fields set to the provided value.
     fn fill(value: T) -> Self;
 }
 
@@ -176,9 +177,18 @@ impl Color {
     /// Create a new color from three `u8` values.
     pub fn new_u8(red: u8, green: u8, blue: u8) -> Self {
         Self {
-            red: f32::from(red) / 255.0,
-            green: f32::from(green) / 255.0,
-            blue: f32::from(blue) / 255.0,
+            red: red as f32 / 255.0,
+            green: green as f32 / 255.0,
+            blue: blue as f32 / 255.0,
+        }
+    }
+
+    /// Create a new color from a integer value.
+    pub fn new_int(color: u32) -> Self {
+        Self {
+            red: ((color >> 16) & 0xFF) as f32 / 255.0,
+            green: ((color >> 8) & 0xFF) as f32 / 255.0,
+            blue: (color & 0xFF) as f32 / 255.0,
         }
     }
 
@@ -202,6 +212,8 @@ impl Color {
     pub const CYAN: Color = Color::AQUA;
 
     /// No color
+    ///
+    /// The LEDs will be turned off
     pub const EMPTY: Color = Color {
         red: 0.0,
         green: 0.0,
@@ -686,5 +698,42 @@ impl<T> JointArrayBuilder<T> {
         self.right_wrist_yaw = Some(joints.right_arm.wrist_yaw);
         self.right_hand = Some(joints.right_arm.hand);
         self
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::types::{FillExt, LeftEye};
+
+    #[test]
+    fn test_color_new() {
+        let color = super::Color::new(0.5, 0.5, 0.5);
+        assert_eq!(color.red, 0.5);
+        assert_eq!(color.green, 0.5);
+        assert_eq!(color.blue, 0.5);
+    }
+
+    #[test]
+    fn test_color_new_u8() {
+        let color = super::Color::new_u8(255, 255, 255);
+        assert_eq!(color.red, 1.0);
+        assert_eq!(color.green, 1.0);
+        assert_eq!(color.blue, 1.0);
+    }
+
+    #[test]
+    fn test_color_new_int() {
+        let color = super::Color::new_int(0xFFFFFF);
+        assert_eq!(color.red, 1.0);
+        assert_eq!(color.green, 1.0);
+        assert_eq!(color.blue, 1.0);
+    }
+
+    #[test]
+    fn test_color_fill() {
+        let color = LeftEye::fill(super::Color::new(0.5, 0.5, 0.5));
+        assert_eq!(color.color_0_deg.red, 0.5);
+        assert_eq!(color.color_0_deg.green, 0.5);
+        assert_eq!(color.color_0_deg.blue, 0.5);
     }
 }
