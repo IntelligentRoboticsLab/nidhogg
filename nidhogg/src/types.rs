@@ -185,11 +185,7 @@ impl Color {
 
     /// Create a new color from a u32 value.
     pub fn new_u32(color: u32) -> Self {
-        Self {
-            red: ((color >> 16) & 0xFF) as f32 / 255.0,
-            green: ((color >> 8) & 0xFF) as f32 / 255.0,
-            blue: (color & 0xFF) as f32 / 255.0,
-        }
+        Color::new_u8((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF)
     }
 
     /// The color blue
@@ -208,7 +204,7 @@ impl Color {
 
     /// No color
     ///
-    /// The LEDs will be turned off
+    /// This color will result in the LEDs being turned off.
     pub const EMPTY: Color = Color {
         red: 0.0,
         green: 0.0,
