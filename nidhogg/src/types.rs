@@ -183,8 +183,8 @@ impl Color {
         }
     }
 
-    /// Create a new color from a integer value.
-    pub fn new_int(color: u32) -> Self {
+    /// Create a new color from a u32 value.
+    pub fn new_u32(color: u32) -> Self {
         Self {
             red: ((color >> 16) & 0xFF) as f32 / 255.0,
             green: ((color >> 8) & 0xFF) as f32 / 255.0,
@@ -205,11 +205,6 @@ impl Color {
         green: 0.0,
         blue: 1.0,
     };
-
-    /// The color cyan
-    ///
-    /// Alias for [`Color::AQUA`]
-    pub const CYAN: Color = Color::AQUA;
 
     /// No color
     ///
@@ -247,11 +242,6 @@ impl Color {
         green: 0.0,
         blue: 1.0,
     };
-
-    /// The color fuchsia
-    ///
-    /// Alias for [`Color::MAGENTA`]
-    pub const FUCHSIA: Color = Color::MAGENTA;
 
     /// The color maroon
     pub const MAROON: Color = Color {
@@ -723,7 +713,7 @@ mod tests {
 
     #[test]
     fn test_color_new_int() {
-        let color = super::Color::new_int(0xFFFFFF);
+        let color = Color::new_u32(0xFFFFFF);
         assert_eq!(color.red, 1.0);
         assert_eq!(color.green, 1.0);
         assert_eq!(color.blue, 1.0);
