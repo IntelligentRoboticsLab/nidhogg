@@ -703,11 +703,11 @@ impl<T> JointArrayBuilder<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::types::{FillExt, LeftEye};
+    use crate::types::{Color, FillExt, LeftEye};
 
     #[test]
     fn test_color_new() {
-        let color = super::Color::new(0.5, 0.5, 0.5);
+        let color = Color::new(0.5, 0.5, 0.5);
         assert_eq!(color.red, 0.5);
         assert_eq!(color.green, 0.5);
         assert_eq!(color.blue, 0.5);
@@ -715,7 +715,7 @@ mod tests {
 
     #[test]
     fn test_color_new_u8() {
-        let color = super::Color::new_u8(255, 255, 255);
+        let color = Color::new_u8(255, 255, 255);
         assert_eq!(color.red, 1.0);
         assert_eq!(color.green, 1.0);
         assert_eq!(color.blue, 1.0);
@@ -731,7 +731,7 @@ mod tests {
 
     #[test]
     fn test_color_fill() {
-        let color = LeftEye::fill(super::Color::new(0.5, 0.5, 0.5));
+        let color = LeftEye::fill(Color::new(0.5, 0.5, 0.5));
         assert_eq!(color.color_0_deg.red, 0.5);
         assert_eq!(color.color_0_deg.green, 0.5);
         assert_eq!(color.color_0_deg.blue, 0.5);
