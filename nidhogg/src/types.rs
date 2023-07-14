@@ -192,17 +192,17 @@ impl Color {
         }
     }
 
-    /// The color aqua
-    pub const AQUA: Color = Color {
-        red: 0.0,
-        green: 1.0,
-        blue: 1.0,
-    };
-
     /// The color blue
     pub const BLUE: Color = Color {
         red: 0.0,
         green: 0.0,
+        blue: 1.0,
+    };
+
+    /// The color cyan
+    pub const CYAN: Color = Color {
+        red: 0.0,
+        green: 1.0,
         blue: 1.0,
     };
 
@@ -465,6 +465,39 @@ pub struct JointArray<T> {
     pub right_hand: T,
 }
 
+impl<T: Clone> FillExt<T> for JointArray<T> {
+    /// Fill in all values with the same value.
+    fn fill(value: T) -> JointArray<T> {
+        JointArray {
+            head_yaw: value.clone(),
+            head_pitch: value.clone(),
+            left_shoulder_pitch: value.clone(),
+            left_shoulder_roll: value.clone(),
+            left_elbow_yaw: value.clone(),
+            left_elbow_roll: value.clone(),
+            left_wrist_yaw: value.clone(),
+            left_hip_yaw_pitch: value.clone(),
+            left_hip_roll: value.clone(),
+            left_hip_pitch: value.clone(),
+            left_knee_pitch: value.clone(),
+            left_ankle_pitch: value.clone(),
+            left_ankle_roll: value.clone(),
+            right_shoulder_pitch: value.clone(),
+            right_shoulder_roll: value.clone(),
+            right_elbow_yaw: value.clone(),
+            right_elbow_roll: value.clone(),
+            right_wrist_yaw: value.clone(),
+            right_hip_roll: value.clone(),
+            right_hip_pitch: value.clone(),
+            right_knee_pitch: value.clone(),
+            right_ankle_pitch: value.clone(),
+            right_ankle_roll: value.clone(),
+            left_hand: value.clone(),
+            right_hand: value.clone(),
+        }
+    }
+}
+
 /// Struct representing the battery status of the robot.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -550,6 +583,16 @@ pub struct HeadJoints<T> {
     pub pitch: T,
 }
 
+impl<T: Clone> FillExt<T> for HeadJoints<T> {
+    /// Fill in all values with the same value.
+    fn fill(value: T) -> HeadJoints<T> {
+        HeadJoints {
+            yaw: value.clone(),
+            pitch: value.clone(),
+        }
+    }
+}
+
 /// Wrapper struct containing the left leg joints of the robot.
 #[derive(Builder, Clone, Debug, Default)]
 pub struct LeftLegJoints<T> {
@@ -559,6 +602,20 @@ pub struct LeftLegJoints<T> {
     pub knee_pitch: T,
     pub ankle_pitch: T,
     pub ankle_roll: T,
+}
+
+impl<T: Clone> FillExt<T> for LeftLegJoints<T> {
+    /// Fill in all values with the same value.
+    fn fill(value: T) -> LeftLegJoints<T> {
+        LeftLegJoints {
+            hip_yaw_pitch: value.clone(),
+            hip_roll: value.clone(),
+            hip_pitch: value.clone(),
+            knee_pitch: value.clone(),
+            ankle_pitch: value.clone(),
+            ankle_roll: value.clone(),
+        }
+    }
 }
 
 /// Wrapper struct containing right left leg joints of the robot.
@@ -573,11 +630,35 @@ pub struct RightLegJoints<T> {
     pub ankle_roll: T,
 }
 
+impl<T: Clone> FillExt<T> for RightLegJoints<T> {
+    /// Fill in all values with the same value.
+    fn fill(value: T) -> RightLegJoints<T> {
+        RightLegJoints {
+            // hip_yaw_pitch: value.clone(),
+            hip_roll: value.clone(),
+            hip_pitch: value.clone(),
+            knee_pitch: value.clone(),
+            ankle_pitch: value.clone(),
+            ankle_roll: value.clone(),
+        }
+    }
+}
+
 /// Wrapper struct containing joint values for both legs of the robot.
 #[derive(Builder, Clone, Debug, Default)]
 pub struct LegJoints<T> {
     pub left_leg: LeftLegJoints<T>,
     pub right_leg: RightLegJoints<T>,
+}
+
+impl<T: Clone> FillExt<T> for LegJoints<T> {
+    /// Fill in all values with the same value.
+    fn fill(value: T) -> LegJoints<T> {
+        LegJoints {
+            left_leg: LeftLegJoints::fill(value.clone()),
+            right_leg: RightLegJoints::fill(value.clone()),
+        }
+    }
 }
 
 /// Wrapper struct containing the joints for a single arm of the robot.
@@ -589,6 +670,20 @@ pub struct SingleArmJoints<T> {
     pub elbow_roll: T,
     pub wrist_yaw: T,
     pub hand: T,
+}
+
+impl<T: Clone> FillExt<T> for SingleArmJoints<T> {
+    /// Fill in all values with the same value.
+    fn fill(value: T) -> SingleArmJoints<T> {
+        SingleArmJoints {
+            shoulder_pitch: value.clone(),
+            shoulder_roll: value.clone(),
+            elbow_yaw: value.clone(),
+            elbow_roll: value.clone(),
+            wrist_yaw: value.clone(),
+            hand: value.clone(),
+        }
+    }
 }
 
 /// Type definition for the left arm joints of the robot.
