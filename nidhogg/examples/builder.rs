@@ -5,7 +5,7 @@ use nidhogg::{types::*, NaoControlMessage};
 fn main() -> Result<()> {
     let cool_float = 1337.0;
     let cool_bool = false;
-    let cool_color = Color::new(0.42, 0.42, 0.42);
+    let cool_color = Color::GRAY;
 
     let _build = JointArray::<f32>::builder().leg_joints(LegJoints::default());
 

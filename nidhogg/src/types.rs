@@ -22,6 +22,12 @@ pub struct Vector3<T> {
     pub z: T,
 }
 
+/// Trait that introduces the [`fill`](`FillExt::fill`) method for a type, which allows filling in all fields with the same value.
+pub trait FillExt<T> {
+    /// Return a new instance of the type, with all fields set to the provided value.
+    fn fill(value: T) -> Self;
+}
+
 /// Struct representing the LEDs on top of the NAO robot's head.  
 ///
 /// Each value represents the intensity of a white LED.
@@ -41,6 +47,25 @@ pub struct Skull {
     pub right_rear_0: f32,
     pub right_rear_1: f32,
     pub right_rear_2: f32,
+}
+
+impl FillExt<f32> for Skull {
+    fn fill(intensity: f32) -> Skull {
+        Skull {
+            left_front_0: intensity,
+            left_front_1: intensity,
+            left_middle_0: intensity,
+            left_rear_0: intensity,
+            left_rear_1: intensity,
+            left_rear_2: intensity,
+            right_front_0: intensity,
+            right_front_1: intensity,
+            right_middle_0: intensity,
+            right_rear_0: intensity,
+            right_rear_1: intensity,
+            right_rear_2: intensity,
+        }
+    }
 }
 
 /// Struct representing the LED intensities in the left ear of the robot.
@@ -70,6 +95,23 @@ pub struct LeftEar {
     pub intensity_324_deg: f32,
 }
 
+impl FillExt<f32> for LeftEar {
+    fn fill(intensity: f32) -> LeftEar {
+        LeftEar {
+            intensity_0_deg: intensity,
+            intensity_36_deg: intensity,
+            intensity_72_deg: intensity,
+            intensity_108_deg: intensity,
+            intensity_144_deg: intensity,
+            intensity_180_deg: intensity,
+            intensity_216_deg: intensity,
+            intensity_252_deg: intensity,
+            intensity_288_deg: intensity,
+            intensity_324_deg: intensity,
+        }
+    }
+}
+
 /// Struct representing the LED intensities in the right ear of the robot.
 ///
 /// ## LED order:
@@ -97,6 +139,23 @@ pub struct RightEar {
     pub intensity_324_deg: f32,
 }
 
+impl FillExt<f32> for RightEar {
+    fn fill(intensity: f32) -> RightEar {
+        RightEar {
+            intensity_0_deg: intensity,
+            intensity_36_deg: intensity,
+            intensity_72_deg: intensity,
+            intensity_108_deg: intensity,
+            intensity_144_deg: intensity,
+            intensity_180_deg: intensity,
+            intensity_216_deg: intensity,
+            intensity_252_deg: intensity,
+            intensity_288_deg: intensity,
+            intensity_324_deg: intensity,
+        }
+    }
+}
+
 /// Struct representing an RGB color.
 #[derive(Debug, Default, Clone, Copy, Builder)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -111,6 +170,138 @@ impl Color {
     pub fn new(red: f32, green: f32, blue: f32) -> Self {
         Self { red, green, blue }
     }
+
+    /// Create a new color from three `u8` values.
+    pub fn new_u8(red: u8, green: u8, blue: u8) -> Self {
+        Self {
+            red: red as f32 / 255.0,
+            green: green as f32 / 255.0,
+            blue: blue as f32 / 255.0,
+        }
+    }
+
+    /// Create a new color from a u32 value.
+    pub fn new_u32(color: u32) -> Self {
+        Color::new_u8(
+            ((color >> 16) & 0xFF) as u8,
+            ((color >> 8) & 0xFF) as u8,
+            (color & 0xFF) as u8,
+        )
+    }
+
+    /// The color blue
+    pub const BLUE: Color = Color {
+        red: 0.0,
+        green: 0.0,
+        blue: 1.0,
+    };
+
+    /// The color cyan
+    pub const CYAN: Color = Color {
+        red: 0.0,
+        green: 1.0,
+        blue: 1.0,
+    };
+
+    /// No color
+    ///
+    /// This color will result in the LEDs being turned off.
+    pub const EMPTY: Color = Color {
+        red: 0.0,
+        green: 0.0,
+        blue: 0.0,
+    };
+
+    /// The color gray
+    pub const GRAY: Color = Color {
+        red: 0.5,
+        green: 0.5,
+        blue: 0.5,
+    };
+
+    /// The color green
+    pub const GREEN: Color = Color {
+        red: 0.0,
+        green: 0.5,
+        blue: 0.0,
+    };
+
+    /// The color lime
+    pub const LIME: Color = Color {
+        red: 0.0,
+        green: 1.0,
+        blue: 0.0,
+    };
+
+    /// The color magenta
+    pub const MAGENTA: Color = Color {
+        red: 1.0,
+        green: 0.0,
+        blue: 1.0,
+    };
+
+    /// The color maroon
+    pub const MAROON: Color = Color {
+        red: 0.5,
+        green: 0.0,
+        blue: 0.0,
+    };
+
+    /// The color navy
+    pub const NAVY: Color = Color {
+        red: 0.0,
+        green: 0.0,
+        blue: 0.5,
+    };
+
+    /// The color olive
+    pub const OLIVE: Color = Color {
+        red: 0.5,
+        green: 0.5,
+        blue: 0.0,
+    };
+
+    /// The color purple
+    pub const PURPLE: Color = Color {
+        red: 0.5,
+        green: 0.0,
+        blue: 0.5,
+    };
+
+    /// The color red
+    pub const RED: Color = Color {
+        red: 1.0,
+        green: 0.0,
+        blue: 0.0,
+    };
+
+    /// The color silver
+    pub const SILVER: Color = Color {
+        red: 0.75,
+        green: 0.75,
+        blue: 0.75,
+    };
+
+    /// The color teal
+    pub const TEAL: Color = Color {
+        red: 0.0,
+        green: 0.5,
+        blue: 0.5,
+    };
+
+    /// The color white
+    pub const WHITE: Color = Color {
+        red: 1.0,
+        green: 1.0,
+        blue: 1.0,
+    };
+
+    /// The color yellow
+    pub const YELLOW: Color = Color {
+        red: 1.0,
+        green: 1.0,
+        blue: 0.0,
+    };
 }
 
 /// Struct representing the RGB LEDs in the left eye of the robot.
@@ -136,6 +327,21 @@ pub struct LeftEye {
     pub color_315_deg: Color,
 }
 
+impl FillExt<Color> for LeftEye {
+    fn fill(color: Color) -> LeftEye {
+        LeftEye {
+            color_0_deg: color,
+            color_45_deg: color,
+            color_90_deg: color,
+            color_135_deg: color,
+            color_180_deg: color,
+            color_225_deg: color,
+            color_270_deg: color,
+            color_315_deg: color,
+        }
+    }
+}
+
 /// Struct representing the RGB LEDs in the left eye of the robot.
 /// ## LED order:
 /// These LEDs are placed in the following order:
@@ -157,6 +363,21 @@ pub struct RightEye {
     pub color_225_deg: Color,
     pub color_270_deg: Color,
     pub color_315_deg: Color,
+}
+
+impl FillExt<Color> for RightEye {
+    fn fill(color: Color) -> RightEye {
+        RightEye {
+            color_0_deg: color,
+            color_45_deg: color,
+            color_90_deg: color,
+            color_135_deg: color,
+            color_180_deg: color,
+            color_225_deg: color,
+            color_270_deg: color,
+            color_315_deg: color,
+        }
+    }
 }
 
 /// Struct containing values of type `T` for all the joints
@@ -237,6 +458,38 @@ pub struct JointArray<T> {
 
     /// The joint representing the right hand.
     pub right_hand: T,
+}
+
+impl<T: Clone> FillExt<T> for JointArray<T> {
+    fn fill(value: T) -> JointArray<T> {
+        JointArray {
+            head_yaw: value.clone(),
+            head_pitch: value.clone(),
+            left_shoulder_pitch: value.clone(),
+            left_shoulder_roll: value.clone(),
+            left_elbow_yaw: value.clone(),
+            left_elbow_roll: value.clone(),
+            left_wrist_yaw: value.clone(),
+            left_hip_yaw_pitch: value.clone(),
+            left_hip_roll: value.clone(),
+            left_hip_pitch: value.clone(),
+            left_knee_pitch: value.clone(),
+            left_ankle_pitch: value.clone(),
+            left_ankle_roll: value.clone(),
+            right_shoulder_pitch: value.clone(),
+            right_shoulder_roll: value.clone(),
+            right_elbow_yaw: value.clone(),
+            right_elbow_roll: value.clone(),
+            right_wrist_yaw: value.clone(),
+            right_hip_roll: value.clone(),
+            right_hip_pitch: value.clone(),
+            right_knee_pitch: value.clone(),
+            right_ankle_pitch: value.clone(),
+            right_ankle_roll: value.clone(),
+            left_hand: value.clone(),
+            right_hand: value.clone(),
+        }
+    }
 }
 
 /// Struct representing the battery status of the robot.
@@ -324,6 +577,15 @@ pub struct HeadJoints<T> {
     pub pitch: T,
 }
 
+impl<T: Clone> FillExt<T> for HeadJoints<T> {
+    fn fill(value: T) -> HeadJoints<T> {
+        HeadJoints {
+            yaw: value.clone(),
+            pitch: value.clone(),
+        }
+    }
+}
+
 /// Wrapper struct containing the left leg joints of the robot.
 #[derive(Builder, Clone, Debug, Default)]
 pub struct LeftLegJoints<T> {
@@ -333,6 +595,19 @@ pub struct LeftLegJoints<T> {
     pub knee_pitch: T,
     pub ankle_pitch: T,
     pub ankle_roll: T,
+}
+
+impl<T: Clone> FillExt<T> for LeftLegJoints<T> {
+    fn fill(value: T) -> LeftLegJoints<T> {
+        LeftLegJoints {
+            hip_yaw_pitch: value.clone(),
+            hip_roll: value.clone(),
+            hip_pitch: value.clone(),
+            knee_pitch: value.clone(),
+            ankle_pitch: value.clone(),
+            ankle_roll: value.clone(),
+        }
+    }
 }
 
 /// Wrapper struct containing right left leg joints of the robot.
@@ -347,11 +622,33 @@ pub struct RightLegJoints<T> {
     pub ankle_roll: T,
 }
 
+impl<T: Clone> FillExt<T> for RightLegJoints<T> {
+    fn fill(value: T) -> RightLegJoints<T> {
+        RightLegJoints {
+            // hip_yaw_pitch: value.clone(),
+            hip_roll: value.clone(),
+            hip_pitch: value.clone(),
+            knee_pitch: value.clone(),
+            ankle_pitch: value.clone(),
+            ankle_roll: value.clone(),
+        }
+    }
+}
+
 /// Wrapper struct containing joint values for both legs of the robot.
 #[derive(Builder, Clone, Debug, Default)]
 pub struct LegJoints<T> {
     pub left_leg: LeftLegJoints<T>,
     pub right_leg: RightLegJoints<T>,
+}
+
+impl<T: Clone> FillExt<T> for LegJoints<T> {
+    fn fill(value: T) -> LegJoints<T> {
+        LegJoints {
+            left_leg: LeftLegJoints::fill(value.clone()),
+            right_leg: RightLegJoints::fill(value.clone()),
+        }
+    }
 }
 
 /// Wrapper struct containing the joints for a single arm of the robot.
@@ -363,6 +660,19 @@ pub struct SingleArmJoints<T> {
     pub elbow_roll: T,
     pub wrist_yaw: T,
     pub hand: T,
+}
+
+impl<T: Clone> FillExt<T> for SingleArmJoints<T> {
+    fn fill(value: T) -> SingleArmJoints<T> {
+        SingleArmJoints {
+            shoulder_pitch: value.clone(),
+            shoulder_roll: value.clone(),
+            elbow_yaw: value.clone(),
+            elbow_roll: value.clone(),
+            wrist_yaw: value.clone(),
+            hand: value.clone(),
+        }
+    }
 }
 
 /// Type definition for the left arm joints of the robot.
@@ -462,5 +772,42 @@ impl<T> JointArrayBuilder<T> {
         self.right_wrist_yaw = Some(joints.right_arm.wrist_yaw);
         self.right_hand = Some(joints.right_arm.hand);
         self
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::types::{Color, FillExt, LeftEye};
+
+    #[test]
+    fn test_color_new() {
+        let color = Color::new(0.5, 0.5, 0.5);
+        assert_eq!(color.red, 0.5);
+        assert_eq!(color.green, 0.5);
+        assert_eq!(color.blue, 0.5);
+    }
+
+    #[test]
+    fn test_color_new_u8() {
+        let color = Color::new_u8(255, 255, 255);
+        assert_eq!(color.red, 1.0);
+        assert_eq!(color.green, 1.0);
+        assert_eq!(color.blue, 1.0);
+    }
+
+    #[test]
+    fn test_color_new_int() {
+        let color = Color::new_u32(0xFFFFFF);
+        assert_eq!(color.red, 1.0);
+        assert_eq!(color.green, 1.0);
+        assert_eq!(color.blue, 1.0);
+    }
+
+    #[test]
+    fn test_color_fill() {
+        let color = LeftEye::fill(Color::new(0.5, 0.5, 0.5));
+        assert_eq!(color.color_0_deg.red, 0.5);
+        assert_eq!(color.color_0_deg.green, 0.5);
+        assert_eq!(color.color_0_deg.blue, 0.5);
     }
 }
