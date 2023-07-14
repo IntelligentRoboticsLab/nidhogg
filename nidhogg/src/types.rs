@@ -44,7 +44,7 @@ pub struct Skull {
 }
 
 impl Skull {
-    /// Fill in all values with the same intensity
+    /// Fill in all values with the same intensity.
     pub fn fill(intensity: f32) -> Skull {
         Skull {
             left_front_0: intensity,
@@ -91,7 +91,7 @@ pub struct LeftEar {
 }
 
 impl LeftEar {
-    /// Fill in all values with the same intensity
+    /// Fill in all values with the same intensity.
     pub fn fill(intensity: f32) -> LeftEar {
         LeftEar {
             intensity_0_deg: intensity,
@@ -136,7 +136,7 @@ pub struct RightEar {
 }
 
 impl RightEar {
-    /// Fill in all values with the same intensity
+    /// Fill in all values with the same intensity.
     pub fn fill(intensity: f32) -> RightEar {
         RightEar {
             intensity_0_deg: intensity,
@@ -177,81 +177,122 @@ impl Color {
         }
     }
 
+    /// The color aqua
+    pub const AQUA: Color = Color {
+        red: 0.0,
+        green: 1.0,
+        blue: 1.0,
+    };
+
+    /// The color blue
     pub const BLUE: Color = Color {
         red: 0.0,
         green: 0.0,
         blue: 1.0,
     };
-    pub const CYAN: Color = Color {
-        red: 0.0,
-        green: 1.0,
-        blue: 1.0,
-    };
+
+    /// The color cyan
+    ///
+    /// Alias for [`Color::AQUA`]
+    pub const CYAN: Color = Color::AQUA;
+
+    /// No color
     pub const EMPTY: Color = Color {
         red: 0.0,
         green: 0.0,
         blue: 0.0,
     };
+
+    /// The color gray
     pub const GRAY: Color = Color {
         red: 0.5,
         green: 0.5,
         blue: 0.5,
     };
+
+    /// The color green
     pub const GREEN: Color = Color {
         red: 0.0,
         green: 0.5,
         blue: 0.0,
     };
+
+    /// The color lime
     pub const LIME: Color = Color {
         red: 0.0,
         green: 1.0,
         blue: 0.0,
     };
+
+    /// The color magenta
     pub const MAGENTA: Color = Color {
         red: 1.0,
         green: 0.0,
         blue: 1.0,
     };
+
+    /// The color fuchsia
+    ///
+    /// Alias for [`Color::MAGENTA`]
+    pub const FUCHSIA: Color = Color::MAGENTA;
+
+    /// The color maroon
     pub const MAROON: Color = Color {
         red: 0.5,
         green: 0.0,
         blue: 0.0,
     };
+
+    /// The color navy
     pub const NAVY: Color = Color {
         red: 0.0,
         green: 0.0,
         blue: 0.5,
     };
+
+    /// The color olive
     pub const OLIVE: Color = Color {
         red: 0.5,
         green: 0.5,
         blue: 0.0,
     };
+
+    /// The color purple
     pub const PURPLE: Color = Color {
         red: 0.5,
         green: 0.0,
         blue: 0.5,
     };
+
+    /// The color red
     pub const RED: Color = Color {
         red: 1.0,
         green: 0.0,
         blue: 0.0,
     };
+
+    /// The color silver
     pub const SILVER: Color = Color {
         red: 0.75,
         green: 0.75,
         blue: 0.75,
     };
+
+    /// The color teal
     pub const TEAL: Color = Color {
         red: 0.0,
         green: 0.5,
         blue: 0.5,
     };
+
+    /// The color white
     pub const WHITE: Color = Color {
         red: 1.0,
         green: 1.0,
         blue: 1.0,
     };
+
+    /// The color yellow
     pub const YELLOW: Color = Color {
         red: 1.0,
         green: 1.0,
