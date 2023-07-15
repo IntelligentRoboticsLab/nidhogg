@@ -358,20 +358,48 @@ impl BulletNao {
 
     pub fn get_touch(&self, physics_client: &mut PhysicsClient) -> Result<Touch<f32>> {
         Ok(Touch {
-            chest_board: physics_client.read_user_debug_parameter(self.touch_input.chest_board)? as f32,
-            head_front: physics_client.read_user_debug_parameter(self.touch_input.head_front)? as f32,
-            head_middle: physics_client.read_user_debug_parameter(self.touch_input.head_middle)? as f32,
-            head_rear: physics_client.read_user_debug_parameter(self.touch_input.head_rear)? as f32,
-            left_foot_left: physics_client.read_user_debug_parameter(self.touch_input.left_foot_left)? as f32,
-            left_foot_right: physics_client.read_user_debug_parameter(self.touch_input.left_foot_right)? as f32,
-            left_hand_back: physics_client.read_user_debug_parameter(self.touch_input.left_hand_back)? as f32,
-            left_hand_left: physics_client.read_user_debug_parameter(self.touch_input.left_hand_left)? as f32,
-            left_hand_right: physics_client.read_user_debug_parameter(self.touch_input.left_hand_right)? as f32,
-            right_foot_left: physics_client.read_user_debug_parameter(self.touch_input.right_foot_left)? as f32,
-            right_foot_right: physics_client.read_user_debug_parameter(self.touch_input.right_foot_right)? as f32,
-            right_hand_back: physics_client.read_user_debug_parameter(self.touch_input.right_hand_back)? as f32,
-            right_hand_left: physics_client.read_user_debug_parameter(self.touch_input.right_hand_left)? as f32,
-            right_hand_right: physics_client.read_user_debug_parameter(self.touch_input.right_hand_right)? as f32,
+            chest_board: physics_client
+                .read_user_debug_parameter(self.touch_input.chest_board)
+                .unwrap_or_default() as f32,
+            head_front: physics_client
+                .read_user_debug_parameter(self.touch_input.head_front)
+                .unwrap_or_default() as f32,
+            head_middle: physics_client
+                .read_user_debug_parameter(self.touch_input.head_middle)
+                .unwrap_or_default() as f32,
+            head_rear: physics_client
+                .read_user_debug_parameter(self.touch_input.head_rear)
+                .unwrap_or_default() as f32,
+            left_foot_left: physics_client
+                .read_user_debug_parameter(self.touch_input.left_foot_left)
+                .unwrap_or_default() as f32,
+            left_foot_right: physics_client
+                .read_user_debug_parameter(self.touch_input.left_foot_right)
+                .unwrap_or_default() as f32,
+            left_hand_back: physics_client
+                .read_user_debug_parameter(self.touch_input.left_hand_back)
+                .unwrap_or_default() as f32,
+            left_hand_left: physics_client
+                .read_user_debug_parameter(self.touch_input.left_hand_left)
+                .unwrap_or_default() as f32,
+            left_hand_right: physics_client
+                .read_user_debug_parameter(self.touch_input.left_hand_right)
+                .unwrap_or_default() as f32,
+            right_foot_left: physics_client
+                .read_user_debug_parameter(self.touch_input.right_foot_left)
+                .unwrap_or_default() as f32,
+            right_foot_right: physics_client
+                .read_user_debug_parameter(self.touch_input.right_foot_right)
+                .unwrap_or_default() as f32,
+            right_hand_back: physics_client
+                .read_user_debug_parameter(self.touch_input.right_hand_back)
+                .unwrap_or_default() as f32,
+            right_hand_left: physics_client
+                .read_user_debug_parameter(self.touch_input.right_hand_left)
+                .unwrap_or_default() as f32,
+            right_hand_right: physics_client
+                .read_user_debug_parameter(self.touch_input.right_hand_right)
+                .unwrap_or_default() as f32,
         })
     }
 }

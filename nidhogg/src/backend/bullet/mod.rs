@@ -1,7 +1,10 @@
 #![allow(missing_debug_implementations)]
-use crate::{NaoBackend, NaoControlMessage, NaoState, Result, types::{Vector3, Vector2}};
+use crate::{
+    types::{Vector2, Vector3},
+    NaoBackend, NaoControlMessage, NaoState, Result,
+};
 use environment::NaoBulletEnvironment;
-use rubullet::{nalgebra::Isometry3, Mode, PhysicsClient};
+use rubullet::{nalgebra::Isometry3, Mode, PhysicsClient, SetPhysicsEngineParameterOptions};
 
 use self::nao::BulletNao;
 
@@ -17,10 +20,18 @@ pub struct BulletBackend {
 
 impl NaoBackend for BulletBackend {
     fn connect() -> Result<Self> {
-        let mut physics_client = PhysicsClient::connect(Mode::Gui)?;
+        let mut physics_client = PhysicsClient::connect(Mode::GuiMainThread)?;
         let environment = NaoBulletEnvironment::create(&mut physics_client)?;
-        let start_position = Isometry3::translation(0.0, 0.0, 0.29);
+        let start_position = Isometry3::translation(0.0, 0.0, 0.30);
         let nao = BulletNao::create(&mut physics_client, start_position)?;
+
+        println!("{:?}", physics_client.get_physics_engine_parameters()?);
+
+        physics_client.set_physics_engine_parameter(SetPhysicsEngineParameterOptions {
+            num_solver_iterations: Some(1000),
+            enable_cone_friction: Some(true),
+            ..Default::default()
+        });
 
         Ok(BulletBackend {
             physics_client,
@@ -40,9 +51,17 @@ impl NaoBackend for BulletBackend {
         Ok(NaoState {
             position: Default::default(),
             stiffness: Default::default(),
-            accelerometer: Vector3 { x: 0.0, y: 0.0, z: 0.0},
-            gyroscope: Vector3 { x: 0.0, y: 0.0, z: 0.0},
-            angles: Vector2 { x: 0.0, y: 0.0},
+            accelerometer: Vector3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            gyroscope: Vector3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            angles: Vector2 { x: 0.0, y: 0.0 },
             sonar: Default::default(),
             force_sensitive_resistors: Default::default(),
             touch: self.nao.get_touch(&mut self.physics_client)?,

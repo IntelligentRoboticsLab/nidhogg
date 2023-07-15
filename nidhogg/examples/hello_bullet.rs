@@ -2,7 +2,6 @@
 use nidhogg::backend::BulletBackend;
 use nidhogg::types::JointArray;
 use nidhogg::{NaoBackend, NaoControlMessage, Result};
-use std::{thread, time::Duration};
 
 fn main() -> Result<()> {
     let mut bullet = BulletBackend::connect()?;
@@ -39,7 +38,6 @@ fn main() -> Result<()> {
                 )
                 .build(),
         )?;
-        thread::sleep(Duration::from_millis(1));
         nao_state = bullet.read_nao_state()?;
     }
 
