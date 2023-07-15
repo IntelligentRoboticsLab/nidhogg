@@ -1,6 +1,6 @@
-use std::collections::HashMap;
 use rubullet::nalgebra::Isometry3;
 use rubullet::{BodyId, JointInfo, LoadModelFlags, PhysicsClient, UrdfOptions};
+use std::collections::HashMap;
 
 use crate::types::JointArray;
 use crate::Result;
@@ -11,7 +11,7 @@ macro_rules! to_nidhogg {
     };
     ($target: ident, "HeadPitch") => {
         $target.head_pitch
-};
+    };
     ($target: ident, "LHipYawPitch") => {
         $target.left_hip_yaw_pitch
     };

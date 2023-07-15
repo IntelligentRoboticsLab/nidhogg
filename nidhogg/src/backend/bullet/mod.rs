@@ -1,5 +1,5 @@
 #![allow(missing_debug_implementations)]
-use crate::NaoBackend;
+use crate::{NaoBackend, NaoControlMessage, NaoState, Result};
 use environment::NaoBulletEnvironment;
 use rubullet::{nalgebra::Isometry3, Mode, PhysicsClient};
 
@@ -16,7 +16,7 @@ pub struct BulletBackend {
 }
 
 impl NaoBackend for BulletBackend {
-    fn connect() -> crate::Result<Self> {
+    fn connect() -> Result<Self> {
         let mut physics_client = PhysicsClient::connect(Mode::Gui)?;
         let environment = NaoBulletEnvironment::create(&mut physics_client)?;
         let start_position = Isometry3::translation(0.0, 0.0, 0.29);
@@ -29,14 +29,14 @@ impl NaoBackend for BulletBackend {
         })
     }
 
-    fn send_control_msg(&mut self, update: crate::NaoControlMessage) -> crate::Result<()> {
+    fn send_control_msg(&mut self, update: NaoControlMessage) -> Result<()> {
         self.nao
             .set_angles(&mut self.physics_client, update.position, update.stiffness);
         self.physics_client.step_simulation()?;
         Ok(())
     }
 
-    fn read_nao_state(&mut self) -> crate::Result<crate::NaoState> {
+    fn read_nao_state(&mut self) -> Result<NaoState> {
         todo!()
     }
 }
