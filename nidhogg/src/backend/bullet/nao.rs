@@ -2,7 +2,7 @@ use rubullet::nalgebra::Isometry3;
 use rubullet::{BodyId, ItemId, JointInfo, LoadModelFlags, PhysicsClient, UrdfOptions};
 use std::collections::HashMap;
 
-use crate::types::{JointArray, Touch};
+use crate::types::{ForceSensitiveResistorFoot, ForceSensitiveResistors, JointArray, Touch};
 use crate::Result;
 
 macro_rules! to_nidhogg {
@@ -401,6 +401,40 @@ impl BulletNao {
                 .read_user_debug_parameter(self.touch_input.right_hand_right)
                 .unwrap_or_default() as f32,
         })
+    }
+
+    pub fn get_fsr(&self, physics_client: &mut PhysicsClient) -> Result<ForceSensitiveResistors> {
+        Ok(ForceSensitiveResistors {
+            left_foot: ForceSensitiveResistorFoot {
+                front_left: self.get_fsr_value(physics_client, "LFsrFL_frame")?,
+                front_right: self.get_fsr_value(physics_client, "LFsrFR_frame")?,
+                rear_left: self.get_fsr_value(physics_client, "LFsrRL_frame")?,
+                rear_right: self.get_fsr_value(physics_client, "LFsrRR_frame")?,
+            },
+            right_foot: ForceSensitiveResistorFoot {
+                front_left: self.get_fsr_value(physics_client, "RFsrFL_frame")?,
+                front_right: self.get_fsr_value(physics_client, "RFsrFR_frame")?,
+                rear_left: self.get_fsr_value(physics_client, "RFsrRL_frame")?,
+                rear_right: self.get_fsr_value(physics_client, "RFsrRR_frame")?,
+            },
+        })
+    }
+
+    fn get_fsr_value(&self, physics_client: &mut PhysicsClient, fsr_link: &str) -> Result<f32> {
+        let contact_points = physics_client
+            .get_contact_points(
+                self.id,
+                None,
+                Some(self.link_map.get(fsr_link).map(|f| f.joint_index)),
+                None,
+            )?;
+
+        let mut total_force = 0f32;
+        for contact in contact_points {
+            total_force += contact.normal_force.unwrap_or(0.0) as f32;
+        }
+
+        Ok(total_force)
     }
 }
 #[derive(Debug)]

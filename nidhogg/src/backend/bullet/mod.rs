@@ -63,7 +63,7 @@ impl NaoBackend for BulletBackend {
             },
             angles: Vector2 { x: 0.0, y: 0.0 },
             sonar: Default::default(),
-            force_sensitive_resistors: Default::default(),
+            force_sensitive_resistors: self.nao.get_fsr(&mut self.physics_client)?,
             touch: self.nao.get_touch(&mut self.physics_client)?,
             battery: Default::default(),
             temperature: Default::default(),
