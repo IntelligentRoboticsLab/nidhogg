@@ -410,7 +410,7 @@ impl FromNidhogg<SonarEnabled> for [bool; 2] {
     }
 }
 
-impl FromLoLA<[f32; 14]> for Touch {
+impl FromLoLA<[f32; 14]> for Touch<f32> {
     fn from_lola(value: [f32; 14]) -> Self {
         Self {
             chest_board: value[0],

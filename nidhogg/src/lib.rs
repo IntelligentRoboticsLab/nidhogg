@@ -100,7 +100,7 @@ pub struct NaoState {
     pub angles: Vector2<f32>,
     pub sonar: SonarValues,
     pub force_sensitive_resistors: ForceSensitiveResistors,
-    pub touch: Touch,
+    pub touch: Touch<f32>,
 
     // Diagnostics
     pub battery: Battery,

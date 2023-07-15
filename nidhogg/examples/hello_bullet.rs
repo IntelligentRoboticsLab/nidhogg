@@ -8,6 +8,7 @@ fn main() -> Result<()> {
     let mut bullet = BulletBackend::connect()?;
 
     let stiffness = 1.0;
+    let mut nao_state = bullet.read_nao_state()?;
     for t in 0..10000 {
         bullet.send_control_msg(
             NaoControlMessage::builder()
@@ -19,7 +20,7 @@ fn main() -> Result<()> {
                         .right_knee_pitch(std::f32::consts::FRAC_PI_4)
                         .left_hip_pitch(-std::f32::consts::FRAC_PI_6)
                         .right_hip_pitch(-std::f32::consts::FRAC_PI_6)
-                        .head_yaw(1.5333 * f32::sin(0.01 * (t as f32)))
+                        .head_yaw(1.5333 * f32::sin(nao_state.touch.chest_board * (t as f32)))
                         .build(),
                 )
                 .stiffness(
@@ -39,6 +40,7 @@ fn main() -> Result<()> {
                 .build(),
         )?;
         thread::sleep(Duration::from_millis(1));
+        nao_state = bullet.read_nao_state()?;
     }
 
     Ok(())

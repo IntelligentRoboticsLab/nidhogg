@@ -1,5 +1,5 @@
 #![allow(missing_debug_implementations)]
-use crate::{NaoBackend, NaoControlMessage, NaoState, Result};
+use crate::{NaoBackend, NaoControlMessage, NaoState, Result, types::{Vector3, Vector2}};
 use environment::NaoBulletEnvironment;
 use rubullet::{nalgebra::Isometry3, Mode, PhysicsClient};
 
@@ -37,6 +37,19 @@ impl NaoBackend for BulletBackend {
     }
 
     fn read_nao_state(&mut self) -> Result<NaoState> {
-        todo!()
+        Ok(NaoState {
+            position: Default::default(),
+            stiffness: Default::default(),
+            accelerometer: Vector3 { x: 0.0, y: 0.0, z: 0.0},
+            gyroscope: Vector3 { x: 0.0, y: 0.0, z: 0.0},
+            angles: Vector2 { x: 0.0, y: 0.0},
+            sonar: Default::default(),
+            force_sensitive_resistors: Default::default(),
+            touch: self.nao.get_touch(&mut self.physics_client)?,
+            battery: Default::default(),
+            temperature: Default::default(),
+            current: Default::default(),
+            status: Default::default(),
+        })
     }
 }
