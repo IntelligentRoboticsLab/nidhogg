@@ -2,7 +2,6 @@ use crate::Result;
 use rubullet::nalgebra::Vector3;
 use rubullet::{BodyId, PhysicsClient};
 
-
 #[derive(Debug)]
 pub struct NaoBulletEnvironment {
     pub plane_id: BodyId,

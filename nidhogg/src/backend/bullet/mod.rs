@@ -1,5 +1,5 @@
 #![allow(missing_debug_implementations)]
-use crate::NaoBackend;
+use crate::{NaoBackend, NaoControlMessage, NaoState, Result, types::{Vector3, Vector2}};
 use environment::NaoBulletEnvironment;
 use rubullet::{nalgebra::Isometry3, Mode, PhysicsClient};
 
@@ -16,7 +16,7 @@ pub struct BulletBackend {
 }
 
 impl NaoBackend for BulletBackend {
-    fn connect() -> crate::Result<Self> {
+    fn connect() -> Result<Self> {
         let mut physics_client = PhysicsClient::connect(Mode::Gui)?;
         let environment = NaoBulletEnvironment::create(&mut physics_client)?;
         let start_position = Isometry3::translation(0.0, 0.0, 0.29);
@@ -29,14 +29,27 @@ impl NaoBackend for BulletBackend {
         })
     }
 
-    fn send_control_msg(&mut self, update: crate::NaoControlMessage) -> crate::Result<()> {
+    fn send_control_msg(&mut self, update: NaoControlMessage) -> Result<()> {
         self.nao
             .set_angles(&mut self.physics_client, update.position, update.stiffness);
         self.physics_client.step_simulation()?;
         Ok(())
     }
 
-    fn read_nao_state(&mut self) -> crate::Result<crate::NaoState> {
-        todo!()
+    fn read_nao_state(&mut self) -> Result<NaoState> {
+        Ok(NaoState {
+            position: Default::default(),
+            stiffness: Default::default(),
+            accelerometer: Vector3 { x: 0.0, y: 0.0, z: 0.0},
+            gyroscope: Vector3 { x: 0.0, y: 0.0, z: 0.0},
+            angles: Vector2 { x: 0.0, y: 0.0},
+            sonar: Default::default(),
+            force_sensitive_resistors: Default::default(),
+            touch: self.nao.get_touch(&mut self.physics_client)?,
+            battery: Default::default(),
+            temperature: Default::default(),
+            current: Default::default(),
+            status: Default::default(),
+        })
     }
 }

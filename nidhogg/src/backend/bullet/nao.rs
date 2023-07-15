@@ -1,8 +1,8 @@
-use std::collections::HashMap;
 use rubullet::nalgebra::Isometry3;
-use rubullet::{BodyId, JointInfo, LoadModelFlags, PhysicsClient, UrdfOptions};
+use rubullet::{BodyId, ItemId, JointInfo, LoadModelFlags, PhysicsClient, UrdfOptions};
+use std::collections::HashMap;
 
-use crate::types::JointArray;
+use crate::types::{JointArray, Touch};
 use crate::Result;
 
 macro_rules! to_nidhogg {
@@ -11,7 +11,7 @@ macro_rules! to_nidhogg {
     };
     ($target: ident, "HeadPitch") => {
         $target.head_pitch
-};
+    };
     ($target: ident, "LHipYawPitch") => {
         $target.left_hip_yaw_pitch
     };
@@ -102,6 +102,7 @@ pub struct BulletNao {
     pub id: BodyId,
     pub link_map: HashMap<String, JointInfo>,
     pub joint_map: HashMap<String, BulletJoint>,
+    pub touch_input: Touch<ItemId>,
 }
 
 impl BulletNao {
@@ -242,6 +243,82 @@ impl BulletNao {
             id,
             link_map: link_ids,
             joint_map: joint_ids,
+            touch_input: Touch {
+                chest_board: physics_client.add_user_debug_parameter(
+                    "chest_board",
+                    0.0,
+                    1.0,
+                    0.0,
+                )?,
+                head_front: physics_client.add_user_debug_parameter("head_front", 0.0, 1.0, 0.0)?,
+                head_middle: physics_client.add_user_debug_parameter(
+                    "head_middle",
+                    0.0,
+                    1.0,
+                    0.0,
+                )?,
+                head_rear: physics_client.add_user_debug_parameter("head_rear", 0.0, 1.0, 0.0)?,
+                left_foot_left: physics_client.add_user_debug_parameter(
+                    "left_foot_left",
+                    0.0,
+                    1.0,
+                    0.0,
+                )?,
+                left_foot_right: physics_client.add_user_debug_parameter(
+                    "left_foot_right",
+                    0.0,
+                    1.0,
+                    0.0,
+                )?,
+                left_hand_back: physics_client.add_user_debug_parameter(
+                    "left_hand_back",
+                    0.0,
+                    1.0,
+                    0.0,
+                )?,
+                left_hand_left: physics_client.add_user_debug_parameter(
+                    "left_hand_left",
+                    0.0,
+                    1.0,
+                    0.0,
+                )?,
+                left_hand_right: physics_client.add_user_debug_parameter(
+                    "left_hand_right",
+                    0.0,
+                    1.0,
+                    0.0,
+                )?,
+                right_foot_left: physics_client.add_user_debug_parameter(
+                    "right_foot_left",
+                    0.0,
+                    1.0,
+                    0.0,
+                )?,
+                right_foot_right: physics_client.add_user_debug_parameter(
+                    "right_foot_right",
+                    0.0,
+                    1.0,
+                    0.0,
+                )?,
+                right_hand_back: physics_client.add_user_debug_parameter(
+                    "right_hand_back",
+                    0.0,
+                    1.0,
+                    0.0,
+                )?,
+                right_hand_left: physics_client.add_user_debug_parameter(
+                    "right_hand_left",
+                    0.0,
+                    1.0,
+                    0.0,
+                )?,
+                right_hand_right: physics_client.add_user_debug_parameter(
+                    "right_hand_right",
+                    0.0,
+                    1.0,
+                    0.0,
+                )?,
+            },
         })
     }
 
@@ -277,6 +354,25 @@ impl BulletNao {
         control_command!(physics_client, self, "RElbowRoll", positions, stiffness);
         control_command!(physics_client, self, "RWristYaw", positions, stiffness);
         control_command!(physics_client, self, "RHand", positions, stiffness);
+    }
+
+    pub fn get_touch(&self, physics_client: &mut PhysicsClient) -> Result<Touch<f32>> {
+        Ok(Touch {
+            chest_board: physics_client.read_user_debug_parameter(self.touch_input.chest_board)? as f32,
+            head_front: physics_client.read_user_debug_parameter(self.touch_input.head_front)? as f32,
+            head_middle: physics_client.read_user_debug_parameter(self.touch_input.head_middle)? as f32,
+            head_rear: physics_client.read_user_debug_parameter(self.touch_input.head_rear)? as f32,
+            left_foot_left: physics_client.read_user_debug_parameter(self.touch_input.left_foot_left)? as f32,
+            left_foot_right: physics_client.read_user_debug_parameter(self.touch_input.left_foot_right)? as f32,
+            left_hand_back: physics_client.read_user_debug_parameter(self.touch_input.left_hand_back)? as f32,
+            left_hand_left: physics_client.read_user_debug_parameter(self.touch_input.left_hand_left)? as f32,
+            left_hand_right: physics_client.read_user_debug_parameter(self.touch_input.left_hand_right)? as f32,
+            right_foot_left: physics_client.read_user_debug_parameter(self.touch_input.right_foot_left)? as f32,
+            right_foot_right: physics_client.read_user_debug_parameter(self.touch_input.right_foot_right)? as f32,
+            right_hand_back: physics_client.read_user_debug_parameter(self.touch_input.right_hand_back)? as f32,
+            right_hand_left: physics_client.read_user_debug_parameter(self.touch_input.right_hand_left)? as f32,
+            right_hand_right: physics_client.read_user_debug_parameter(self.touch_input.right_hand_right)? as f32,
+        })
     }
 }
 #[derive(Debug)]
