@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use miette::bail;
 use rubullet::nalgebra::{Isometry3, Quaternion, Vector3};
 use rubullet::{BodyId, JointInfo, LoadModelFlags, PhysicsClient, UrdfOptions};
@@ -8,6 +10,7 @@ use crate::Result;
 #[derive(Debug)]
 pub struct BulletNao {
     pub id: BodyId,
+    pub link_map: HashMap<String, JointInfo>,
 }
 
 impl BulletNao {
@@ -42,52 +45,62 @@ impl BulletNao {
             start_position,
         )?;
 
-        Ok(BulletNao { id: id })
+        let mut link_ids = HashMap::new();
+        build_joint_link_array(physics_client, id, &mut link_ids);
+
+        // TODO: needs more idiomatic rust!
+        physics_client.set_collision_filter_pair(
+            id,
+            id,
+            link_ids.get("torso").unwrap().joint_index,
+            link_ids.get("Head").unwrap().joint_index,
+            false,
+        );
+
+        do_for_both_sides(physics_client, id, "Thigh".to_string(), "Hip".to_string(), &link_ids);
+        do_for_both_sides(physics_client, id, "Bicep".to_string(), "ForeArm".to_string(), &link_ids);
+        do_for_both_sides(physics_client, id, "Pelvis".to_string(), "Thigh".to_string(), &link_ids);
+        do_for_both_sides(physics_client, id, "Pelvis".to_string(), "Thigh".to_string(), &link_ids);
+        
+        Ok(BulletNao {
+            id: id,
+            link_map: link_ids,
+        })
     }
+}
+
+fn do_for_both_sides(
+    physics_client: &mut PhysicsClient,
+    id: BodyId,
+    link1: String,
+    link2: String,
+    link_ids: &HashMap<String, JointInfo>,
+) {
+    physics_client.set_collision_filter_pair(
+        id,
+        id,
+        link_ids.get(&format!("R{}", link1)).unwrap().joint_index,
+        link_ids.get(&format!("R{}", link2)).unwrap().joint_index,
+        false,
+    );
+    physics_client.set_collision_filter_pair(
+        id,
+        id,
+        link_ids.get(&format!("L{}", link1)).unwrap().joint_index,
+        link_ids.get(&format!("L{}", link2)).unwrap().joint_index,
+        false,
+    );
 }
 
 fn build_joint_link_array(
     physics_client: &mut PhysicsClient,
     body_id: BodyId,
-) -> Result<JointArray<WrappedJointInfo>> {
-    let mut builder = JointArray::<WrappedJointInfo>::builder();
+    map: &mut HashMap<String, JointInfo>,
+) {
     for i in 0..physics_client.get_num_joints(body_id) {
-        let joint_info = physics_client.get_joint_info(body_id, i);
-        match joint_info.joint_name.as_str() {
-            "HeadPitch" => {
-                builder = builder.head_pitch(WrappedJointInfo(joint_info));
-            },
-            "HeadYaw" => {
-                builder = builder.head_yaw(WrappedJointInfo(joint_info));
-            },
-            _ => {}
-        }
-    }
-
-    Ok(builder.build())
-}
-
-struct WrappedJointInfo(JointInfo);
-
-impl Default for WrappedJointInfo {
-    fn default() -> Self {
-        Self(JointInfo {
-            joint_index: Default::default(),
-            joint_name: Default::default(),
-            joint_type: rubullet::JointType::Fixed,
-            q_index: Default::default(),
-            u_index: Default::default(),
-            flags: Default::default(),
-            joint_damping: Default::default(),
-            joint_friction: Default::default(),
-            joint_lower_limit: Default::default(),
-            joint_upper_limit: Default::default(),
-            joint_max_force: Default::default(),
-            joint_max_velocity: Default::default(),
-            link_name: Default::default(),
-            joint_axis: Default::default(),
-            parent_frame_pose: Isometry3::identity(),
-            parent_index: Default::default(),
-        })
+        map.insert(
+            String::from(physics_client.get_joint_info(body_id, i).link_name),
+            physics_client.get_joint_info(body_id, i),
+        );
     }
 }
