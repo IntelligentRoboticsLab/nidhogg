@@ -39,6 +39,7 @@ fn main() -> Result<()> {
                 .build(),
         )?;
         nao_state = bullet.read_nao_state()?;
+        println!("Accello: {:?}", nao_state.accelerometer);
     }
 
     Ok(())

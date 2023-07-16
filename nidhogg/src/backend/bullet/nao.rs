@@ -421,13 +421,12 @@ impl BulletNao {
     }
 
     fn get_fsr_value(&self, physics_client: &mut PhysicsClient, fsr_link: &str) -> Result<f32> {
-        let contact_points = physics_client
-            .get_contact_points(
-                self.id,
-                None,
-                Some(self.link_map.get(fsr_link).map(|f| f.joint_index)),
-                None,
-            )?;
+        let contact_points = physics_client.get_contact_points(
+            self.id,
+            None,
+            Some(self.link_map.get(fsr_link).map(|f| f.joint_index)),
+            None,
+        )?;
 
         let mut total_force = 0f32;
         for contact in contact_points {

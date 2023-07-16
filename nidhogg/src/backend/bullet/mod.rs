@@ -48,14 +48,17 @@ impl NaoBackend for BulletBackend {
     }
 
     fn read_nao_state(&mut self) -> Result<NaoState> {
+        let vel = self.physics_client.get_base_velocity(self.nao.id)?;
+
         Ok(NaoState {
             position: Default::default(),
             stiffness: Default::default(),
             accelerometer: Vector3 {
-                x: 0.0,
-                y: 0.0,
-                z: 0.0,
+                x: vel.get_linear_velocity().x as f32,
+                y: vel.get_linear_velocity().y as f32,
+                z: vel.get_linear_velocity().z as f32,
             },
+
             gyroscope: Vector3 {
                 x: 0.0,
                 y: 0.0,
@@ -63,7 +66,7 @@ impl NaoBackend for BulletBackend {
             },
             angles: Vector2 { x: 0.0, y: 0.0 },
             sonar: Default::default(),
-            force_sensitive_resistors: self.nao.get_fsr(&mut self.physics_client)?,
+            force_sensitive_resistors: Default::default(),
             touch: self.nao.get_touch(&mut self.physics_client)?,
             battery: Default::default(),
             temperature: Default::default(),
