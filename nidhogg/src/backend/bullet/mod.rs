@@ -49,7 +49,6 @@ impl NaoBackend for BulletBackend {
 
     fn read_nao_state(&mut self) -> Result<NaoState> {
         let vel = self.physics_client.get_base_velocity(self.nao.id)?;
-
         Ok(NaoState {
             position: Default::default(),
             stiffness: Default::default(),
@@ -60,9 +59,9 @@ impl NaoBackend for BulletBackend {
             },
 
             gyroscope: Vector3 {
-                x: 0.0,
-                y: 0.0,
-                z: 0.0,
+                x: vel.get_angular_velocity().x as f32,
+                y: vel.get_angular_velocity().y as f32,
+                z: vel.get_angular_velocity().z as f32,
             },
             angles: Vector2 { x: 0.0, y: 0.0 },
             sonar: Default::default(),
