@@ -511,18 +511,38 @@ pub struct Battery {
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct ForceSensitiveResistors {
+    /// FSR values from the four sensors in the left foot.
     pub left_foot: ForceSensitiveResistorFoot,
+    /// FSR values from the four sensors in the right foot.
     pub right_foot: ForceSensitiveResistorFoot,
+}
+
+impl ForceSensitiveResistors {
+    /// Calculates the average force based on the measurement from the resistors in both feet.
+    pub fn avg_force(&self) -> f32 {
+        (self.left_foot.avg_force() + self.right_foot.avg_force()) / 2.0
+    }
 }
 
 /// Struct representing the force sensitive resistors in one of the feet.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct ForceSensitiveResistorFoot {
+    /// FSR value ranging from [0.0, 25.0] Newton in the front left foot sensor.
     pub front_left: f32,
+    /// FSR value ranging from [0.0, 25.0] Newton in the front right foot sensor.
     pub front_right: f32,
+    /// FSR value ranging from [0.0, 25.0] Newton in the rear left foot sensor.
     pub rear_left: f32,
+    /// FSR value ranging from [0.0, 25.0] Newton in the rear right foot sensor.
     pub rear_right: f32,
+}
+
+impl ForceSensitiveResistorFoot {
+    /// Calculates the average force based on the measurements from the four foot resistors.
+    pub fn avg_force(&self) -> f32 {
+        (self.front_left + self.front_right + self.rear_left + self.rear_right) / 4.0
+    }
 }
 
 /// Values read by the left and right sonar sensor.
@@ -778,6 +798,41 @@ impl<T> JointArrayBuilder<T> {
 #[cfg(test)]
 mod tests {
     use crate::types::{Color, FillExt, LeftEye};
+
+    use super::ForceSensitiveResistorFoot;
+    use super::ForceSensitiveResistors;
+
+    #[test]
+    fn test_average_force_feet() {
+        let foot1 = ForceSensitiveResistorFoot {
+            front_left: 0.0,
+            front_right: 1.0,
+            rear_left: 0.32,
+            rear_right: 0.76,
+        };
+        let foot2 = ForceSensitiveResistorFoot {
+            front_left: 0.54,
+            front_right: 1.0,
+            rear_left: 0.32,
+            rear_right: 0.95,
+        };
+        let feet = ForceSensitiveResistors {
+            left_foot: foot1,
+            right_foot: foot2,
+        };
+        assert_eq!(feet.avg_force(), 0.61125);
+    }
+
+    #[test]
+    fn test_average_force_foot() {
+        let foot = ForceSensitiveResistorFoot {
+            front_left: 0.0,
+            front_right: 1.0,
+            rear_left: 0.32,
+            rear_right: 0.76,
+        };
+        assert_eq!(foot.avg_force(), 0.52);
+    }
 
     #[test]
     fn test_color_new() {
