@@ -461,6 +461,7 @@ pub struct JointArray<T> {
 }
 
 impl<T> JointArray<T> {
+    /// Retrieves the left leg joints.
     pub fn left_leg_joints(&self) -> LeftLegJoints<&T> {
         LeftLegJoints {
             hip_yaw_pitch: &self.left_hip_yaw_pitch,
@@ -472,6 +473,7 @@ impl<T> JointArray<T> {
         }
     }
 
+    /// Retrieves the left arm joints.
     pub fn left_arm_joints(&self) -> LeftArmJoints<&T> {
         LeftArmJoints {
             shoulder_pitch: &self.left_shoulder_pitch,
@@ -483,6 +485,7 @@ impl<T> JointArray<T> {
         }
     }
 
+    /// Retrieves the right leg joints.
     pub fn right_leg_joints(&self) -> RightLegJoints<&T> {
         RightLegJoints {
             hip_roll: &self.right_hip_roll,
@@ -493,6 +496,7 @@ impl<T> JointArray<T> {
         }
     }
 
+    /// Retrieves the right arm joints.
     pub fn right_arm_joints(&self) -> RightArmJoints<&T> {
         RightArmJoints {
             shoulder_pitch: &self.right_shoulder_pitch,
@@ -504,6 +508,7 @@ impl<T> JointArray<T> {
         }
     }
 
+    /// Retrieves the head joints.
     pub fn head_joints(&self) -> HeadJoints<&T> {
         HeadJoints {
             yaw: &self.head_yaw,
