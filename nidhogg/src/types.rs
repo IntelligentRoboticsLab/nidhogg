@@ -6,7 +6,7 @@ use nidhogg_derive::Builder;
 use serde::{Deserialize, Serialize};
 
 /// Struct containing two values of type `T`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Vector2<T> {
     pub x: T,
@@ -14,7 +14,7 @@ pub struct Vector2<T> {
 }
 
 /// Struct containing three values of type `T`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Vector3<T> {
     pub x: T,
