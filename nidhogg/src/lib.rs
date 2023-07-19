@@ -94,8 +94,22 @@ pub trait NaoBackend: Sized {
 pub struct NaoState {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
+    /// Accelerometer (m/s²):
+    /// The Accelerometer measures the proper acceleration along three axes (x, y, and z)
+    /// in meters per second squared (m/s²).
+    /// It is located at the Nao torso and part of the Inertial Measurement Unit.
     pub accelerometer: Vector3<f32>,
+    /// Gyroscope (rad/s):
+    ///The Gyroscope provides direct measurements of the rotational speed along
+    /// three axes (x, y and z) in radians per second (rad/s)
+    /// It is located at the Nao torso and part of the Inertial Measurement Unit.
+    /// The Z-axis gyroscope data is currently unavailable.
     pub gyroscope: Vector3<f32>,
+    /// Angles (rad):
+    /// Using data from the Gyroscope and Accelerometer, the inertial board in the NAO robot calculates
+    /// three inclination angles (x, y and z) of the robot's body.
+    /// These angles represent the orientation of the robot and are measured in radians (rad).
+    /// The Z angle data is not currently available.
     pub angles: Vector2<f32>,
     pub sonar: SonarValues,
     pub force_sensitive_resistors: ForceSensitiveResistors,
