@@ -100,7 +100,7 @@ pub struct NaoState {
     /// It is located at the Nao torso and part of the Inertial Measurement Unit.
     pub accelerometer: Vector3<f32>,
     /// Gyroscope (rad/s):
-    ///The Gyroscope provides direct measurements of the rotational speed along
+    /// The Gyroscope provides direct measurements of the rotational speed along
     /// three axes (x, y and z) in radians per second (rad/s)
     /// It is located at the Nao torso and part of the Inertial Measurement Unit.
     /// The Z-axis gyroscope data is currently unavailable.
