@@ -94,22 +94,26 @@ pub trait NaoBackend: Sized {
 pub struct NaoState {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
-    /// Accelerometer (m/s²):
+    /// Accelerometer (Inertial Measurement Unit):
+    ///
     /// The Accelerometer measures the proper acceleration along three axes (x, y, and z)
-    /// in meters per second squared (m/s²).
-    /// It is located at the Nao torso and part of the Inertial Measurement Unit.
+    /// in meters per second squared (m/s²). The Z axis is facing up.
+    ///
+    /// Position relative to the torso frame: (-0.008, 0.00606, 0.027) in m.
     pub accelerometer: Vector3<f32>,
-    /// Gyroscope (rad/s):
+    /// Gyroscope (Inertial Measurement Unit):
+    ///
     /// The Gyroscope provides direct measurements of the rotational speed along
-    /// three axes (x, y and z) in radians per second (rad/s)
-    /// It is located at the Nao torso and part of the Inertial Measurement Unit.
-    /// The Z-axis gyroscope data is currently unavailable.
+    /// three axes (x, y and z) in radians per second (rad/s). The Z axis is facing up.
+    ///
+    /// Position relative to the torso frame: (-0.008, 0.006, 0.029) in m.
     pub gyroscope: Vector3<f32>,
-    /// Angles (rad):
+    /// Angles:
+    ///
     /// Using data from the Gyroscope and Accelerometer, the inertial board in the NAO robot calculates
-    /// three inclination angles (x, y and z) of the robot's body.
-    /// These angles represent the orientation of the robot and are measured in radians (rad).
-    /// The Z angle data is not currently available.
+    /// two inclination angles (x, y) of the robot's body.
+    ///
+    /// These angles represent the orientation of the robot (Inertial Measurement Unit)and are measured in radians (rad).
     pub angles: Vector2<f32>,
     pub sonar: SonarValues,
     pub force_sensitive_resistors: ForceSensitiveResistors,
