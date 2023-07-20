@@ -99,21 +99,21 @@ pub struct NaoState {
     /// The Accelerometer measures the proper acceleration along three axes (x, y, and z)
     /// in meters per second squared (m/s²). The Z axis is facing up.
     ///
-    /// Position relative to the torso frame: (-0.008, 0.00606, 0.027) in m.
+    /// Position relative to the torso frame: (-0.008, 0.00606, 0.027) in meters.
     pub accelerometer: Vector3<f32>,
     /// Gyroscope (Inertial Measurement Unit):
     ///
     /// The Gyroscope provides direct measurements of the rotational speed along
     /// three axes (x, y and z) in radians per second (rad/s). The Z axis is facing up.
     ///
-    /// Position relative to the torso frame: (-0.008, 0.006, 0.029) in m.
+    /// Position relative to the torso frame: (-0.008, 0.006, 0.029) in meters.
     pub gyroscope: Vector3<f32>,
     /// Angles:
     ///
     /// Using data from the Gyroscope and Accelerometer, the inertial board in the NAO robot calculates
     /// two inclination angles (x, y) of the robot's body.
     ///
-    /// These angles represent the orientation of the robot (Inertial Measurement Unit)and are measured in radians (rad).
+    /// These angles represent the orientation of the robot and are measured in radians.
     pub angles: Vector2<f32>,
     pub sonar: SonarValues,
     pub force_sensitive_resistors: ForceSensitiveResistors,
