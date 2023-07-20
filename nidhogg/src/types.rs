@@ -518,9 +518,14 @@ pub struct ForceSensitiveResistors {
 }
 
 impl ForceSensitiveResistors {
-    /// Calculates the average force based on the measurement from the resistors in both feet.
-    pub fn avg_force(&self) -> f32 {
-        (self.left_foot.avg_force() + self.right_foot.avg_force()) / 2.0
+    /// Computes the sum of the FSR sensor values for both feet.
+    pub fn sum(&self) -> f32 {
+        self.left_foot.sum() + self.right_foot.sum()
+    }
+
+    /// Calculates the average weigth based on the measurement from the resistors in both feet.
+    pub fn avg(&self) -> f32 {
+        (self.left_foot.avg() + self.right_foot.avg()) / 2.0
     }
 }
 
@@ -528,20 +533,33 @@ impl ForceSensitiveResistors {
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct ForceSensitiveResistorFoot {
-    /// FSR value ranging from [0.0, 25.0] Newton in the front left foot sensor.
+    /// FSR value representing the estimated weight in kilograms on the front left foot sensor.
+    ///
+    /// Please note that this value is approximate.
     pub front_left: f32,
-    /// FSR value ranging from [0.0, 25.0] Newton in the front right foot sensor.
+    /// FSR value representing the estimated weight in kilograms on the front right foot sensor.
+    ///
+    /// Please note that this value is approximate.
     pub front_right: f32,
-    /// FSR value ranging from [0.0, 25.0] Newton in the rear left foot sensor.
+    /// FSR value representing the estimated weight in kilograms on the rear left foot sensor.
+    ///
+    /// Please note that this value is approximate.
     pub rear_left: f32,
-    /// FSR value ranging from [0.0, 25.0] Newton in the rear right foot sensor.
+    /// FSR value representing the estimated weight in kilograms on the rear right foot sensor.
+    ///
+    /// Please note that this value is approximate.
     pub rear_right: f32,
 }
 
 impl ForceSensitiveResistorFoot {
-    /// Calculates the average force based on the measurements from the four foot resistors.
-    pub fn avg_force(&self) -> f32 {
-        (self.front_left + self.front_right + self.rear_left + self.rear_right) / 4.0
+    /// Computes the sum of the FSR sensor values for the foot.
+    pub fn sum(&self) -> f32 {
+        self.front_left + self.front_right + self.rear_left + self.rear_right
+    }
+
+    /// Calculates the average weight on the foot.
+    pub fn avg(&self) -> f32 {
+        self.sum() / 4.0
     }
 }
 
@@ -853,18 +871,18 @@ mod tests {
             left_foot: foot1,
             right_foot: foot2,
         };
-        assert_eq!(feet.avg_force(), 0.61125);
+        assert_eq!(feet.avg(), 0.61125);
     }
 
     #[test]
-    fn test_average_force_foot() {
+    fn test_average_weight_foot() {
         let foot = ForceSensitiveResistorFoot {
             front_left: 0.0,
             front_right: 1.0,
             rear_left: 0.32,
             rear_right: 0.76,
         };
-        assert_eq!(foot.avg_force(), 0.52);
+        assert_eq!(foot.avg(), 0.52);
     }
 
     #[test]
