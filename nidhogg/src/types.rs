@@ -711,6 +711,39 @@ pub struct ArmJoints<T> {
 }
 
 impl<T> JointArrayBuilder<T> {
+    /// Set all the joint values to the corresponding values from the provided [`JointArray`].
+    pub fn from_joint_array(mut self, joints: JointArray<T>) {
+        self.head_pitch = Some(joints.head_pitch);
+        self.head_yaw = Some(joints.head_yaw);
+
+        self.left_hip_yaw_pitch = Some(joints.left_hip_yaw_pitch);
+        self.left_hip_roll = Some(joints.left_hip_roll);
+        self.left_hip_pitch = Some(joints.left_hip_pitch);
+        self.left_knee_pitch = Some(joints.left_knee_pitch);
+        self.left_ankle_pitch = Some(joints.left_ankle_pitch);
+        self.left_ankle_roll = Some(joints.left_ankle_roll);
+
+        self.right_hip_roll = Some(joints.right_hip_roll);
+        self.right_hip_pitch = Some(joints.right_hip_pitch);
+        self.right_knee_pitch = Some(joints.right_knee_pitch);
+        self.right_ankle_pitch = Some(joints.right_ankle_pitch);
+        self.right_ankle_roll = Some(joints.right_ankle_roll);
+
+        self.left_shoulder_pitch = Some(joints.left_shoulder_pitch);
+        self.left_shoulder_roll = Some(joints.left_shoulder_roll);
+        self.left_elbow_yaw = Some(joints.left_elbow_yaw);
+        self.left_elbow_roll = Some(joints.left_elbow_roll);
+        self.left_wrist_yaw = Some(joints.left_wrist_yaw);
+        self.left_hand = Some(joints.left_hand);
+
+        self.right_shoulder_pitch = Some(joints.right_shoulder_pitch);
+        self.right_shoulder_roll = Some(joints.right_shoulder_roll);
+        self.right_elbow_yaw = Some(joints.right_elbow_yaw);
+        self.right_elbow_roll = Some(joints.right_elbow_roll);
+        self.right_wrist_yaw = Some(joints.right_wrist_yaw);
+        self.right_hand = Some(joints.right_hand);
+    }
+
     /// Set the `head_pitch` and `head_yaw` values to the corresponding values from the provided [`HeadJoints`].
     pub fn head_joints(mut self, joints: HeadJoints<T>) -> Self {
         self.head_pitch = Some(joints.pitch);
