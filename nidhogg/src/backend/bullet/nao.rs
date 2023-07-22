@@ -1,6 +1,7 @@
 use rubullet::nalgebra::Isometry3;
 use rubullet::{BodyId, ItemId, JointInfo, LoadModelFlags, PhysicsClient, UrdfOptions};
 use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
 use crate::types::{JointArray, Touch};
 use crate::Result;
@@ -107,10 +108,11 @@ pub struct BulletNao {
 
 impl BulletNao {
     pub fn create(
-        physics_client: &mut PhysicsClient,
+        physics_client: Arc<Mutex<PhysicsClient>>,
         start_position: Isometry3<f64>,
     ) -> Result<Self> {
-        let id = physics_client.load_urdf(
+        let mut pc = physics_client.lock().unwrap();
+        let id = pc.load_urdf(
             "nao.urdf",
             UrdfOptions {
                 base_transform: start_position,
@@ -121,7 +123,7 @@ impl BulletNao {
             },
         )?;
 
-        let balance_constraint = physics_client.create_constraint(
+        let balance_constraint = pc.create_constraint(
             id,
             None,
             None,
@@ -134,10 +136,12 @@ impl BulletNao {
 
         let mut link_ids = HashMap::new();
         let mut joint_ids = HashMap::new();
-        build_link_id_map(physics_client, id, &mut link_ids, &mut joint_ids);
+        drop(pc);
+        build_link_id_map(physics_client.clone(), id, &mut link_ids, &mut joint_ids);
 
+        let mut pc = physics_client.lock().unwrap();
         // TODO: needs more idiomatic rust!
-        physics_client.set_collision_filter_pair(
+        pc.set_collision_filter_pair(
             id,
             id,
             link_ids.get("torso").unwrap().joint_index,
@@ -146,28 +150,28 @@ impl BulletNao {
         );
 
         for side in ["L", "R"] {
-            physics_client.set_collision_filter_pair(
+            pc.set_collision_filter_pair(
                 id,
                 id,
                 link_ids.get(&format!("{side}Thigh")).unwrap().joint_index,
                 link_ids.get(&format!("{side}Hip")).unwrap().joint_index,
                 false,
             );
-            physics_client.set_collision_filter_pair(
+            pc.set_collision_filter_pair(
                 id,
                 id,
                 link_ids.get(&format!("{side}Bicep")).unwrap().joint_index,
                 link_ids.get(&format!("{side}ForeArm")).unwrap().joint_index,
                 false,
             );
-            physics_client.set_collision_filter_pair(
+            pc.set_collision_filter_pair(
                 id,
                 id,
                 link_ids.get(&format!("{side}Pelvis")).unwrap().joint_index,
                 link_ids.get(&format!("{side}Thigh")).unwrap().joint_index,
                 false,
             );
-            physics_client.set_collision_filter_pair(
+            pc.set_collision_filter_pair(
                 id,
                 id,
                 link_ids.get(&format!("{side}Tibia")).unwrap().joint_index,
@@ -177,7 +181,7 @@ impl BulletNao {
                     .joint_index,
                 false,
             );
-            physics_client.set_collision_filter_pair(
+            pc.set_collision_filter_pair(
                 id,
                 id,
                 link_ids
@@ -190,7 +194,7 @@ impl BulletNao {
                     .joint_index,
                 false,
             );
-            physics_client.set_collision_filter_pair(
+            pc.set_collision_filter_pair(
                 id,
                 id,
                 link_ids
@@ -206,7 +210,7 @@ impl BulletNao {
         }
 
         for base_link in ["RThigh", "LThigh", "RBicep", "LBicep"] {
-            physics_client.set_collision_filter_pair(
+            pc.set_collision_filter_pair(
                 id,
                 id,
                 link_ids.get("torso").unwrap().joint_index,
@@ -222,7 +226,7 @@ impl BulletNao {
                 if name.to_lowercase().contains(first.as_str())
                     || name.to_lowercase().contains(second.as_str())
                 {
-                    physics_client.set_collision_filter_pair(
+                    pc.set_collision_filter_pair(
                         id,
                         id,
                         link_ids.get(wrist).unwrap().joint_index,
@@ -234,85 +238,85 @@ impl BulletNao {
         });
 
         for joint in joint_ids.values() {
-            physics_client.reset_joint_state(id, joint.0.joint_index, 0.0, None)?;
+            pc.reset_joint_state(id, joint.0.joint_index, 0.0, None)?;
         }
 
-        physics_client.remove_constraint(balance_constraint);
+        pc.remove_constraint(balance_constraint);
 
         Ok(BulletNao {
             id,
             link_map: link_ids,
             joint_map: joint_ids,
             touch_input: Touch {
-                chest_board: physics_client.add_user_debug_parameter(
+                chest_board: pc.add_user_debug_parameter(
                     "chest_board",
                     0.0,
                     1.0,
                     0.0,
                 )?,
-                head_front: physics_client.add_user_debug_parameter("head_front", 0.0, 1.0, 0.0)?,
-                head_middle: physics_client.add_user_debug_parameter(
+                head_front: pc.add_user_debug_parameter("head_front", 0.0, 1.0, 0.0)?,
+                head_middle: pc.add_user_debug_parameter(
                     "head_middle",
                     0.0,
                     1.0,
                     0.0,
                 )?,
-                head_rear: physics_client.add_user_debug_parameter("head_rear", 0.0, 1.0, 0.0)?,
-                left_foot_left: physics_client.add_user_debug_parameter(
+                head_rear: pc.add_user_debug_parameter("head_rear", 0.0, 1.0, 0.0)?,
+                left_foot_left: pc.add_user_debug_parameter(
                     "left_foot_left",
                     0.0,
                     1.0,
                     0.0,
                 )?,
-                left_foot_right: physics_client.add_user_debug_parameter(
+                left_foot_right: pc.add_user_debug_parameter(
                     "left_foot_right",
                     0.0,
                     1.0,
                     0.0,
                 )?,
-                left_hand_back: physics_client.add_user_debug_parameter(
+                left_hand_back: pc.add_user_debug_parameter(
                     "left_hand_back",
                     0.0,
                     1.0,
                     0.0,
                 )?,
-                left_hand_left: physics_client.add_user_debug_parameter(
+                left_hand_left: pc.add_user_debug_parameter(
                     "left_hand_left",
                     0.0,
                     1.0,
                     0.0,
                 )?,
-                left_hand_right: physics_client.add_user_debug_parameter(
+                left_hand_right: pc.add_user_debug_parameter(
                     "left_hand_right",
                     0.0,
                     1.0,
                     0.0,
                 )?,
-                right_foot_left: physics_client.add_user_debug_parameter(
+                right_foot_left: pc.add_user_debug_parameter(
                     "right_foot_left",
                     0.0,
                     1.0,
                     0.0,
                 )?,
-                right_foot_right: physics_client.add_user_debug_parameter(
+                right_foot_right: pc.add_user_debug_parameter(
                     "right_foot_right",
                     0.0,
                     1.0,
                     0.0,
                 )?,
-                right_hand_back: physics_client.add_user_debug_parameter(
+                right_hand_back: pc.add_user_debug_parameter(
                     "right_hand_back",
                     0.0,
                     1.0,
                     0.0,
                 )?,
-                right_hand_left: physics_client.add_user_debug_parameter(
+                right_hand_left: pc.add_user_debug_parameter(
                     "right_hand_left",
                     0.0,
                     1.0,
                     0.0,
                 )?,
-                right_hand_right: physics_client.add_user_debug_parameter(
+                right_hand_right: pc.add_user_debug_parameter(
                     "right_hand_right",
                     0.0,
                     1.0,
@@ -324,54 +328,56 @@ impl BulletNao {
 
     pub fn set_angles(
         &self,
-        physics_client: &mut PhysicsClient,
+        physics_client: Arc<Mutex<PhysicsClient>>,
         positions: JointArray<f32>,
         stiffness: JointArray<f32>,
     ) {
-        control_command!(physics_client, self, "HeadYaw", positions, stiffness);
-        control_command!(physics_client, self, "HeadPitch", positions, stiffness);
-        control_command!(physics_client, self, "LHipYawPitch", positions, stiffness);
-        control_command!(physics_client, self, "LHipRoll", positions, stiffness);
-        control_command!(physics_client, self, "LHipPitch", positions, stiffness);
-        control_command!(physics_client, self, "LKneePitch", positions, stiffness);
-        control_command!(physics_client, self, "LAnklePitch", positions, stiffness);
-        control_command!(physics_client, self, "LAnkleRoll", positions, stiffness);
-        control_command!(physics_client, self, "RHipYawPitch", positions, stiffness);
-        control_command!(physics_client, self, "RHipRoll", positions, stiffness);
-        control_command!(physics_client, self, "RHipPitch", positions, stiffness);
-        control_command!(physics_client, self, "RKneePitch", positions, stiffness);
-        control_command!(physics_client, self, "RAnklePitch", positions, stiffness);
-        control_command!(physics_client, self, "RAnkleRoll", positions, stiffness);
-        control_command!(physics_client, self, "LShoulderPitch", positions, stiffness);
-        control_command!(physics_client, self, "LShoulderRoll", positions, stiffness);
-        control_command!(physics_client, self, "LElbowYaw", positions, stiffness);
-        control_command!(physics_client, self, "LElbowRoll", positions, stiffness);
-        control_command!(physics_client, self, "LWristYaw", positions, stiffness);
-        control_command!(physics_client, self, "LHand", positions, stiffness);
-        control_command!(physics_client, self, "RShoulderPitch", positions, stiffness);
-        control_command!(physics_client, self, "RShoulderRoll", positions, stiffness);
-        control_command!(physics_client, self, "RElbowYaw", positions, stiffness);
-        control_command!(physics_client, self, "RElbowRoll", positions, stiffness);
-        control_command!(physics_client, self, "RWristYaw", positions, stiffness);
-        control_command!(physics_client, self, "RHand", positions, stiffness);
+        let mut pc = physics_client.lock().unwrap();
+        control_command!(pc, self, "HeadYaw", positions, stiffness);
+        control_command!(pc, self, "HeadPitch", positions, stiffness);
+        control_command!(pc, self, "LHipYawPitch", positions, stiffness);
+        control_command!(pc, self, "LHipRoll", positions, stiffness);
+        control_command!(pc, self, "LHipPitch", positions, stiffness);
+        control_command!(pc, self, "LKneePitch", positions, stiffness);
+        control_command!(pc, self, "LAnklePitch", positions, stiffness);
+        control_command!(pc, self, "LAnkleRoll", positions, stiffness);
+        control_command!(pc, self, "RHipYawPitch", positions, stiffness);
+        control_command!(pc, self, "RHipRoll", positions, stiffness);
+        control_command!(pc, self, "RHipPitch", positions, stiffness);
+        control_command!(pc, self, "RKneePitch", positions, stiffness);
+        control_command!(pc, self, "RAnklePitch", positions, stiffness);
+        control_command!(pc, self, "RAnkleRoll", positions, stiffness);
+        control_command!(pc, self, "LShoulderPitch", positions, stiffness);
+        control_command!(pc, self, "LShoulderRoll", positions, stiffness);
+        control_command!(pc, self, "LElbowYaw", positions, stiffness);
+        control_command!(pc, self, "LElbowRoll", positions, stiffness);
+        control_command!(pc, self, "LWristYaw", positions, stiffness);
+        control_command!(pc, self, "LHand", positions, stiffness);
+        control_command!(pc, self, "RShoulderPitch", positions, stiffness);
+        control_command!(pc, self, "RShoulderRoll", positions, stiffness);
+        control_command!(pc, self, "RElbowYaw", positions, stiffness);
+        control_command!(pc, self, "RElbowRoll", positions, stiffness);
+        control_command!(pc, self, "RWristYaw", positions, stiffness);
+        control_command!(pc, self, "RHand", positions, stiffness);
     }
 
-    pub fn get_touch(&self, physics_client: &mut PhysicsClient) -> Result<Touch<f32>> {
+    pub fn get_touch(&self, physics_client: Arc<Mutex<PhysicsClient>>) -> Result<Touch<f32>> {
+        let mut pc = physics_client.lock().unwrap();
         Ok(Touch {
-            chest_board: physics_client.read_user_debug_parameter(self.touch_input.chest_board)? as f32,
-            head_front: physics_client.read_user_debug_parameter(self.touch_input.head_front)? as f32,
-            head_middle: physics_client.read_user_debug_parameter(self.touch_input.head_middle)? as f32,
-            head_rear: physics_client.read_user_debug_parameter(self.touch_input.head_rear)? as f32,
-            left_foot_left: physics_client.read_user_debug_parameter(self.touch_input.left_foot_left)? as f32,
-            left_foot_right: physics_client.read_user_debug_parameter(self.touch_input.left_foot_right)? as f32,
-            left_hand_back: physics_client.read_user_debug_parameter(self.touch_input.left_hand_back)? as f32,
-            left_hand_left: physics_client.read_user_debug_parameter(self.touch_input.left_hand_left)? as f32,
-            left_hand_right: physics_client.read_user_debug_parameter(self.touch_input.left_hand_right)? as f32,
-            right_foot_left: physics_client.read_user_debug_parameter(self.touch_input.right_foot_left)? as f32,
-            right_foot_right: physics_client.read_user_debug_parameter(self.touch_input.right_foot_right)? as f32,
-            right_hand_back: physics_client.read_user_debug_parameter(self.touch_input.right_hand_back)? as f32,
-            right_hand_left: physics_client.read_user_debug_parameter(self.touch_input.right_hand_left)? as f32,
-            right_hand_right: physics_client.read_user_debug_parameter(self.touch_input.right_hand_right)? as f32,
+            chest_board: pc.read_user_debug_parameter(self.touch_input.chest_board)? as f32,
+            head_front: pc.read_user_debug_parameter(self.touch_input.head_front)? as f32,
+            head_middle: pc.read_user_debug_parameter(self.touch_input.head_middle)? as f32,
+            head_rear: pc.read_user_debug_parameter(self.touch_input.head_rear)? as f32,
+            left_foot_left: pc.read_user_debug_parameter(self.touch_input.left_foot_left)? as f32,
+            left_foot_right: pc.read_user_debug_parameter(self.touch_input.left_foot_right)? as f32,
+            left_hand_back: pc.read_user_debug_parameter(self.touch_input.left_hand_back)? as f32,
+            left_hand_left: pc.read_user_debug_parameter(self.touch_input.left_hand_left)? as f32,
+            left_hand_right: pc.read_user_debug_parameter(self.touch_input.left_hand_right)? as f32,
+            right_foot_left: pc.read_user_debug_parameter(self.touch_input.right_foot_left)? as f32,
+            right_foot_right: pc.read_user_debug_parameter(self.touch_input.right_foot_right)? as f32,
+            right_hand_back: pc.read_user_debug_parameter(self.touch_input.right_hand_back)? as f32,
+            right_hand_left: pc.read_user_debug_parameter(self.touch_input.right_hand_left)? as f32,
+            right_hand_right: pc.read_user_debug_parameter(self.touch_input.right_hand_right)? as f32,
         })
     }
 }
@@ -379,18 +385,19 @@ impl BulletNao {
 pub struct BulletJoint(JointInfo);
 
 fn build_link_id_map(
-    physics_client: &mut PhysicsClient,
+    physics_client: Arc<Mutex<PhysicsClient>>,
     body_id: BodyId,
     link_map: &mut HashMap<String, JointInfo>,
     joint_map: &mut HashMap<String, BulletJoint>,
 ) {
-    for i in 0..physics_client.get_num_joints(body_id) {
-        let joint_info = physics_client.get_joint_info(body_id, i);
+    let mut pc = physics_client.lock().unwrap();
+    for i in 0..pc.get_num_joints(body_id) {
+        let joint_info = pc.get_joint_info(body_id, i);
         match joint_info.joint_type {
             rubullet::JointType::Revolute | rubullet::JointType::Prismatic => {
                 joint_map.insert(
                     joint_info.joint_name.clone(),
-                    BulletJoint(physics_client.get_joint_info(body_id, i)),
+                    BulletJoint(pc.get_joint_info(body_id, i)),
                 );
                 println!("{}", joint_info.joint_name);
             }
@@ -398,8 +405,8 @@ fn build_link_id_map(
             }
         }
         link_map.insert(
-            physics_client.get_joint_info(body_id, i).link_name,
-            physics_client.get_joint_info(body_id, i),
+            pc.get_joint_info(body_id, i).link_name,
+            pc.get_joint_info(body_id, i),
         );
     }
 }

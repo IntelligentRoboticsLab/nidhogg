@@ -13,7 +13,7 @@ miette = { version = "5.5.0", features = ["fancy"] }
 tracing = "0.1.37"
 nidhogg_derive = { workspace = true }
 zmq_remote_api = { git = "https://github.com/samuel-cavalcanti/rust_zmqRemoteApi", optional = true }
-rubullet = { git = "https://github.com/neachdainn/rubullet", branch = "8-fix-macos", optional = true }
+rubullet = { path = "../../rubullet/rubullet", optional = true }
 
 
 [dev-dependencies]
