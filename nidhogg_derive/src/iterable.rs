@@ -58,18 +58,14 @@ fn parse_fields(data: Data) -> Vec<TokenStream> {
         .collect()
 }
 
-fn impl_to_vec(
-    struct_name: &Ident,
-    generics: &Generics,
-    fields_iter: &Vec<TokenStream>,
-) -> TokenStream {
+fn impl_to_vec(struct_name: &Ident, generics: &Generics, fields: &Vec<TokenStream>) -> TokenStream {
     let (_, ty_generics, _) = generics.split_for_impl();
     let impl_generics_test = generic_type_params_with_clone(generics);
 
     quote! {
         impl <#(#impl_generics_test)*> #struct_name #ty_generics {
              pub fn to_vec(&self) -> std::vec::Vec #ty_generics {
-                 vec![#(#fields_iter), *]
+                 vec![#(#fields), *]
              }
         }
     }
@@ -78,7 +74,7 @@ fn impl_to_vec(
 fn impl_into_iterator(
     struct_name: &Ident,
     generics: &Generics,
-    fields_iter: &Vec<TokenStream>,
+    fields: &Vec<TokenStream>,
     field_type: &Ident,
 ) -> TokenStream {
     let (_, ty_generics, _) = generics.split_for_impl();
@@ -90,7 +86,7 @@ fn impl_into_iterator(
             type IntoIter = std::vec::IntoIter<Self::Item>;
 
             fn into_iter(self) -> std::vec::IntoIter<#field_type> {
-                vec![#(#fields_iter), *].into_iter()
+                vec![#(#fields), *].into_iter()
             }
         }
     }
