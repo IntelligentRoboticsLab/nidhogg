@@ -60,10 +60,10 @@ fn parse_fields(data: Data) -> Vec<TokenStream> {
 
 fn impl_to_vec(struct_name: &Ident, generics: &Generics, fields: &Vec<TokenStream>) -> TokenStream {
     let (_, ty_generics, _) = generics.split_for_impl();
-    let impl_generics_test = generic_type_params_with_clone(generics);
+    let impl_generics = generic_type_params_with_clone(generics);
 
     quote! {
-        impl <#(#impl_generics_test)*> #struct_name #ty_generics {
+        impl <#(#impl_generics)*> #struct_name #ty_generics {
              pub fn to_vec(&self) -> std::vec::Vec #ty_generics {
                  vec![#(#fields), *]
              }
