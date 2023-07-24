@@ -2,6 +2,7 @@
 //!
 
 use nidhogg_derive::Builder;
+use nidhogg_derive::Iterable;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -28,7 +29,7 @@ pub trait FillExt<T> {
     fn fill(value: T) -> Self;
 }
 
-/// Struct representing the LEDs on top of the NAO robot's head.  
+/// Struct representing the LEDs on top of the NAO robot's head.
 ///
 /// Each value represents the intensity of a white LED.
 #[derive(Builder, Clone, Debug, Default)]
@@ -79,7 +80,7 @@ impl FillExt<f32> for Skull {
 /// 252     108
 ///  216  144
 ///    180
-/// ```  
+/// ```
 #[derive(Builder, Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct LeftEar {
@@ -123,7 +124,7 @@ impl FillExt<f32> for LeftEar {
 /// 252     108
 ///  216  144
 ///    180
-/// ```  
+/// ```
 #[derive(Builder, Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct RightEar {
@@ -313,7 +314,7 @@ impl Color {
 /// 90      270
 ///  135   225
 ///    180
-/// ```  
+/// ```
 #[derive(Builder, Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct LeftEye {
@@ -351,7 +352,7 @@ impl FillExt<Color> for LeftEye {
 /// 90      270
 ///  135   225
 ///    180
-/// ```  
+/// ```
 #[derive(Builder, Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct RightEye {
@@ -381,7 +382,7 @@ impl FillExt<Color> for RightEye {
 }
 
 /// Struct containing values of type `T` for all the joints
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Iterable)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct JointArray<T> {
     /// The yaw joint of the robot's head, allowing rotation horizontally.
@@ -461,6 +462,41 @@ pub struct JointArray<T> {
 }
 
 impl<T> JointArray<T> {
+    /// Consumes a `Vec<T>` to initialize a `JointArray<T>`.
+    pub fn from_vec(mut vector: Vec<T>) -> Result<JointArray<T>, &'static str> {
+        if vector.len() < 25 {
+            return Err("Not enough elements in vector");
+        }
+
+        Ok(JointArray {
+            head_yaw: vector.remove(0),
+            head_pitch: vector.remove(0),
+            left_shoulder_pitch: vector.remove(0),
+            left_shoulder_roll: vector.remove(0),
+            left_elbow_yaw: vector.remove(0),
+            left_elbow_roll: vector.remove(0),
+            left_wrist_yaw: vector.remove(0),
+            left_hip_yaw_pitch: vector.remove(0),
+            left_hip_roll: vector.remove(0),
+            left_hip_pitch: vector.remove(0),
+            left_knee_pitch: vector.remove(0),
+            left_ankle_pitch: vector.remove(0),
+            left_ankle_roll: vector.remove(0),
+            right_shoulder_pitch: vector.remove(0),
+            right_shoulder_roll: vector.remove(0),
+            right_elbow_yaw: vector.remove(0),
+            right_elbow_roll: vector.remove(0),
+            right_wrist_yaw: vector.remove(0),
+            right_hip_roll: vector.remove(0),
+            right_hip_pitch: vector.remove(0),
+            right_knee_pitch: vector.remove(0),
+            right_ankle_pitch: vector.remove(0),
+            right_ankle_roll: vector.remove(0),
+            left_hand: vector.remove(0),
+            right_hand: vector.remove(0),
+        })
+    }
+
     /// Retrieves the left leg joints.
     pub fn left_leg_joints(&self) -> LeftLegJoints<&T> {
         LeftLegJoints {
@@ -666,7 +702,7 @@ pub struct Touch {
 }
 
 /// Wrapper struct containing the head joints of the robot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Iterable)]
 pub struct HeadJoints<T> {
     pub yaw: T,
     pub pitch: T,
@@ -682,7 +718,7 @@ impl<T: Clone> FillExt<T> for HeadJoints<T> {
 }
 
 /// Wrapper struct containing the left leg joints of the robot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Iterable)]
 pub struct LeftLegJoints<T> {
     pub hip_yaw_pitch: T,
     pub hip_roll: T,
@@ -706,7 +742,7 @@ impl<T: Clone> FillExt<T> for LeftLegJoints<T> {
 }
 
 /// Wrapper struct containing right left leg joints of the robot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Iterable)]
 pub struct RightLegJoints<T> {
     // This value does not exist
     // pub hip_yaw_pitch: T,
@@ -747,7 +783,7 @@ impl<T: Clone> FillExt<T> for LegJoints<T> {
 }
 
 /// Wrapper struct containing the joints for a single arm of the robot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Iterable)]
 pub struct SingleArmJoints<T> {
     pub shoulder_pitch: T,
     pub shoulder_roll: T,
