@@ -1,4 +1,3 @@
-use proc_macro;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::{parse_macro_input, Data, DeriveInput, Field, Fields, GenericParam, Generics, TypeParam};
@@ -41,7 +40,7 @@ fn parse_fields(data: Data) -> Vec<TokenStream> {
         _ => panic!("Only supports structs"),
     };
 
-    if fields.len() < 1 {
+    if fields.is_empty() {
         panic!("Must contain at least one field!");
     }
 
@@ -65,7 +64,7 @@ fn impl_to_vec(
     fields_iter: &Vec<TokenStream>,
 ) -> TokenStream {
     let (_, ty_generics, _) = generics.split_for_impl();
-    let impl_generics_test = generic_type_params_with_clone(&generics);
+    let impl_generics_test = generic_type_params_with_clone(generics);
 
     quote! {
         impl <#(#impl_generics_test)*> #struct_name #ty_generics {
@@ -83,7 +82,7 @@ fn impl_into_iterator(
     field_type: &Ident,
 ) -> TokenStream {
     let (_, ty_generics, _) = generics.split_for_impl();
-    let impl_generics_test = generic_type_params_with_clone(&generics);
+    let impl_generics_test = generic_type_params_with_clone(generics);
 
     quote! {
         impl <#(#impl_generics_test)*> std::iter::IntoIterator for #struct_name #ty_generics {
