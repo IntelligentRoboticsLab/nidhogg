@@ -28,6 +28,6 @@ pub fn derive_builder(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(Filler)]
-pub fn derive_builder(input: TokenStream) -> TokenStream {
+pub fn derive_filler(input: TokenStream) -> TokenStream {
     filler::derive(input)
 }
