@@ -78,10 +78,10 @@ fn impl_into_iterator(
     field_type: &Ident,
 ) -> TokenStream {
     let (_, ty_generics, _) = generics.split_for_impl();
-    let impl_generics_test = generic_type_params_with_clone(generics);
+    let impl_generics = generic_type_params_with_clone(generics);
 
     quote! {
-        impl <#(#impl_generics_test)*> std::iter::IntoIterator for #struct_name #ty_generics {
+        impl <#(#impl_generics)*> std::iter::IntoIterator for #struct_name #ty_generics {
             type Item = #field_type;
             type IntoIter = std::vec::IntoIter<Self::Item>;
 
