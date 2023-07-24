@@ -1,6 +1,6 @@
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, Data, DeriveInput, Field, Fields, GenericParam, Generics, TypeParam};
+use syn::{parse_macro_input, Data, DeriveInput, Field, Fields, Generics};
 
 /// Trait that introduces the [`fill`](`FillExt::fill`) method for a type, which allows filling in all fields with the same value.
 pub trait FillExt<T> {
@@ -19,18 +19,35 @@ pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let struct_name = ident;
 
     match generics.params.first() {
-        Some(GenericParam::Type(TypeParam {
-            ident: _field_type, ..
-        })) => {
+        Some(_) => {
             let (fields, field_type) = parse_fields(data);
-            impl_fill_ext_with_generics(&struct_name, &generics, &fields, &field_type).into()
+            let (_, ty_generics, _) = generics.split_for_impl();
+            let impl_generics_test = generic_type_params_with_clone(&generics);
+
+            quote! {
+                impl<#(#impl_generics_test)*> FillExt<#field_type> for #struct_name #ty_generics {
+                    fn fill(value: #field_type) -> #struct_name<#field_type> {
+                        #struct_name {
+                            #( #fields: value.clone() ), *
+                        }
+                    }
+                }
+            }
         }
         None => {
             let (fields, field_type) = parse_fields(data);
-            impl_fill_ext(&struct_name, &fields, &field_type).into()
+            quote! {
+                impl FillExt<#field_type> for #struct_name {
+                    fn fill(value: #field_type) -> #struct_name {
+                        #struct_name {
+                            #( #fields: value ), *
+                        }
+                    }
+                }
+            }
         }
-        _ => panic!("Struct cannot contain more than one generic parameter."),
     }
+    .into()
 }
 
 fn parse_fields(data: Data) -> (Vec<TokenStream>, syn::Type) {
@@ -46,7 +63,6 @@ fn parse_fields(data: Data) -> (Vec<TokenStream>, syn::Type) {
         panic!("Must contain at least one field!");
     }
 
-    // Should always be possible, since a struct with a generic will have fields.
     let field_type = &fields[0].ty;
 
     (
@@ -61,42 +77,6 @@ fn parse_fields(data: Data) -> (Vec<TokenStream>, syn::Type) {
             .collect(),
         field_type.clone(),
     )
-}
-
-fn impl_fill_ext(
-    struct_name: &Ident,
-    fields: &Vec<TokenStream>,
-    field_type: &syn::Type,
-) -> TokenStream {
-    quote! {
-        impl FillExt<#field_type> for #struct_name {
-            fn fill(value: #field_type) -> #struct_name {
-                #struct_name {
-                    #( #fields: value ), *
-                }
-            }
-        }
-    }
-}
-
-fn impl_fill_ext_with_generics(
-    struct_name: &Ident,
-    generics: &Generics,
-    fields: &Vec<TokenStream>,
-    field_type: &syn::Type,
-) -> TokenStream {
-    let (_, ty_generics, _) = generics.split_for_impl();
-    let impl_generics_test = generic_type_params_with_clone(generics);
-
-    quote! {
-        impl<#(#impl_generics_test)*> FillExt<#field_type> for #struct_name #ty_generics {
-            fn fill(value: #field_type) -> #struct_name<#field_type> {
-                #struct_name {
-                    #( #fields: value.clone() ), *
-                }
-            }
-        }
-    }
 }
 
 fn generic_type_params_with_clone(generics: &Generics) -> Vec<TokenStream> {
