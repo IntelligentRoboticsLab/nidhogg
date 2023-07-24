@@ -27,7 +27,7 @@ pub trait FillExt<T> {
     /// Return a new instance of the type, with all fields set to the provided value.
     fn fill(value: T) -> Self;
 }
-
+///
 /// Struct representing the LEDs on top of the NAO robot's head.  
 ///
 /// Each value represents the intensity of a white LED.
@@ -569,7 +569,7 @@ pub struct LeftLegJoints<T> {
 }
 
 /// Wrapper struct containing right left leg joints of the robot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Filler)]
 pub struct RightLegJoints<T> {
     // This value does not exist
     // pub hip_yaw_pitch: T,
@@ -578,19 +578,6 @@ pub struct RightLegJoints<T> {
     pub knee_pitch: T,
     pub ankle_pitch: T,
     pub ankle_roll: T,
-}
-
-impl<T: Clone> FillExt<T> for RightLegJoints<T> {
-    fn fill(value: T) -> RightLegJoints<T> {
-        RightLegJoints {
-            // hip_yaw_pitch: value.clone(),
-            hip_roll: value.clone(),
-            hip_pitch: value.clone(),
-            knee_pitch: value.clone(),
-            ankle_pitch: value.clone(),
-            ankle_roll: value.clone(),
-        }
-    }
 }
 
 /// Wrapper struct containing joint values for both legs of the robot.

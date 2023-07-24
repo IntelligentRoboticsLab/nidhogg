@@ -3,7 +3,7 @@ use quote::quote;
 use syn::{parse_macro_input, Data, DeriveInput, Field, Fields, GenericParam, Generics, TypeParam};
 
 /// Trait that introduces the [`fill`](`FillExt::fill`) method for a type, which allows filling in all fields with the same value.
-pub trait FillExtMacro<T> {
+pub trait FillExt<T> {
     /// Return a new instance of the type, with all fields set to the provided value.
     fn fill(value: T) -> Self;
 }
@@ -18,23 +18,22 @@ pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     } = parse_macro_input!(input);
     let struct_name = ident;
 
-    //field_type
     match generics.params.first() {
         Some(GenericParam::Type(TypeParam {
             ident: _field_type, ..
         })) => {
-            let (fields, field_type) = parse_fields(data, true);
+            let (fields, field_type) = parse_fields(data);
             impl_fill_ext_with_generics(&struct_name, &generics, &fields, &field_type).into()
         }
         None => {
-            let (fields, field_type) = parse_fields(data, false);
+            let (fields, field_type) = parse_fields(data);
             impl_fill_ext(&struct_name, &fields, &field_type).into()
         }
         _ => panic!("Struct cannot contain more than one generic parameter."),
     }
 }
 
-fn parse_fields(data: Data, generics: bool) -> (Vec<TokenStream>, syn::Type) {
+fn parse_fields(data: Data) -> (Vec<TokenStream>, syn::Type) {
     let fields = match data {
         Data::Struct(data_struct) => match data_struct.fields {
             Fields::Named(fields_named) => fields_named.named,
@@ -57,11 +56,7 @@ fn parse_fields(data: Data, generics: bool) -> (Vec<TokenStream>, syn::Type) {
                 if ty != field_type {
                     panic!("All fields must be of the same type");
                 }
-                if generics {
-                    quote! { #ident.clone() }
-                } else {
-                    quote! { #ident }
-                }
+                quote! { #ident }
             })
             .collect(),
         field_type.clone(),
@@ -94,10 +89,10 @@ fn impl_fill_ext_with_generics(
     let impl_generics_test = generic_type_params_with_clone(generics);
 
     quote! {
-        impl<#(#impl)> FillExt<#field_type> for #struct_name {
-            fn fill(value: #field_type) -> #struct_name {
+        impl<#(#impl_generics_test)*> FillExt<#field_type> for #struct_name #ty_generics {
+            fn fill(value: #field_type) -> #struct_name<#field_type> {
                 #struct_name {
-                    #( #fields: value ), *
+                    #( #fields: value.clone() ), *
                 }
             }
         }
