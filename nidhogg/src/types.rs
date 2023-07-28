@@ -509,7 +509,23 @@ impl ForceSensitiveResistorFoot {
 #[derive(Builder, Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct SonarValues {
+    /// Left Sonar Value.
+    ///
+    /// The values are in metres ranging from zero to five meter.
+    /// A value of 0 means an error. A value of Max Detection range means no echo.
+    ///
+    /// Be aware that:
+    /// - You’ll likely detect the ground before the maximum distance for detection.
+    /// - You can detect the robot arms.
     pub left: f32,
+    /// Right Sonar Value.
+    ///
+    /// The values are in metres ranging from zero to five meter.
+    /// A value of 0 means an error. A value of Max Detection range means no echo.
+    ///
+    /// Be aware that:
+    /// - You’ll likely detect the ground before the maximum distance for detection.
+    /// - Be careful you can detect the robot arms!
     pub right: f32,
 }
 

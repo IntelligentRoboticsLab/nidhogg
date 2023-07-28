@@ -115,6 +115,11 @@ pub struct NaoState {
     ///
     /// These angles represent the orientation of the robot and are measured in radians.
     pub angles: Vector2<f32>,
+    /// Sonar:
+    ///
+    /// Sends sonar waves and the result of the wave gets updated every 10ms.
+    /// The resulting values are in meters and range from zero to five metres.
+    /// There are three different kinds of waves. For explanation per wave type see the aldebaran docs.
     pub sonar: SonarValues,
     pub force_sensitive_resistors: ForceSensitiveResistors,
     pub touch: Touch,
