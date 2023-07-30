@@ -1,12 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, Data, DeriveInput, Field, Fields, Generics};
-
-/// Trait that introduces the [`fill`](`FillExt::fill`) method for a type, which allows filling in all fields with the same value.
-pub trait FillExt<T> {
-    /// Return a new instance of the type, with all fields set to the provided value.
-    fn fill(value: T) -> Self;
-}
+use syn::{Ident, Type, parse_macro_input, Data, DeriveInput, Field, Fields, Generics};
 
 /// Derive implementation for function that fills struct with one fixed value.
 pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -16,17 +10,23 @@ pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
         generics,
         ..
     } = parse_macro_input!(input);
-    let struct_name = ident;
+    match parse_fields(data) {
+        Err(err) => { err },
+        Ok((fields, field_type)) => {
+            gen_filler_impl(&generics, ident, fields, field_type)
+        },
+    }.into()
+}
 
+fn gen_filler_impl(generics: &Generics, struct_name: Ident, fields: Vec<TokenStream>, field_type: Type) -> TokenStream {
     match generics.params.first() {
         Some(_) => {
-            let (fields, field_type) = parse_fields(data);
-            let (_, ty_generics, _) = generics.split_for_impl();
-            let impl_generics_test = generic_type_params_with_clone(&generics);
+            let (_, ty_generics, where_clause) = generics.split_for_impl();
+            let impl_generics_test = generic_type_params_with_clone(generics);
 
             quote! {
-                impl<#(#impl_generics_test)*> FillExt<#field_type> for #struct_name #ty_generics {
-                    fn fill(value: #field_type) -> #struct_name<#field_type> {
+                impl<#(#impl_generics_test)*> nidhogg::types::FillExt<#field_type> for #struct_name #ty_generics #where_clause {
+                    fn fill(value: #field_type) -> Self {
                         #struct_name {
                             #( #fields: value.clone() ), *
                         }
@@ -35,48 +35,58 @@ pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             }
         }
         None => {
-            let (fields, field_type) = parse_fields(data);
             quote! {
-                impl FillExt<#field_type> for #struct_name {
-                    fn fill(value: #field_type) -> #struct_name {
+                impl nidhogg::types::FillExt<#field_type> for #struct_name {
+                    fn fill(value: #field_type) -> Self {
                         #struct_name {
-                            #( #fields: value ), *
+                            #( #fields: value.clone() ), *
                         }
                     }
                 }
             }
         }
     }
-    .into()
+
 }
 
-fn parse_fields(data: Data) -> (Vec<TokenStream>, syn::Type) {
+fn parse_fields(data: Data) -> Result<(Vec<TokenStream>, syn::Type), TokenStream> {
     let fields = match data {
         Data::Struct(data_struct) => match data_struct.fields {
             Fields::Named(fields_named) => fields_named.named,
-            _ => panic!("Only structs with named fields are supported"),
+            other => {
+                return Err(syn::Error::new_spanned(
+                    other,
+                    "Only structs with named fields are supported",
+                )
+                .to_compile_error());
+            }
         },
-        _ => panic!("Only supports structs"),
+        _ => {
+            return Err(syn::Error::new_spanned(
+                "",
+                "Only supports structs",
+            )
+            .to_compile_error());
+        }
     };
 
     if fields.is_empty() {
-        panic!("Must contain at least one field!");
+        return Err(syn::Error::new_spanned(
+            "",
+            "Only supports structs",
+        )
+        .to_compile_error());
     }
 
     let field_type = &fields[0].ty;
 
-    (
+    Ok((
         fields
             .iter()
-            .map(|Field { ident, ty, .. }| {
-                if ty != field_type {
-                    panic!("All fields must be of the same type");
-                }
-                quote! { #ident }
-            })
+            .map(|Field { ident, .. }| { quote! { #ident } })
             .collect(),
         field_type.clone(),
-    )
+    ))
 }
 
 fn generic_type_params_with_clone(generics: &Generics) -> Vec<TokenStream> {

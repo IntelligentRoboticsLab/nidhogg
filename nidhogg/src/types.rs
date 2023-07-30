@@ -27,7 +27,7 @@ pub trait FillExt<T> {
     /// Return a new instance of the type, with all fields set to the provided value.
     fn fill(value: T) -> Self;
 }
-///
+
 /// Struct representing the LEDs on top of the NAO robot's head.  
 ///
 /// Each value represents the intensity of a white LED.
