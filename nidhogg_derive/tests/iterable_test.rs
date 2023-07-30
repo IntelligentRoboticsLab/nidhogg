@@ -2,6 +2,12 @@
 mod iterable_tests {
     use nidhogg_derive::Iterable;
 
+    /// Deriving `Iterable` on the following struct kinds should result in a compile-error:
+    /// ```compile_fail
+    /// use nidhogg_derive::Iterable;
+    /// #[derive(Iterable)]
+    /// struct DoesNotCompile(i32);
+    ///```
     #[derive(Debug, Iterable)]
     pub struct TestStruct<T> {
         pub test_field: T,

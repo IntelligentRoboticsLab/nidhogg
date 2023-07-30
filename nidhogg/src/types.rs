@@ -462,39 +462,38 @@ pub struct JointArray<T> {
 }
 
 impl<T> JointArray<T> {
-    /// Consumes a `Vec<T>` to initialize a `JointArray<T>`.
-    pub fn from_vec(mut vector: Vec<T>) -> Result<JointArray<T>, &'static str> {
-        if vector.len() < 25 {
-            return Err("Not enough elements in vector");
-        }
+    /// Consumes a `[T; 25]` to initialize a `JointArray<T>`.
+    pub fn from_slice(arr: [T; 25]) -> JointArray<T> {
+        let [head_yaw, head_pitch, left_shoulder_pitch, left_shoulder_roll, left_elbow_yaw, left_elbow_roll, left_wrist_yaw, left_hip_yaw_pitch, left_hip_roll, left_hip_pitch, left_knee_pitch, left_ankle_pitch, left_ankle_roll, right_shoulder_pitch, right_shoulder_roll, right_elbow_yaw, right_elbow_roll, right_wrist_yaw, right_hip_roll, right_hip_pitch, right_knee_pitch, right_ankle_pitch, right_ankle_roll, left_hand, right_hand] =
+            arr;
 
-        Ok(JointArray {
-            head_yaw: vector.remove(0),
-            head_pitch: vector.remove(0),
-            left_shoulder_pitch: vector.remove(0),
-            left_shoulder_roll: vector.remove(0),
-            left_elbow_yaw: vector.remove(0),
-            left_elbow_roll: vector.remove(0),
-            left_wrist_yaw: vector.remove(0),
-            left_hip_yaw_pitch: vector.remove(0),
-            left_hip_roll: vector.remove(0),
-            left_hip_pitch: vector.remove(0),
-            left_knee_pitch: vector.remove(0),
-            left_ankle_pitch: vector.remove(0),
-            left_ankle_roll: vector.remove(0),
-            right_shoulder_pitch: vector.remove(0),
-            right_shoulder_roll: vector.remove(0),
-            right_elbow_yaw: vector.remove(0),
-            right_elbow_roll: vector.remove(0),
-            right_wrist_yaw: vector.remove(0),
-            right_hip_roll: vector.remove(0),
-            right_hip_pitch: vector.remove(0),
-            right_knee_pitch: vector.remove(0),
-            right_ankle_pitch: vector.remove(0),
-            right_ankle_roll: vector.remove(0),
-            left_hand: vector.remove(0),
-            right_hand: vector.remove(0),
-        })
+        JointArray {
+            head_yaw,
+            head_pitch,
+            left_shoulder_pitch,
+            left_shoulder_roll,
+            left_elbow_yaw,
+            left_elbow_roll,
+            left_wrist_yaw,
+            left_hip_yaw_pitch,
+            left_hip_roll,
+            left_hip_pitch,
+            left_knee_pitch,
+            left_ankle_pitch,
+            left_ankle_roll,
+            right_shoulder_pitch,
+            right_shoulder_roll,
+            right_elbow_yaw,
+            right_elbow_roll,
+            right_wrist_yaw,
+            right_hip_roll,
+            right_hip_pitch,
+            right_knee_pitch,
+            right_ankle_pitch,
+            right_ankle_roll,
+            left_hand,
+            right_hand,
+        }
     }
 
     /// Retrieves the left leg joints.

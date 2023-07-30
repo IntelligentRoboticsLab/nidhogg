@@ -5,57 +5,61 @@ use syn::{parse_macro_input, Data, DeriveInput, Field, Fields, GenericParam, Gen
 /// Derive implementation for making structs with a single generic field type iterable.
 pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let DeriveInput {
-        ident,
+        ident: struct_name,
         data,
         generics,
         ..
     } = parse_macro_input!(input);
-    let struct_name = ident;
 
     match generics.params.first() {
         Some(GenericParam::Type(TypeParam {
             ident: field_type, ..
-        })) => {
-            let fields = parse_fields(data);
-            let impl_to_vec = impl_to_vec(&struct_name, &generics, &fields);
-            let impl_into_iterator =
-                impl_into_iterator(&struct_name, &generics, &fields, field_type);
+        })) => match parse_fields(data) {
+            Ok(fields) => {
+                let impl_to_vec = impl_to_vec(&struct_name, &generics, &fields);
+                let impl_into_iterator =
+                    impl_into_iterator(&struct_name, &generics, &fields, field_type);
 
-            quote! {
-                #impl_to_vec
-                #impl_into_iterator
+                quote! {
+                    #impl_to_vec
+                    #impl_into_iterator
+                }
             }
-            .into()
-        }
-        _ => panic!("Must use exactly one generic!"),
+            Err(err) => err,
+        },
+        other => syn::Error::new_spanned(other, "Only structs with named fields are supported")
+            .to_compile_error(),
     }
+    .into()
 }
 
-fn parse_fields(data: Data) -> Vec<TokenStream> {
+fn parse_fields(data: Data) -> Result<Vec<TokenStream>, TokenStream> {
     let fields = match data {
         Data::Struct(data_struct) => match data_struct.fields {
             Fields::Named(fields_named) => fields_named.named,
-            _ => panic!("Only structs with named fields are supported"),
+            other => {
+                return Err(syn::Error::new_spanned(
+                    other,
+                    "Only structs with named fields are supported",
+                )
+                .to_compile_error());
+            }
         },
-        _ => panic!("Only supports structs"),
+        _ => {
+            return Err(syn::Error::new_spanned("", "Only supports structs").to_compile_error());
+        }
     };
 
     if fields.is_empty() {
         panic!("Must contain at least one field!");
     }
 
-    // Should always be possible, since a struct with a generic will have fields.
-    let field_type = &fields[0].ty;
-
-    fields
+    Ok(fields
         .iter()
-        .map(|Field { ident, ty, .. }| {
-            if ty != field_type {
-                panic!("All fields must be of the same type");
-            }
+        .map(|Field { ident, .. }| {
             quote! { self.#ident.clone() }
         })
-        .collect()
+        .collect())
 }
 
 fn impl_to_vec(struct_name: &Ident, generics: &Generics, fields: &Vec<TokenStream>) -> TokenStream {
