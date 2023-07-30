@@ -122,19 +122,20 @@ fn impl_from_iterator(
     field_type: &Ident,
 ) -> TokenStream {
     let (impl_generics, ty_generics, _) = generics.split_for_impl();
-    let l = fields.len();
+    let number_of_fields = fields.len();
 
     quote! {
         impl #impl_generics FromIterator<#field_type> for #struct_name #ty_generics {
             fn from_iter<I: IntoIterator<Item=#field_type>>(iter: I) -> Self {
-                let mut t: Vec<#field_type> = Vec::new();
+                let mut collector: Vec<#field_type> = Vec::new();
 
                 for item in iter {
-                    t.push(item);
+                    collector.push(item);
                 }
 
-                let Ok([#(#fields), *]): Result<[#field_type; #l], Vec<#field_type>> = t.try_into() else {
-                    panic!("Not enough values in iterator");
+                let collector_len = collector.len();
+                let Ok([#(#fields), *]): Result<[#field_type; #number_of_fields], Vec<#field_type>> = collector.try_into() else {
+                    panic!("Not the correct number of values in iterator expected {:?}, values got {:?}.", #number_of_fields, collector_len);
                 };
                 Self {
                     #(#fields), *

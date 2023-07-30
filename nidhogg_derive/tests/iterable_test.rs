@@ -45,4 +45,10 @@ mod iterable_tests {
             assert_eq!(a, b);
         }
     }
+
+    #[test]
+    #[should_panic]
+    fn from_iter() {
+        let _ = TestStruct::from_iter(vec![1,2,3]);
+    }
 }
