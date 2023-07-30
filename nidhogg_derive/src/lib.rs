@@ -1,3 +1,4 @@
+//! This crate provides the [`Builder`] macro used in nidhogg.
 use proc_macro::TokenStream;
 
 mod builder;

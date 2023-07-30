@@ -1,116 +1,154 @@
-//! Abstraction layer on top of the LoLA socket for RoboCup SPL NAO V6 robots.  
+// TODO: disallow missing docs
+#![deny(missing_debug_implementations, nonstandard_style)]
+#![warn(unreachable_pub, rust_2018_idioms)]
+
+//! A high level abstraction layer for interfacing with NAO V6 robots.
 //!
+//! ## About
+//!
+//! ## Backends
+//! nidhogg works by connecting to a backend that implements the [`NaoBackend`] trait.
+//!
+//! Backends can be enabled with features, by default the `lola` feature is enabled.
+//!
+//! | Backend | Supported | Feature name |
+//! |-|-|-|
+//! | `LoLA` | ✅ | `lola` |
+//! | `CoppeliaSim` | 🚧 | `coppelia` |
+//!
+//! ✅: Fully supported!  
+//! 🚧: Work in progress
+//!
+//! # Example
+//! ```no_run
+//! use nidhogg::{
+//!     backend::LolaBackend,
+//!     NaoBackend,
+//! };
+//!
+//! // We use the LoLA backend to connect to a LoLA socket on a real NAO V6.
+//! let mut nao = LolaBackend::connect().unwrap();
+//!
+//! // We can now get the current state of the robot!
+//! let state = nao.read_nao_state().expect("Failed to retrieve sensor data!");
+//! ```
+//!
+
+pub mod backend;
 mod error;
-mod lola;
 pub mod types;
 
-use std::{
-    io::{BufWriter, Read},
-    os::unix::net::UnixStream,
-    thread,
-    time::Duration,
+pub use error::*;
+use nidhogg_derive::Builder;
+use serde::Serialize;
+use types::{
+    Battery, Color, ForceSensitiveResistors, JointArray, LeftEar, LeftEye, RightEar, RightEye,
+    Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
 };
 
-use rmp_serde::from_slice;
-use tracing::info;
+/// Generic backend trait used for implementing a NAO interface.
+pub trait NaoBackend: Sized {
+    /// Connects to a NAO backend
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use nidhogg::{NaoBackend, backend::LolaBackend};
+    ///
+    /// // We connect to a real NAO using the LoLA backend
+    /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
+    /// ```
+    fn connect() -> Result<Self>;
 
-use lola::{RawState, RawUpdate};
+    /// Converts a control message to the format required by the backend and writes it to that backend.
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::Color};
+    ///
+    /// let mut nao = LolaBackend::connect().unwrap();
+    ///
+    /// // First, create a new control message where we set the chest color
+    /// let msg = NaoControlMessage::builder().chest(Color::MAGENTA).build();
+    ///
+    /// // Now we send it to the NAO!
+    /// nao.send_control_msg(msg).expect("Failed to write control message to backend!");
+    /// ```
+    fn send_control_msg(&mut self, update: NaoControlMessage) -> Result<()>;
 
-pub use error::{Error, Result};
-pub use types::{HardwareInfo, State, Update};
-
-/// Wrapper around a [`UnixStream`] containing methods to interact with
-/// the LoLA socket on the NAO 6 robot.
-pub struct Nao {
-    stream: UnixStream,
-    buffer: [u8; 896],
+    /// Reads the current sensor data from the chosen backend
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use nidhogg::{NaoBackend, backend::LolaBackend};
+    ///
+    /// let mut nao = LolaBackend::connect().unwrap();
+    ///
+    /// // Get the current state of the robot
+    /// let state = nao.read_nao_state().expect("Failed to retrieve sensor data!");
+    /// ```
+    fn read_nao_state(&mut self) -> Result<NaoState>;
 }
 
-impl Nao {
-    const ROBOCUP_PATH: &'static str = "/tmp/robocup";
-
-    /// Attempt to connect to the LoLA socket.
+/// High level representation of the `LoLA` state message.
+#[derive(Debug, Clone, Serialize)]
+pub struct NaoState {
+    pub position: JointArray<f32>,
+    pub stiffness: JointArray<f32>,
+    /// Accelerometer (Inertial Measurement Unit):
     ///
-    /// # Examples
-    /// ```no_run
-    /// use nidhogg::Nao;
+    /// The Accelerometer measures the proper acceleration along three axes (x, y, and z)
+    /// in meters per second squared (m/s²). The Z axis is facing up.
     ///
-    /// let nao = Nao::connect().expect("Failed to connect to LoLA socket!");
-    /// ```
-    pub fn connect() -> Result<Self> {
-        let stream = UnixStream::connect(Self::ROBOCUP_PATH)?;
-
-        Ok(Nao {
-            stream,
-            buffer: [0; 896],
-        })
-    }
-
-    /// Attempt to connect to the LoLA socket, with a specified amount of retries.
+    /// Position relative to the torso frame: (-0.008, 0.00606, 0.027) in meters.
+    pub accelerometer: Vector3<f32>,
+    /// Gyroscope (Inertial Measurement Unit):
     ///
-    /// # Examples
-    /// ```no_run
-    /// use nidhogg::Nao;
-    /// use std::time::Duration;
+    /// The Gyroscope provides direct measurements of the rotational speed along
+    /// three axes (x, y and z) in radians per second (rad/s). The Z axis is facing up.
     ///
-    /// let nao = Nao::connect_retry(10, Duration::from_secs(10)).expect("Failed to connect to LoLA socket!");
-    /// ```
-    pub fn connect_retry(retry_count: usize, retry_interval: Duration) -> Result<Self> {
-        for i in 0..retry_count {
-            let try_number = i + 1;
-
-            match Self::connect() {
-                sock if sock.is_ok() => {
-                    return sock;
-                }
-                // return the last error if we didn't connect succesfully
-                Err(e) if try_number == retry_count => return Err(e),
-                _ => (),
-            }
-
-            info!("({}/{retry_count}) Connecting to LoLA Socket...", i + 1);
-            thread::sleep(retry_interval);
-        }
-
-        unreachable!()
-    }
-
-    /// Reads the hardware info from the current [`RawState`]
-    pub fn read_hardware_info(&mut self) -> Result<HardwareInfo> {
-        Ok(self.read_raw()?.into())
-    }
-
-    /// Reads the current [`RawState`] from the LoLA socket and converts it
-    /// into the higher level [`State`].
-    pub fn read_state(&mut self) -> Result<State> {
-        Ok(self.read_raw()?.into())
-    }
-
-    /// Converts update to the format required by LoLA and writes it to the socket.
+    /// Position relative to the torso frame: (-0.008, 0.006, 0.029) in meters.
+    pub gyroscope: Vector3<f32>,
+    /// Angles:
     ///
-    /// # Examples
-    /// ```no_run
-    /// use nidhogg::{Nao, Update};
+    /// Using data from the Gyroscope and Accelerometer, the inertial board in the NAO robot calculates
+    /// two inclination angles (x, y) of the robot's body.
     ///
-    /// let mut nao = Nao::connect().expect("Failed to connect to LoLA socket!");
-    /// let update = Update::default();
-    ///
-    /// nao.write_update(update).expect("Failed to write update to LoLA socket!");
-    /// ```
-    pub fn write_update(&mut self, update: Update) -> Result<()> {
-        let raw: RawUpdate = update.into();
-        let mut writer = BufWriter::new(&mut self.stream);
-        rmp_serde::encode::write_named(&mut writer, &raw)?;
+    /// These angles represent the orientation of the robot and are measured in radians.
+    pub angles: Vector2<f32>,
+    pub sonar: SonarValues,
+    pub force_sensitive_resistors: ForceSensitiveResistors,
+    pub touch: Touch,
 
-        Ok(())
-    }
+    // Diagnostics
+    pub battery: Battery,
+    pub temperature: JointArray<f32>,
+    pub current: JointArray<f32>,
+    pub status: JointArray<i32>,
+}
 
-    /// Read a [`RawState`] from the LoLA socket.
-    fn read_raw(&mut self) -> Result<RawState> {
-        // TODO: Can we remove hardcoded size?
-        // println!("{}", size_of::<RawState>());
+/// High level representation of the `LoLA` update message.
+#[derive(Builder, Clone, Debug, Default)]
+pub struct NaoControlMessage {
+    pub position: JointArray<f32>,
+    pub stiffness: JointArray<f32>,
+    pub sonar: SonarEnabled,
 
-        self.stream.read_exact(&mut self.buffer)?;
-        Ok(from_slice::<RawState>(&self.buffer)?)
-    }
+    // LEDs
+    pub left_ear: LeftEar,
+    pub right_ear: RightEar,
+    pub chest: Color,
+    pub left_eye: LeftEye,
+    pub right_eye: RightEye,
+    pub left_foot: Color,
+    pub right_foot: Color,
+    pub skull: Skull,
+}
+
+/// Struct containing the hardware identifiers for the NAO V6 robot.
+#[derive(Debug)]
+pub struct HardwareInfo {
+    pub body_id: String,
+    pub body_version: String,
+    pub head_id: String,
+    pub head_version: String,
 }

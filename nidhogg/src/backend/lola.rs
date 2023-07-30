@@ -1,7 +1,108 @@
-use crate::types::*;
+//! `LoLA` backend that communicates through the socket at `/tmp/robocup`.  
+//!
+
+use crate::{
+    types::{
+        Battery, Color, ForceSensitiveResistorFoot, ForceSensitiveResistors, JointArray, LeftEar,
+        LeftEye, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
+    },
+    Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
+};
+use std::{
+    io::{BufWriter, Read},
+    os::unix::net::UnixStream,
+};
+
+use rmp_serde::{encode, from_slice};
 use serde::{Deserialize, Serialize};
 
-/// A trait that provides conversions from Nidhogg data to LoLA data
+use super::{ConnectWithRetry, ReadHardwareInfo};
+
+const ROBOCUP_SOCKET_PATH: &str = "/tmp/robocup";
+const LOLA_BUFFER_SIZE: usize = 896;
+
+/// `LoLA` backend that communicates with a real NAO V6 through the socket at `/tmp/robocup`
+#[derive(Debug)]
+pub struct LolaBackend(UnixStream);
+
+impl NaoBackend for LolaBackend {
+    /// Connects to a NAO backend
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use nidhogg::{NaoBackend, backend::LolaBackend};
+    ///
+    /// // We connect to a real NAO using the `LoLA` backend
+    /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
+    /// ```
+    fn connect() -> Result<Self> {
+        let stream = UnixStream::connect(ROBOCUP_SOCKET_PATH).map_err(Error::NoLoLAConnection)?;
+
+        Ok(LolaBackend(stream))
+    }
+
+    /// Converts a control message to the format required by the backend and writes it to that backend.
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::Color};
+    ///
+    /// let mut nao = LolaBackend::connect().unwrap();
+    ///
+    /// // First, create a new control message where we set the chest color
+    /// let msg = NaoControlMessage::builder().chest(Color::MAGENTA).build();
+    ///
+    /// // Now we send it to the NAO!
+    /// nao.send_control_msg(msg).expect("Failed to write control message to backend!");
+    /// ```
+    fn send_control_msg(&mut self, control_msg: NaoControlMessage) -> Result<()> {
+        let raw: LolaControlMsg = control_msg.into();
+
+        // convert to MessagePack and write to the socket in a buffer
+        let mut buf = BufWriter::new(&mut self.0);
+        encode::write_named(&mut buf, &raw).map_err(Error::MsgPackEncodeError)
+    }
+
+    /// Reads the current sensor data from the chosen backend
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use nidhogg::{NaoBackend, backend::LolaBackend};
+    ///
+    /// let mut nao = LolaBackend::connect().unwrap();
+    ///
+    /// // Get the current state of the robot
+    /// let state = nao.read_nao_state().expect("Failed to retrieve sensor data!");
+    /// ```
+    fn read_nao_state(&mut self) -> Result<NaoState> {
+        let mut buf = [0; LOLA_BUFFER_SIZE];
+
+        Ok(self.read_lola_nao_state(&mut buf)?.into())
+    }
+}
+
+impl ConnectWithRetry for LolaBackend {}
+
+impl ReadHardwareInfo for LolaBackend {
+    fn read_hardware_info(&mut self) -> Result<HardwareInfo> {
+        let mut buf = [0; LOLA_BUFFER_SIZE];
+
+        self.read_lola_nao_state(&mut buf).map(LolaNaoState::into)
+    }
+}
+
+impl LolaBackend {
+    /// Read a [`LolaNaoState`] from the `LoLA` socket.
+    fn read_lola_nao_state<'a>(
+        &mut self,
+        buf: &'a mut [u8; LOLA_BUFFER_SIZE],
+    ) -> Result<LolaNaoState<'a>> {
+        self.0.read_exact(buf)?;
+        from_slice::<LolaNaoState<'_>>(buf).map_err(Error::MsgPackDecodeError)
+    }
+}
+
+/// A trait that provides conversions from nidhogg data to `LoLA` data
 ///
 /// ## 🗒️ Note:
 /// Like [`From`] does with [`Into`], this trait automatically provides an implementation for [`IntoLoLA`].
@@ -9,7 +110,7 @@ trait FromNidhogg<N> {
     fn from_nidhogg(value: N) -> Self;
 }
 
-/// A trait that provides conversions from Nidhogg data to LoLA data
+/// A trait that provides conversions from `nihogg` data to `LoLA` data
 ///
 /// ## ⚠️ Warning:
 // This trait gets automatically implemented when implementing [`FromNidhogg`], so you should prefer implementing that.
@@ -18,14 +119,14 @@ trait IntoLoLA<L> {
 }
 
 /// From<T> for U implies Into<U> for T
-/// See: https://doc.rust-lang.org/std/convert/trait.From.html
+/// See: <https://doc.rust-lang.org/std/convert/trait.From.html>
 impl<N, L: FromNidhogg<N>> IntoLoLA<L> for N {
     fn into_lola(self) -> L {
         L::from_nidhogg(self)
     }
 }
 
-/// A trait that provides conversions from LoLA data to Nidhogg data
+/// A trait that provides conversions from `LoLA` data to nidhogg data
 ///
 /// ## 🗒️ Note:
 /// Like [`From`] does with [`Into`], this trait automatically provides an implementation for [`IntoLoLA`].
@@ -33,7 +134,7 @@ trait FromLoLA<L> {
     fn from_lola(value: L) -> Self;
 }
 
-/// A trait that provides conversions from LoLA data to Nidhogg data
+/// A trait that provides conversions from `LoLA` data to nidhogg data
 ///
 /// ## ⚠️ Warning:
 // This trait gets automatically implemented when implementing [`FromNidhogg`], so you should prefer implementing that.
@@ -42,15 +143,15 @@ trait IntoNidhogg<N> {
 }
 
 /// From<T> for U implies Into<U> for T
-/// See: https://doc.rust-lang.org/std/convert/trait.From.html
+/// See: <https://doc.rust-lang.org/std/convert/trait.From.html>
 impl<L, N: FromLoLA<L>> IntoNidhogg<N> for L {
     fn into_nidhogg(self) -> N {
         N::from_lola(self)
     }
 }
 
-impl FromNidhogg<Ear<Left>> for [f32; 10] {
-    fn from_nidhogg(value: Ear<Left>) -> Self {
+impl FromNidhogg<LeftEar> for [f32; 10] {
+    fn from_nidhogg(value: LeftEar) -> Self {
         [
             value.intensity_0_deg,
             value.intensity_36_deg,
@@ -66,8 +167,8 @@ impl FromNidhogg<Ear<Left>> for [f32; 10] {
     }
 }
 
-impl FromNidhogg<Ear<Right>> for [f32; 10] {
-    fn from_nidhogg(value: Ear<Right>) -> Self {
+impl FromNidhogg<RightEar> for [f32; 10] {
+    fn from_nidhogg(value: RightEar) -> Self {
         [
             value.intensity_324_deg,
             value.intensity_288_deg,
@@ -89,8 +190,8 @@ impl FromNidhogg<Color> for [f32; 3] {
     }
 }
 
-impl FromNidhogg<Eye<Left>> for [f32; 24] {
-    fn from_nidhogg(value: Eye<Left>) -> Self {
+impl FromNidhogg<LeftEye> for [f32; 24] {
+    fn from_nidhogg(value: LeftEye) -> Self {
         [
             value.color_45_deg.red,
             value.color_0_deg.red,
@@ -122,8 +223,8 @@ impl FromNidhogg<Eye<Left>> for [f32; 24] {
     }
 }
 
-impl FromNidhogg<Eye<Right>> for [f32; 24] {
-    fn from_nidhogg(value: Eye<Right>) -> Self {
+impl FromNidhogg<RightEye> for [f32; 24] {
+    fn from_nidhogg(value: RightEye) -> Self {
         [
             value.color_0_deg.red,
             value.color_45_deg.red,
@@ -191,6 +292,7 @@ impl<T> FromLoLA<[T; 25]> for JointArray<T> {
             left_elbow_yaw,
             left_elbow_roll,
             left_wrist_yaw,
+
             left_hip_yaw_pitch,
             left_hip_roll,
             left_hip_pitch,
@@ -198,16 +300,17 @@ impl<T> FromLoLA<[T; 25]> for JointArray<T> {
             left_ankle_pitch,
             left_ankle_roll,
 
-            right_hip_roll,
-            right_hip_pitch,
-            right_knee_pitch,
-            right_ankle_pitch,
-            right_ankle_roll,
             right_shoulder_pitch,
             right_shoulder_roll,
             right_elbow_yaw,
             right_elbow_roll,
             right_wrist_yaw,
+
+            right_hip_roll,
+            right_hip_pitch,
+            right_knee_pitch,
+            right_ankle_pitch,
+            right_ankle_roll,
 
             left_hand,
             right_hand,
@@ -281,15 +384,28 @@ impl FromLoLA<[f32; 4]> for ForceSensitiveResistorFoot {
     }
 }
 
-impl<T> FromLoLA<[T; 2]> for Sonar<T> {
-    fn from_lola(value: [T; 2]) -> Self {
+impl FromLoLA<[f32; 2]> for SonarValues {
+    fn from_lola(value: [f32; 2]) -> Self {
         let [left, right] = value;
-        Sonar { left, right }
+        SonarValues { left, right }
     }
 }
 
-impl<T> FromNidhogg<Sonar<T>> for [T; 2] {
-    fn from_nidhogg(value: Sonar<T>) -> Self {
+impl FromNidhogg<SonarValues> for [f32; 2] {
+    fn from_nidhogg(value: SonarValues) -> Self {
+        [value.left, value.right]
+    }
+}
+
+impl FromLoLA<[bool; 2]> for SonarEnabled {
+    fn from_lola(value: [bool; 2]) -> Self {
+        let [left, right] = value;
+        SonarEnabled { left, right }
+    }
+}
+
+impl FromNidhogg<SonarEnabled> for [bool; 2] {
+    fn from_nidhogg(value: SonarEnabled) -> Self {
         [value.left, value.right]
     }
 }
@@ -336,25 +452,25 @@ impl FromLoLA<[f32; 3]> for Vector3<f32> {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
-pub struct RawState<'a> {
-    pub stiffness: [f32; 25],
-    pub position: [f32; 25],
-    pub temperature: [f32; 25],
-    pub current: [f32; 25],
-    pub battery: [f32; 4],
-    pub accelerometer: [f32; 3],
-    pub gyroscope: [f32; 3],
-    pub angles: [f32; 2],
-    pub sonar: [f32; 2],
-    pub f_s_r: [f32; 8],
-    pub touch: [f32; 14],
-    pub status: [i32; 25],
+struct LolaNaoState<'a> {
+    stiffness: [f32; 25],
+    position: [f32; 25],
+    temperature: [f32; 25],
+    current: [f32; 25],
+    battery: [f32; 4],
+    accelerometer: [f32; 3],
+    gyroscope: [f32; 3],
+    angles: [f32; 2],
+    sonar: [f32; 2],
+    f_s_r: [f32; 8],
+    touch: [f32; 14],
+    status: [i32; 25],
     #[serde(borrow)]
-    pub robot_config: [&'a str; 4],
+    robot_config: [&'a str; 4],
 }
 
-impl From<RawState<'_>> for State {
-    fn from(value: RawState) -> Self {
+impl From<LolaNaoState<'_>> for NaoState {
+    fn from(value: LolaNaoState<'_>) -> Self {
         Self {
             stiffness: value.stiffness.into_nidhogg(),
             position: value.position.into_nidhogg(),
@@ -372,8 +488,8 @@ impl From<RawState<'_>> for State {
     }
 }
 
-impl<'a> From<RawState<'a>> for HardwareInfo {
-    fn from(value: RawState<'a>) -> Self {
+impl From<LolaNaoState<'_>> for HardwareInfo {
+    fn from(value: LolaNaoState<'_>) -> Self {
         Self {
             body_id: value.robot_config[0].to_string(),
             body_version: value.robot_config[1].to_string(),
@@ -385,22 +501,22 @@ impl<'a> From<RawState<'a>> for HardwareInfo {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "PascalCase")]
-pub struct RawUpdate {
-    pub position: [f32; 25],
-    pub stiffness: [f32; 25],
-    pub r_ear: [f32; 10],
-    pub l_ear: [f32; 10],
-    pub chest: [f32; 3],
-    pub l_eye: [f32; 24],
-    pub r_eye: [f32; 24],
-    pub l_foot: [f32; 3],
-    pub r_foot: [f32; 3],
-    pub skull: [f32; 12],
-    pub sonar: [bool; 2],
+struct LolaControlMsg {
+    position: [f32; 25],
+    stiffness: [f32; 25],
+    r_ear: [f32; 10],
+    l_ear: [f32; 10],
+    chest: [f32; 3],
+    l_eye: [f32; 24],
+    r_eye: [f32; 24],
+    l_foot: [f32; 3],
+    r_foot: [f32; 3],
+    skull: [f32; 12],
+    sonar: [bool; 2],
 }
 
-impl From<Update> for RawUpdate {
-    fn from(value: Update) -> Self {
+impl From<NaoControlMessage> for LolaControlMsg {
+    fn from(value: NaoControlMessage) -> Self {
         Self {
             position: value.position.into_lola(),
             stiffness: value.stiffness.into_lola(),
