@@ -38,8 +38,11 @@ mod iterable_tests {
             test_field_2: -3,
         };
 
-        let t2: TestStruct<i32> =
-            t0.into_iter().zip(t1.into_iter()).map(|(a, b)| (a + b) / 2).collect();
+        let t2: TestStruct<i32> = t0
+            .into_iter()
+            .zip(t1.into_iter())
+            .map(|(a, b)| (a + b) / 2)
+            .collect();
 
         for (a, b) in t2.into_iter().zip(vec![8, -4]) {
             assert_eq!(a, b);
@@ -49,6 +52,6 @@ mod iterable_tests {
     #[test]
     #[should_panic]
     fn from_iter() {
-        let _ = TestStruct::from_iter(vec![1,2,3]);
+        let _ = TestStruct::from_iter(vec![1, 2, 3]);
     }
 }
