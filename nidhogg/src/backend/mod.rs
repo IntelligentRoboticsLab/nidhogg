@@ -19,10 +19,9 @@ use std::any::type_name;
 use std::thread;
 use std::time::Duration;
 
-use tracing::info;
-
-use crate::error::Result;
 use crate::{HardwareInfo, NaoBackend};
+use miette::Result;
+use tracing::info;
 
 /// Trait that introduces [`ConnectWithRetry::connect_with_retry`] to a type that implements [`NaoBackend`].
 pub trait ConnectWithRetry: NaoBackend {
@@ -41,8 +40,8 @@ pub trait ConnectWithRetry: NaoBackend {
         for i in 0..=retry_count {
             info!(
                 "[{}/{}] Connecting to {}",
-                i + 1,
-                retry_count + 1,
+                i,
+                retry_count,
                 type_name::<Self>()
             );
 

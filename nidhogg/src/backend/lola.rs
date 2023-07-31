@@ -6,15 +6,15 @@ use crate::{
         Battery, Color, ForceSensitiveResistorFoot, ForceSensitiveResistors, JointArray, LeftEar,
         LeftEye, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
     },
-    Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
+    Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState,
 };
+use miette::{IntoDiagnostic, Result};
+use rmp_serde::{encode, from_slice};
+use serde::{Deserialize, Serialize};
 use std::{
     io::{BufWriter, Read},
     os::unix::net::UnixStream,
 };
-
-use rmp_serde::{encode, from_slice};
-use serde::{Deserialize, Serialize};
 
 use super::{ConnectWithRetry, ReadHardwareInfo};
 
@@ -60,7 +60,9 @@ impl NaoBackend for LolaBackend {
 
         // convert to MessagePack and write to the socket in a buffer
         let mut buf = BufWriter::new(&mut self.0);
-        encode::write_named(&mut buf, &raw).map_err(Error::MsgPackEncodeError)
+        encode::write_named(&mut buf, &raw)
+            .map_err(Error::MsgPackEncodeError)
+            .into_diagnostic()
     }
 
     /// Reads the current sensor data from the chosen backend
@@ -97,8 +99,13 @@ impl LolaBackend {
         &mut self,
         buf: &'a mut [u8; LOLA_BUFFER_SIZE],
     ) -> Result<LolaNaoState<'a>> {
-        self.0.read_exact(buf)?;
-        from_slice::<LolaNaoState<'_>>(buf).map_err(Error::MsgPackDecodeError)
+        self.0
+            .read_exact(buf)
+            .map_err(Error::NoLoLAConnection)
+            .into_diagnostic()?;
+        from_slice::<LolaNaoState<'_>>(buf)
+            .map_err(Error::MsgPackDecodeError)
+            .into_diagnostic()
     }
 }
 

@@ -38,7 +38,8 @@ pub mod backend;
 mod error;
 pub mod types;
 
-pub use error::*;
+pub use error::Error;
+use miette::Result;
 use nidhogg_derive::Builder;
 use serde::Serialize;
 use types::{
