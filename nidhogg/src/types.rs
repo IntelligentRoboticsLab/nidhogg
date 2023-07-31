@@ -511,21 +511,21 @@ impl ForceSensitiveResistorFoot {
 pub struct SonarValues {
     /// Left Sonar Value.
     ///
-    /// The values are in metres ranging from zero to five meter.
+    /// The value is in meter ranging from 0 to 5 meters.
     /// A value of 0 means an error. A value of Max Detection range means no echo.
     ///
     /// Be aware that:
-    /// - You’ll likely detect the ground before the maximum distance for detection.
-    /// - You can detect the robot arms.
+    /// - The ground will likely be detected before the maximum distance for detection is reached.
+    /// - Robot arms might be detected.
     pub left: f32,
     /// Right Sonar Value.
     ///
-    /// The values are in metres ranging from zero to five meter.
+    /// The value is in meter ranging from 0 to 5 meter.
     /// A value of 0 means an error. A value of Max Detection range means no echo.
     ///
     /// Be aware that:
-    /// - You’ll likely detect the ground before the maximum distance for detection.
-    /// - Be careful you can detect the robot arms!
+    /// - The ground will likely be detected before the maximum distance for detection is reached.
+    /// - Robot arms might be detected.
     pub right: f32,
 }
 
