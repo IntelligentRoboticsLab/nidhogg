@@ -14,7 +14,7 @@ pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     match generics.params.first() {
         Some(GenericParam::Type(TypeParam {
             ident: field_type, ..
-        })) => match parse_data(data) {
+        })) => match parse_data(data, &struct_name) {
             Ok((fields_clone, fields)) => {
                 let impl_to_vec = impl_to_vec(&struct_name, &generics, &fields_clone);
                 let impl_into_iterator =
@@ -38,7 +38,10 @@ pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     .into()
 }
 
-fn parse_data(data: Data) -> Result<(Vec<TokenStream>, Vec<TokenStream>), TokenStream> {
+fn parse_data(
+    data: Data,
+    struct_name: &Ident,
+) -> Result<(Vec<TokenStream>, Vec<TokenStream>), TokenStream> {
     let fields = match data {
         Data::Struct(data_struct) => match data_struct.fields {
             Fields::Named(fields_named) => fields_named.named,
@@ -51,7 +54,9 @@ fn parse_data(data: Data) -> Result<(Vec<TokenStream>, Vec<TokenStream>), TokenS
             }
         },
         _ => {
-            return Err(syn::Error::new_spanned("", "Only supports structs").to_compile_error());
+            return Err(
+                syn::Error::new_spanned(struct_name, "Only supports structs").to_compile_error(),
+            );
         }
     };
 
