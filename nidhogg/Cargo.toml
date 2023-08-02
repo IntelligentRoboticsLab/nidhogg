@@ -9,7 +9,7 @@ edition = "2021"
 rmp-serde = { version = "1.1.1", optional = true }
 serde = { version = "1.0.150", features = ["derive"] }
 thiserror = "1.0.38"
-miette = { version = "5.5.0", features = ["fancy"] }
+miette = { version = "5.10.0" }
 tracing = "0.1.37"
 nidhogg_derive = { workspace = true }
 zmq_remote_api = { git = "https://github.com/samuel-cavalcanti/rust_zmqRemoteApi", optional = true }

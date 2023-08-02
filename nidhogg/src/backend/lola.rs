@@ -8,13 +8,13 @@ use crate::{
     },
     Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
 };
+
+use rmp_serde::{encode, from_slice};
+use serde::{Deserialize, Serialize};
 use std::{
     io::{BufWriter, Read},
     os::unix::net::UnixStream,
 };
-
-use rmp_serde::{encode, from_slice};
-use serde::{Deserialize, Serialize};
 
 use super::{ConnectWithRetry, ReadHardwareInfo};
 
