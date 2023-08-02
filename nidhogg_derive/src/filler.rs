@@ -10,9 +10,9 @@ pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
         generics,
         ..
     } = parse_macro_input!(input);
-    match parse_fields(data) {
-        Err(err) => err,
+    match parse_fields(data, &ident) {
         Ok((fields, field_type)) => gen_filler_impl(&generics, ident, fields, field_type),
+        Err(err) => err,
     }
     .into()
 }
@@ -52,7 +52,10 @@ fn gen_filler_impl(
     }
 }
 
-fn parse_fields(data: Data) -> Result<(Vec<TokenStream>, syn::Type), TokenStream> {
+fn parse_fields(
+    data: Data,
+    struct_name: &Ident,
+) -> Result<(Vec<TokenStream>, syn::Type), TokenStream> {
     let fields = match data {
         Data::Struct(data_struct) => match data_struct.fields {
             Fields::Named(fields_named) => fields_named.named,
@@ -65,12 +68,16 @@ fn parse_fields(data: Data) -> Result<(Vec<TokenStream>, syn::Type), TokenStream
             }
         },
         _ => {
-            return Err(syn::Error::new_spanned("", "Only supports structs").to_compile_error());
+            return Err(
+                syn::Error::new_spanned(struct_name, "Only supports structs").to_compile_error(),
+            );
         }
     };
 
     if fields.is_empty() {
-        return Err(syn::Error::new_spanned("", "Only supports structs").to_compile_error());
+        return Err(
+            syn::Error::new_spanned(struct_name, "Only supports structs").to_compile_error(),
+        );
     }
 
     let field_type = &fields[0].ty;
