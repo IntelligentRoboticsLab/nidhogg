@@ -73,9 +73,9 @@ fn impl_builder_struct(
     let data_type = field_data.field_types.as_slice();
     let data_doc: Vec<_> = data_name
         .iter()
-        .map(|ident| format!("Set the `{}` value to the provided value.", ident))
+        .map(|ident| format!("Set the `{ident}` value to the provided value."))
         .collect();
-    let build_fn_doc = format!("Use the provided values to build a new instance of [`{}`].\n\nNot explicitly defined fields will use their [`Default`] value. ", ident);
+    let build_fn_doc = format!("Use the provided values to build a new instance of [`{ident}`].\n\nNot explicitly defined fields will use their [`Default`] value. ");
 
     let ty_generics_with_default = generic_type_params_with_default(generics);
     let (_impl_generics, ty_generics, where_clause) = generics.split_for_impl();
