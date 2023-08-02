@@ -19,8 +19,7 @@ use std::any::type_name;
 use std::thread;
 use std::time::Duration;
 
-use crate::{HardwareInfo, NaoBackend};
-use miette::Result;
+use crate::{error::Result, HardwareInfo, NaoBackend};
 use tracing::info;
 
 /// Trait that introduces [`ConnectWithRetry::connect_with_retry`] to a type that implements [`NaoBackend`].

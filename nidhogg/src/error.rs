@@ -1,7 +1,9 @@
 use miette::Diagnostic;
 use thiserror::Error;
 
-#[derive(Error, Debug, Diagnostic)]
+pub type Result<T> = miette::Result<T, Error>;
+
+#[derive(Error, Diagnostic, Debug)]
 #[non_exhaustive]
 pub enum Error {
     #[cfg(feature = "lola")]
