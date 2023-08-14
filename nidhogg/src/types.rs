@@ -515,37 +515,51 @@ impl<T> JointArray<T> {
             pitch: &self.head_pitch,
         }
     }
+
+    fn from_iter<I>(mut iter: I) -> JointArray<T>
+    where
+        I: std::iter::Iterator<Item = T>,
+    {
+        Self {
+            head_yaw: iter.next().unwrap(),
+            head_pitch: iter.next().unwrap(),
+            left_shoulder_pitch: iter.next().unwrap(),
+            left_shoulder_roll: iter.next().unwrap(),
+            left_elbow_yaw: iter.next().unwrap(),
+            left_elbow_roll: iter.next().unwrap(),
+            left_wrist_yaw: iter.next().unwrap(),
+            left_hip_yaw_pitch: iter.next().unwrap(),
+            left_hip_roll: iter.next().unwrap(),
+            left_hip_pitch: iter.next().unwrap(),
+            left_knee_pitch: iter.next().unwrap(),
+            left_ankle_pitch: iter.next().unwrap(),
+            left_ankle_roll: iter.next().unwrap(),
+            right_shoulder_pitch: iter.next().unwrap(),
+            right_shoulder_roll: iter.next().unwrap(),
+            right_elbow_yaw: iter.next().unwrap(),
+            right_elbow_roll: iter.next().unwrap(),
+            right_wrist_yaw: iter.next().unwrap(),
+            right_hip_roll: iter.next().unwrap(),
+            right_hip_pitch: iter.next().unwrap(),
+            right_knee_pitch: iter.next().unwrap(),
+            right_ankle_pitch: iter.next().unwrap(),
+            right_ankle_roll: iter.next().unwrap(),
+            left_hand: iter.next().unwrap(),
+            right_hand: iter.next().unwrap(),
+        }
+    }
 }
 
 impl<T: Clone> FillExt<T> for JointArray<T> {
     fn fill(value: T) -> JointArray<T> {
-        JointArray {
-            head_yaw: value.clone(),
-            head_pitch: value.clone(),
-            left_shoulder_pitch: value.clone(),
-            left_shoulder_roll: value.clone(),
-            left_elbow_yaw: value.clone(),
-            left_elbow_roll: value.clone(),
-            left_wrist_yaw: value.clone(),
-            left_hip_yaw_pitch: value.clone(),
-            left_hip_roll: value.clone(),
-            left_hip_pitch: value.clone(),
-            left_knee_pitch: value.clone(),
-            left_ankle_pitch: value.clone(),
-            left_ankle_roll: value.clone(),
-            right_shoulder_pitch: value.clone(),
-            right_shoulder_roll: value.clone(),
-            right_elbow_yaw: value.clone(),
-            right_elbow_roll: value.clone(),
-            right_wrist_yaw: value.clone(),
-            right_hip_roll: value.clone(),
-            right_hip_pitch: value.clone(),
-            right_knee_pitch: value.clone(),
-            right_ankle_pitch: value.clone(),
-            right_ankle_roll: value.clone(),
-            left_hand: value.clone(),
-            right_hand: value.clone(),
-        }
+        JointArray::from_iter(std::iter::repeat(value))
+    }
+}
+
+impl<T> std::iter::FromIterator<T> for JointArray<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iterable: I) -> Self {
+        let iter = iterable.into_iter();
+        JointArray::from_iter(iter)
     }
 }
 
@@ -582,75 +596,6 @@ impl<T: Clone> std::iter::IntoIterator for JointArray<T> {
             self.right_hand.clone(),
         ]
         .into_iter()
-    }
-}
-
-impl<T> std::iter::FromIterator<T> for JointArray<T> {
-    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut collector: Vec<T> = Vec::new();
-
-        for item in iter {
-            collector.push(item);
-        }
-
-        let collector_len = collector.len();
-        let Ok([
-            head_yaw,
-            head_pitch,
-            left_shoulder_pitch,
-            left_shoulder_roll,
-            left_elbow_yaw,
-            left_elbow_roll,
-            left_wrist_yaw,
-            left_hip_yaw_pitch,
-            left_hip_roll,
-            left_hip_pitch,
-            left_knee_pitch,
-            left_ankle_pitch,
-            left_ankle_roll,
-            right_shoulder_pitch,
-            right_shoulder_roll,
-            right_elbow_yaw,
-            right_elbow_roll,
-            right_wrist_yaw,
-            right_hip_roll,
-            right_hip_pitch,
-            right_knee_pitch,
-            right_ankle_pitch,
-            right_ankle_roll,
-            left_hand,
-            right_hand,
-        ]): Result<[T; 25], Vec<T>> = collector.try_into() else {
-            panic!("Not the correct number of values in iterator expected {:?}, values got {:?}.", 25, collector_len);
-        };
-
-        Self {
-            head_yaw,
-            head_pitch,
-            left_shoulder_pitch,
-            left_shoulder_roll,
-            left_elbow_yaw,
-            left_elbow_roll,
-            left_wrist_yaw,
-            left_hip_yaw_pitch,
-            left_hip_roll,
-            left_hip_pitch,
-            left_knee_pitch,
-            left_ankle_pitch,
-            left_ankle_roll,
-            right_shoulder_pitch,
-            right_shoulder_roll,
-            right_elbow_yaw,
-            right_elbow_roll,
-            right_wrist_yaw,
-            right_hip_roll,
-            right_hip_pitch,
-            right_knee_pitch,
-            right_ankle_pitch,
-            right_ankle_roll,
-            left_hand,
-            right_hand,
-        }
     }
 }
 
