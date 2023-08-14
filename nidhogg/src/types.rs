@@ -549,6 +549,111 @@ impl<T: Clone> FillExt<T> for JointArray<T> {
     }
 }
 
+impl<T: Clone> std::iter::IntoIterator for JointArray<T> {
+    type Item = T;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> std::vec::IntoIter<T> {
+        vec![
+            self.head_yaw.clone(),
+            self.head_pitch.clone(),
+            self.left_shoulder_pitch.clone(),
+            self.left_shoulder_roll.clone(),
+            self.left_elbow_yaw.clone(),
+            self.left_elbow_roll.clone(),
+            self.left_wrist_yaw.clone(),
+            self.left_hip_yaw_pitch.clone(),
+            self.left_hip_roll.clone(),
+            self.left_hip_pitch.clone(),
+            self.left_knee_pitch.clone(),
+            self.left_ankle_pitch.clone(),
+            self.left_ankle_roll.clone(),
+            self.right_shoulder_pitch.clone(),
+            self.right_shoulder_roll.clone(),
+            self.right_elbow_yaw.clone(),
+            self.right_elbow_roll.clone(),
+            self.right_wrist_yaw.clone(),
+            self.right_hip_roll.clone(),
+            self.right_hip_pitch.clone(),
+            self.right_knee_pitch.clone(),
+            self.right_ankle_pitch.clone(),
+            self.right_ankle_roll.clone(),
+            self.left_hand.clone(),
+            self.right_hand.clone(),
+        ]
+        .into_iter()
+    }
+}
+
+impl<T> std::iter::FromIterator<T> for JointArray<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut collector: Vec<T> = Vec::new();
+
+        for item in iter {
+            collector.push(item);
+        }
+
+        let collector_len = collector.len();
+        let Ok([
+            head_yaw,
+            head_pitch,
+            left_shoulder_pitch,
+            left_shoulder_roll,
+            left_elbow_yaw,
+            left_elbow_roll,
+            left_wrist_yaw,
+            left_hip_yaw_pitch,
+            left_hip_roll,
+            left_hip_pitch,
+            left_knee_pitch,
+            left_ankle_pitch,
+            left_ankle_roll,
+            right_shoulder_pitch,
+            right_shoulder_roll,
+            right_elbow_yaw,
+            right_elbow_roll,
+            right_wrist_yaw,
+            right_hip_roll,
+            right_hip_pitch,
+            right_knee_pitch,
+            right_ankle_pitch,
+            right_ankle_roll,
+            left_hand,
+            right_hand,
+        ]): Result<[T; 25], Vec<T>> = collector.try_into() else {
+            panic!("Not the correct number of values in iterator expected {:?}, values got {:?}.", 25, collector_len);
+        };
+
+        Self {
+            head_yaw,
+            head_pitch,
+            left_shoulder_pitch,
+            left_shoulder_roll,
+            left_elbow_yaw,
+            left_elbow_roll,
+            left_wrist_yaw,
+            left_hip_yaw_pitch,
+            left_hip_roll,
+            left_hip_pitch,
+            left_knee_pitch,
+            left_ankle_pitch,
+            left_ankle_roll,
+            right_shoulder_pitch,
+            right_shoulder_roll,
+            right_elbow_yaw,
+            right_elbow_roll,
+            right_wrist_yaw,
+            right_hip_roll,
+            right_hip_pitch,
+            right_knee_pitch,
+            right_ankle_pitch,
+            right_ankle_roll,
+            left_hand,
+            right_hand,
+        }
+    }
+}
+
 /// Struct representing the battery status of the robot.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -905,6 +1010,7 @@ impl<T> JointArrayBuilder<T> {
 
 #[cfg(test)]
 mod tests {
+    use crate::types::JointArray;
     use crate::types::{Color, FillExt, LeftEye};
 
     use super::ForceSensitiveResistorFoot;
@@ -972,5 +1078,17 @@ mod tests {
         assert_eq!(color.color_0_deg.red, 0.5);
         assert_eq!(color.color_0_deg.green, 0.5);
         assert_eq!(color.color_0_deg.blue, 0.5);
+    }
+
+    #[test]
+    fn test_joint_array() {
+        let t1 = JointArray::fill(1);
+        let t2: Vec<i32> = vec![1; 25];
+
+        for (i, elem) in t1.clone().into_iter().enumerate() {
+            assert_eq!(elem, t2[i])
+        }
+
+        let _: JointArray<i32> = t2.into_iter().collect();
     }
 }
