@@ -517,12 +517,12 @@ impl<T> JointArray<T> {
     }
 
     /// Returns a `JointArrayIterator`.
-    pub fn iter<'a>(&'a self) -> JointArrayIterator<'a, T> {
-        JointArrayIterator::new(&self)
+    pub fn iter(&self) -> JointArrayIterator<'_, T> {
+        JointArrayIterator::new(self)
     }
 
     /// Initializes a `JointArray` from an iterator.
-    pub fn from_iter<I>(mut iter: I) -> JointArray<T>
+    fn from_iter<I>(mut iter: I) -> JointArray<T>
     where
         I: std::iter::Iterator<Item = T>,
     {
