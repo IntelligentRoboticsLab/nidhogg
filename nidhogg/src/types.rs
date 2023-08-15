@@ -516,7 +516,13 @@ impl<T> JointArray<T> {
         }
     }
 
-    fn from_iter<I>(mut iter: I) -> JointArray<T>
+    /// Returns a `JointArrayIterator`.
+    pub fn iter<'a>(&'a self) -> JointArrayIterator<'a, T> {
+        JointArrayIterator::new(&self)
+    }
+
+    /// Initializes a `JointArray` from an iterator.
+    pub fn from_iter<I>(mut iter: I) -> JointArray<T>
     where
         I: std::iter::Iterator<Item = T>,
     {
@@ -563,41 +569,149 @@ impl<T> std::iter::FromIterator<T> for JointArray<T> {
     }
 }
 
-impl<T: Clone> std::iter::IntoIterator for JointArray<T> {
-    type Item = T;
-    type IntoIter = std::vec::IntoIter<Self::Item>;
+#[derive(Debug)]
+enum JointArrayField {
+    HeadYaw,
+    HeadPitch,
+    LeftShoulderPitch,
+    LeftShoulderRoll,
+    LeftElbowYaw,
+    LeftElbowRoll,
+    LeftWristYaw,
+    LeftHipYawPitch,
+    LeftHipRoll,
+    LeftHipPitch,
+    LeftKneePitch,
+    LeftAnklePitch,
+    LeftAnkleRoll,
+    RightShoulderPitch,
+    RightShoulderRoll,
+    RightElbowYaw,
+    RightElbowRoll,
+    RightWristYaw,
+    RightHipRoll,
+    RightHipPitch,
+    RightKneePitch,
+    RightAnklePitch,
+    RightAnkleRoll,
+    LeftHand,
+    RightHand,
+    End,
+}
 
-    fn into_iter(self) -> std::vec::IntoIter<T> {
-        vec![
-            self.head_yaw.clone(),
-            self.head_pitch.clone(),
-            self.left_shoulder_pitch.clone(),
-            self.left_shoulder_roll.clone(),
-            self.left_elbow_yaw.clone(),
-            self.left_elbow_roll.clone(),
-            self.left_wrist_yaw.clone(),
-            self.left_hip_yaw_pitch.clone(),
-            self.left_hip_roll.clone(),
-            self.left_hip_pitch.clone(),
-            self.left_knee_pitch.clone(),
-            self.left_ankle_pitch.clone(),
-            self.left_ankle_roll.clone(),
-            self.right_shoulder_pitch.clone(),
-            self.right_shoulder_roll.clone(),
-            self.right_elbow_yaw.clone(),
-            self.right_elbow_roll.clone(),
-            self.right_wrist_yaw.clone(),
-            self.right_hip_roll.clone(),
-            self.right_hip_pitch.clone(),
-            self.right_knee_pitch.clone(),
-            self.right_ankle_pitch.clone(),
-            self.right_ankle_roll.clone(),
-            self.left_hand.clone(),
-            self.right_hand.clone(),
-        ]
-        .into_iter()
+impl JointArrayField {
+    fn next(&self) -> Self {
+        match self {
+            Self::HeadYaw => Self::HeadPitch,
+            Self::HeadPitch => Self::LeftShoulderPitch,
+            Self::LeftShoulderPitch => Self::LeftShoulderRoll,
+            Self::LeftShoulderRoll => Self::LeftElbowYaw,
+            Self::LeftElbowYaw => Self::LeftElbowRoll,
+            Self::LeftElbowRoll => Self::LeftWristYaw,
+            Self::LeftWristYaw => Self::LeftHipYawPitch,
+            Self::LeftHipYawPitch => Self::LeftHipRoll,
+            Self::LeftHipRoll => Self::LeftHipPitch,
+            Self::LeftHipPitch => Self::LeftKneePitch,
+            Self::LeftKneePitch => Self::LeftAnklePitch,
+            Self::LeftAnklePitch => Self::LeftAnkleRoll,
+            Self::LeftAnkleRoll => Self::RightShoulderPitch,
+            Self::RightShoulderPitch => Self::RightShoulderRoll,
+            Self::RightShoulderRoll => Self::RightElbowYaw,
+            Self::RightElbowYaw => Self::RightElbowRoll,
+            Self::RightElbowRoll => Self::RightWristYaw,
+            Self::RightWristYaw => Self::RightHipRoll,
+            Self::RightHipRoll => Self::RightHipPitch,
+            Self::RightHipPitch => Self::RightKneePitch,
+            Self::RightKneePitch => Self::RightAnklePitch,
+            Self::RightAnklePitch => Self::RightAnkleRoll,
+            Self::RightAnkleRoll => Self::LeftHand,
+            Self::LeftHand => Self::RightHand,
+            _ => Self::End,
+        }
     }
 }
+
+#[derive(Debug)]
+pub struct JointArrayIterator<'a, T>(JointArrayField, &'a JointArray<T>);
+
+impl<'a, T> JointArrayIterator<'a, T> {
+    fn new(joint_array: &'a JointArray<T>) -> Self {
+        Self(JointArrayField::HeadYaw, joint_array)
+    }
+}
+
+impl<'a, T> std::iter::Iterator for JointArrayIterator<'a, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<&'a T> {
+        let val = match self.0 {
+            JointArrayField::HeadYaw => Some(&self.1.head_yaw),
+            JointArrayField::HeadPitch => Some(&self.1.head_pitch),
+            JointArrayField::LeftShoulderPitch => Some(&self.1.left_shoulder_pitch),
+            JointArrayField::LeftShoulderRoll => Some(&self.1.left_shoulder_roll),
+            JointArrayField::LeftElbowYaw => Some(&self.1.left_elbow_yaw),
+            JointArrayField::LeftElbowRoll => Some(&self.1.left_elbow_roll),
+            JointArrayField::LeftWristYaw => Some(&self.1.left_wrist_yaw),
+            JointArrayField::LeftHipYawPitch => Some(&self.1.left_hip_yaw_pitch),
+            JointArrayField::LeftHipRoll => Some(&self.1.left_hip_roll),
+            JointArrayField::LeftHipPitch => Some(&self.1.left_hip_pitch),
+            JointArrayField::LeftKneePitch => Some(&self.1.left_knee_pitch),
+            JointArrayField::LeftAnklePitch => Some(&self.1.left_ankle_pitch),
+            JointArrayField::LeftAnkleRoll => Some(&self.1.left_ankle_roll),
+            JointArrayField::RightShoulderPitch => Some(&self.1.right_shoulder_pitch),
+            JointArrayField::RightShoulderRoll => Some(&self.1.right_shoulder_roll),
+            JointArrayField::RightElbowYaw => Some(&self.1.right_elbow_yaw),
+            JointArrayField::RightElbowRoll => Some(&self.1.right_elbow_roll),
+            JointArrayField::RightWristYaw => Some(&self.1.right_wrist_yaw),
+            JointArrayField::RightHipRoll => Some(&self.1.right_hip_roll),
+            JointArrayField::RightHipPitch => Some(&self.1.right_hip_pitch),
+            JointArrayField::RightKneePitch => Some(&self.1.right_knee_pitch),
+            JointArrayField::RightAnklePitch => Some(&self.1.right_ankle_pitch),
+            JointArrayField::RightAnkleRoll => Some(&self.1.right_ankle_roll),
+            JointArrayField::LeftHand => Some(&self.1.left_hand),
+            JointArrayField::RightHand => Some(&self.1.right_hand),
+            JointArrayField::End => None,
+        };
+        self.0 = self.0.next();
+        val
+    }
+}
+
+// impl<T: Clone> std::iter::IntoIterator for JointArray<T> {
+//     type Item = T;
+//     type IntoIter = std::vec::IntoIter<Self::Item>;
+//
+//     fn into_iter(self) -> std::vec::IntoIter<T> {
+//         vec![
+//             self.head_yaw.clone(),
+//             self.head_pitch.clone(),
+//             self.left_shoulder_pitch.clone(),
+//             self.left_shoulder_roll.clone(),
+//             self.left_elbow_yaw.clone(),
+//             self.left_elbow_roll.clone(),
+//             self.left_wrist_yaw.clone(),
+//             self.left_hip_yaw_pitch.clone(),
+//             self.left_hip_roll.clone(),
+//             self.left_hip_pitch.clone(),
+//             self.left_knee_pitch.clone(),
+//             self.left_ankle_pitch.clone(),
+//             self.left_ankle_roll.clone(),
+//             self.right_shoulder_pitch.clone(),
+//             self.right_shoulder_roll.clone(),
+//             self.right_elbow_yaw.clone(),
+//             self.right_elbow_roll.clone(),
+//             self.right_wrist_yaw.clone(),
+//             self.right_hip_roll.clone(),
+//             self.right_hip_pitch.clone(),
+//             self.right_knee_pitch.clone(),
+//             self.right_ankle_pitch.clone(),
+//             self.right_ankle_roll.clone(),
+//             self.left_hand.clone(),
+//             self.right_hand.clone(),
+//         ]
+//         .into_iter()
+//     }
+// }
 
 /// Struct representing the battery status of the robot.
 #[derive(Clone, Debug, Default)]
@@ -958,8 +1072,11 @@ mod tests {
     use crate::types::JointArray;
     use crate::types::{Color, FillExt, LeftEye};
 
-    use super::ForceSensitiveResistorFoot;
     use super::ForceSensitiveResistors;
+    use super::{
+        ForceSensitiveResistorFoot, HeadJoints, LeftArmJoints, LeftLegJoints, RightArmJoints,
+        RightLegJoints,
+    };
 
     #[test]
     fn test_average_force_feet() {
@@ -1027,13 +1144,24 @@ mod tests {
 
     #[test]
     fn test_joint_array() {
-        let t1 = JointArray::fill(1);
-        let t2: Vec<i32> = vec![1; 25];
+        let t1 = JointArray::builder()
+            .left_arm_joints(LeftArmJoints::fill(1))
+            .left_leg_joints(LeftLegJoints::fill(2))
+            .right_arm_joints(RightArmJoints::fill(3))
+            .right_leg_joints(RightLegJoints::fill(4))
+            .head_joints(HeadJoints::fill(5))
+            .build();
 
-        for (i, elem) in t1.clone().into_iter().enumerate() {
-            assert_eq!(elem, t2[i])
+        let t2: Vec<i32> = vec![
+            5, 5, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 1, 3,
+        ];
+
+        for (i, elem) in t1.iter().enumerate() {
+            println!("elems {} {}", i, elem);
+            assert_eq!(*elem, t2[i])
         }
 
         let _: JointArray<i32> = t2.into_iter().collect();
+        let _: JointArray<i32> = t1.iter().map(|x| x + 1).collect();
     }
 }
