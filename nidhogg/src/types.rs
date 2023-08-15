@@ -600,7 +600,7 @@ enum JointArrayField {
 }
 
 impl JointArrayField {
-    fn next(&self) -> Self {
+    fn get_next(&self) -> Self {
         match self {
             Self::HeadYaw => Self::HeadPitch,
             Self::HeadPitch => Self::LeftShoulderPitch,
@@ -672,7 +672,7 @@ impl<'a, T> std::iter::Iterator for JointArrayIterator<'a, T> {
             JointArrayField::RightHand => Some(&self.1.right_hand),
             JointArrayField::End => None,
         };
-        self.0 = self.0.next();
+        self.0 = self.0.get_next();
         val
     }
 }
