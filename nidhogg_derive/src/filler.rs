@@ -29,7 +29,7 @@ fn gen_filler_impl(
             let impl_generics_test = generic_type_params_with_clone(generics);
 
             quote! {
-                impl<#(#impl_generics_test)*> nidhogg::types::FillExt<#field_type> for #struct_name #ty_generics #where_clause {
+                impl<#(#impl_generics_test)*> crate::types::FillExt<#field_type> for #struct_name #ty_generics #where_clause {
                     fn fill(value: #field_type) -> Self {
                         #struct_name {
                             #( #fields: value.clone() ), *
@@ -40,7 +40,7 @@ fn gen_filler_impl(
         }
         None => {
             quote! {
-                impl nidhogg::types::FillExt<#field_type> for #struct_name {
+                impl crate::types::FillExt<#field_type> for #struct_name {
                     fn fill(value: #field_type) -> Self {
                         #struct_name {
                             #( #fields: value.clone() ), *

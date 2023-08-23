@@ -152,5 +152,3 @@ pub struct HardwareInfo {
     pub head_id: String,
     pub head_version: String,
 }
-
-extern crate self as nidhogg;
