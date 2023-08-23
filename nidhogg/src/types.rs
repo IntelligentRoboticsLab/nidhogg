@@ -516,202 +516,101 @@ impl<T> JointArray<T> {
         }
     }
 
-    /// Returns a `JointArrayIterator`.
-    pub fn iter(&self) -> JointArrayIterator<'_, T> {
-        JointArrayIterator::new(self)
+    pub fn map<F, U>(self, mut f: F) -> JointArray<U>
+    where
+        F: FnMut(T) -> U
+    {
+        JointArray {
+            head_yaw: f(self.head_yaw),
+            head_pitch: f(self.head_pitch),
+            left_shoulder_pitch: f(self.left_shoulder_pitch),
+            left_shoulder_roll: f(self.left_shoulder_roll),
+            left_elbow_yaw: f(self.left_elbow_yaw),
+            left_elbow_roll: f(self.left_elbow_roll),
+            left_wrist_yaw: f(self.left_wrist_yaw),
+            left_hip_yaw_pitch: f(self.left_hip_yaw_pitch),
+            left_hip_roll: f(self.left_hip_roll),
+            left_hip_pitch: f(self.left_hip_pitch),
+            left_knee_pitch: f(self.left_knee_pitch),
+            left_ankle_pitch: f(self.left_ankle_pitch),
+            left_ankle_roll: f(self.left_ankle_roll),
+            right_shoulder_pitch: f(self.right_shoulder_pitch),
+            right_shoulder_roll: f(self.right_shoulder_roll),
+            right_elbow_yaw: f(self.right_elbow_yaw),
+            right_elbow_roll: f(self.right_elbow_roll),
+            right_wrist_yaw: f(self.right_wrist_yaw),
+            right_hip_roll: f(self.right_hip_roll),
+            right_hip_pitch: f(self.right_hip_pitch),
+            right_knee_pitch: f(self.right_knee_pitch),
+            right_ankle_pitch: f(self.right_ankle_pitch),
+            right_ankle_roll: f(self.right_ankle_roll),
+            left_hand: f(self.left_hand),
+            right_hand: f(self.right_hand),
+        }
     }
 
-    /// Initializes a `JointArray` from an iterator.
-    fn from_iter<I>(mut iter: I) -> JointArray<T>
-    where
-        I: std::iter::Iterator<Item = T>,
-    {
-        Self {
-            head_yaw: iter.next().unwrap(),
-            head_pitch: iter.next().unwrap(),
-            left_shoulder_pitch: iter.next().unwrap(),
-            left_shoulder_roll: iter.next().unwrap(),
-            left_elbow_yaw: iter.next().unwrap(),
-            left_elbow_roll: iter.next().unwrap(),
-            left_wrist_yaw: iter.next().unwrap(),
-            left_hip_yaw_pitch: iter.next().unwrap(),
-            left_hip_roll: iter.next().unwrap(),
-            left_hip_pitch: iter.next().unwrap(),
-            left_knee_pitch: iter.next().unwrap(),
-            left_ankle_pitch: iter.next().unwrap(),
-            left_ankle_roll: iter.next().unwrap(),
-            right_shoulder_pitch: iter.next().unwrap(),
-            right_shoulder_roll: iter.next().unwrap(),
-            right_elbow_yaw: iter.next().unwrap(),
-            right_elbow_roll: iter.next().unwrap(),
-            right_wrist_yaw: iter.next().unwrap(),
-            right_hip_roll: iter.next().unwrap(),
-            right_hip_pitch: iter.next().unwrap(),
-            right_knee_pitch: iter.next().unwrap(),
-            right_ankle_pitch: iter.next().unwrap(),
-            right_ankle_roll: iter.next().unwrap(),
-            left_hand: iter.next().unwrap(),
-            right_hand: iter.next().unwrap(),
+    pub fn zip<U>(self, other: JointArray::<U>) -> JointArray<(T, U)> {
+        JointArray {
+            head_yaw: (self.head_yaw, other.head_yaw),
+            head_pitch: (self.head_pitch, other.head_pitch),
+            left_shoulder_pitch: (self.left_shoulder_pitch, other.left_shoulder_pitch),
+            left_shoulder_roll: (self.left_shoulder_roll, other.left_shoulder_roll),
+            left_elbow_yaw: (self.left_elbow_yaw, other.left_elbow_yaw),
+            left_elbow_roll: (self.left_elbow_roll, other.left_elbow_roll),
+            left_wrist_yaw: (self.left_wrist_yaw, other.left_wrist_yaw),
+            left_hip_yaw_pitch: (self.left_hip_yaw_pitch, other.left_hip_yaw_pitch),
+            left_hip_roll: (self.left_hip_roll, other.left_hip_roll),
+            left_hip_pitch: (self.left_hip_pitch, other.left_hip_pitch),
+            left_knee_pitch: (self.left_knee_pitch, other.left_knee_pitch),
+            left_ankle_pitch: (self.left_ankle_pitch, other.left_ankle_pitch),
+            left_ankle_roll: (self.left_ankle_roll, other.left_ankle_roll),
+            right_shoulder_pitch: (self.right_shoulder_pitch, other.right_shoulder_pitch),
+            right_shoulder_roll: (self.right_shoulder_roll, other.right_shoulder_roll),
+            right_elbow_yaw: (self.right_elbow_yaw, other.right_elbow_yaw),
+            right_elbow_roll: (self.right_elbow_roll, other.right_elbow_roll),
+            right_wrist_yaw: (self.right_wrist_yaw, other.right_wrist_yaw),
+            right_hip_roll: (self.right_hip_roll, other.right_hip_roll),
+            right_hip_pitch: (self.right_hip_pitch, other.right_hip_pitch),
+            right_knee_pitch: (self.right_knee_pitch, other.right_knee_pitch),
+            right_ankle_pitch: (self.right_ankle_pitch, other.right_ankle_pitch),
+            right_ankle_roll: (self.right_ankle_roll, other.right_ankle_roll),
+            left_hand: (self.left_hand, other.left_hand),
+            right_hand: (self.right_hand, other.right_hand),
         }
     }
 }
 
 impl<T: Clone> FillExt<T> for JointArray<T> {
     fn fill(value: T) -> JointArray<T> {
-        JointArray::from_iter(std::iter::repeat(value))
-    }
-}
-
-impl<T> std::iter::FromIterator<T> for JointArray<T> {
-    fn from_iter<I: IntoIterator<Item = T>>(iterable: I) -> Self {
-        let iter = iterable.into_iter();
-        JointArray::from_iter(iter)
-    }
-}
-
-#[derive(Debug)]
-enum JointArrayField {
-    HeadYaw,
-    HeadPitch,
-    LeftShoulderPitch,
-    LeftShoulderRoll,
-    LeftElbowYaw,
-    LeftElbowRoll,
-    LeftWristYaw,
-    LeftHipYawPitch,
-    LeftHipRoll,
-    LeftHipPitch,
-    LeftKneePitch,
-    LeftAnklePitch,
-    LeftAnkleRoll,
-    RightShoulderPitch,
-    RightShoulderRoll,
-    RightElbowYaw,
-    RightElbowRoll,
-    RightWristYaw,
-    RightHipRoll,
-    RightHipPitch,
-    RightKneePitch,
-    RightAnklePitch,
-    RightAnkleRoll,
-    LeftHand,
-    RightHand,
-    End,
-}
-
-impl JointArrayField {
-    fn get_next(&self) -> Self {
-        match self {
-            Self::HeadYaw => Self::HeadPitch,
-            Self::HeadPitch => Self::LeftShoulderPitch,
-            Self::LeftShoulderPitch => Self::LeftShoulderRoll,
-            Self::LeftShoulderRoll => Self::LeftElbowYaw,
-            Self::LeftElbowYaw => Self::LeftElbowRoll,
-            Self::LeftElbowRoll => Self::LeftWristYaw,
-            Self::LeftWristYaw => Self::LeftHipYawPitch,
-            Self::LeftHipYawPitch => Self::LeftHipRoll,
-            Self::LeftHipRoll => Self::LeftHipPitch,
-            Self::LeftHipPitch => Self::LeftKneePitch,
-            Self::LeftKneePitch => Self::LeftAnklePitch,
-            Self::LeftAnklePitch => Self::LeftAnkleRoll,
-            Self::LeftAnkleRoll => Self::RightShoulderPitch,
-            Self::RightShoulderPitch => Self::RightShoulderRoll,
-            Self::RightShoulderRoll => Self::RightElbowYaw,
-            Self::RightElbowYaw => Self::RightElbowRoll,
-            Self::RightElbowRoll => Self::RightWristYaw,
-            Self::RightWristYaw => Self::RightHipRoll,
-            Self::RightHipRoll => Self::RightHipPitch,
-            Self::RightHipPitch => Self::RightKneePitch,
-            Self::RightKneePitch => Self::RightAnklePitch,
-            Self::RightAnklePitch => Self::RightAnkleRoll,
-            Self::RightAnkleRoll => Self::LeftHand,
-            Self::LeftHand => Self::RightHand,
-            _ => Self::End,
+        JointArray {
+            head_yaw: value.clone(),
+            head_pitch: value.clone(),
+            left_shoulder_pitch: value.clone(),
+            left_shoulder_roll: value.clone(),
+            left_elbow_yaw: value.clone(),
+            left_elbow_roll: value.clone(),
+            left_wrist_yaw: value.clone(),
+            left_hip_yaw_pitch: value.clone(),
+            left_hip_roll: value.clone(),
+            left_hip_pitch: value.clone(),
+            left_knee_pitch: value.clone(),
+            left_ankle_pitch: value.clone(),
+            left_ankle_roll: value.clone(),
+            right_shoulder_pitch: value.clone(),
+            right_shoulder_roll: value.clone(),
+            right_elbow_yaw: value.clone(),
+            right_elbow_roll: value.clone(),
+            right_wrist_yaw: value.clone(),
+            right_hip_roll: value.clone(),
+            right_hip_pitch: value.clone(),
+            right_knee_pitch: value.clone(),
+            right_ankle_pitch: value.clone(),
+            right_ankle_roll: value.clone(),
+            left_hand: value.clone(),
+            right_hand: value.clone(),
         }
     }
 }
-
-#[derive(Debug)]
-pub struct JointArrayIterator<'a, T>(JointArrayField, &'a JointArray<T>);
-
-impl<'a, T> JointArrayIterator<'a, T> {
-    fn new(joint_array: &'a JointArray<T>) -> Self {
-        Self(JointArrayField::HeadYaw, joint_array)
-    }
-}
-
-impl<'a, T> std::iter::Iterator for JointArrayIterator<'a, T> {
-    type Item = &'a T;
-
-    fn next(&mut self) -> Option<&'a T> {
-        let val = match self.0 {
-            JointArrayField::HeadYaw => Some(&self.1.head_yaw),
-            JointArrayField::HeadPitch => Some(&self.1.head_pitch),
-            JointArrayField::LeftShoulderPitch => Some(&self.1.left_shoulder_pitch),
-            JointArrayField::LeftShoulderRoll => Some(&self.1.left_shoulder_roll),
-            JointArrayField::LeftElbowYaw => Some(&self.1.left_elbow_yaw),
-            JointArrayField::LeftElbowRoll => Some(&self.1.left_elbow_roll),
-            JointArrayField::LeftWristYaw => Some(&self.1.left_wrist_yaw),
-            JointArrayField::LeftHipYawPitch => Some(&self.1.left_hip_yaw_pitch),
-            JointArrayField::LeftHipRoll => Some(&self.1.left_hip_roll),
-            JointArrayField::LeftHipPitch => Some(&self.1.left_hip_pitch),
-            JointArrayField::LeftKneePitch => Some(&self.1.left_knee_pitch),
-            JointArrayField::LeftAnklePitch => Some(&self.1.left_ankle_pitch),
-            JointArrayField::LeftAnkleRoll => Some(&self.1.left_ankle_roll),
-            JointArrayField::RightShoulderPitch => Some(&self.1.right_shoulder_pitch),
-            JointArrayField::RightShoulderRoll => Some(&self.1.right_shoulder_roll),
-            JointArrayField::RightElbowYaw => Some(&self.1.right_elbow_yaw),
-            JointArrayField::RightElbowRoll => Some(&self.1.right_elbow_roll),
-            JointArrayField::RightWristYaw => Some(&self.1.right_wrist_yaw),
-            JointArrayField::RightHipRoll => Some(&self.1.right_hip_roll),
-            JointArrayField::RightHipPitch => Some(&self.1.right_hip_pitch),
-            JointArrayField::RightKneePitch => Some(&self.1.right_knee_pitch),
-            JointArrayField::RightAnklePitch => Some(&self.1.right_ankle_pitch),
-            JointArrayField::RightAnkleRoll => Some(&self.1.right_ankle_roll),
-            JointArrayField::LeftHand => Some(&self.1.left_hand),
-            JointArrayField::RightHand => Some(&self.1.right_hand),
-            JointArrayField::End => None,
-        };
-        self.0 = self.0.get_next();
-        val
-    }
-}
-
-// impl<T: Clone> std::iter::IntoIterator for JointArray<T> {
-//     type Item = T;
-//     type IntoIter = std::vec::IntoIter<Self::Item>;
-//
-//     fn into_iter(self) -> std::vec::IntoIter<T> {
-//         vec![
-//             self.head_yaw.clone(),
-//             self.head_pitch.clone(),
-//             self.left_shoulder_pitch.clone(),
-//             self.left_shoulder_roll.clone(),
-//             self.left_elbow_yaw.clone(),
-//             self.left_elbow_roll.clone(),
-//             self.left_wrist_yaw.clone(),
-//             self.left_hip_yaw_pitch.clone(),
-//             self.left_hip_roll.clone(),
-//             self.left_hip_pitch.clone(),
-//             self.left_knee_pitch.clone(),
-//             self.left_ankle_pitch.clone(),
-//             self.left_ankle_roll.clone(),
-//             self.right_shoulder_pitch.clone(),
-//             self.right_shoulder_roll.clone(),
-//             self.right_elbow_yaw.clone(),
-//             self.right_elbow_roll.clone(),
-//             self.right_wrist_yaw.clone(),
-//             self.right_hip_roll.clone(),
-//             self.right_hip_pitch.clone(),
-//             self.right_knee_pitch.clone(),
-//             self.right_ankle_pitch.clone(),
-//             self.right_ankle_roll.clone(),
-//             self.left_hand.clone(),
-//             self.right_hand.clone(),
-//         ]
-//         .into_iter()
-//     }
-// }
 
 /// Struct representing the battery status of the robot.
 #[derive(Clone, Debug, Default)]
@@ -1151,17 +1050,16 @@ mod tests {
             .right_leg_joints(RightLegJoints::fill(4))
             .head_joints(HeadJoints::fill(5))
             .build();
+        let t2 = JointArray::builder()
+            .left_arm_joints(LeftArmJoints::fill(1))
+            .left_leg_joints(LeftLegJoints::fill(2))
+            .right_arm_joints(RightArmJoints::fill(3))
+            .right_leg_joints(RightLegJoints::fill(4))
+            .head_joints(HeadJoints::fill(5))
+            .build();
 
-        let t2: Vec<i32> = vec![
-            5, 5, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 1, 3,
-        ];
-
-        for (i, elem) in t1.iter().enumerate() {
-            println!("elems {} {}", i, elem);
-            assert_eq!(*elem, t2[i])
-        }
-
-        let _: JointArray<i32> = t2.into_iter().collect();
-        let _: JointArray<i32> = t1.iter().map(|x| x + 1).collect();
+        let t3 = t1.zip(t2).map(|(elem1, elem2)| elem1 + elem2);
+        assert_eq!(t3.head_pitch, 10);
+        assert_eq!(t3.left_elbow_yaw, 2);
     }
 }
