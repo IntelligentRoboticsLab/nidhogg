@@ -518,7 +518,7 @@ impl<T> JointArray<T> {
 
     pub fn map<F, U>(self, mut f: F) -> JointArray<U>
     where
-        F: FnMut(T) -> U
+        F: FnMut(T) -> U,
     {
         JointArray {
             head_yaw: f(self.head_yaw),
@@ -549,7 +549,7 @@ impl<T> JointArray<T> {
         }
     }
 
-    pub fn zip<U>(self, other: JointArray::<U>) -> JointArray<(T, U)> {
+    pub fn zip<U>(self, other: JointArray<U>) -> JointArray<(T, U)> {
         JointArray {
             head_yaw: (self.head_yaw, other.head_yaw),
             head_pitch: (self.head_pitch, other.head_pitch),
