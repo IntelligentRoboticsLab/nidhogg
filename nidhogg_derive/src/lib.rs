@@ -2,6 +2,7 @@
 use proc_macro::TokenStream;
 
 mod builder;
+mod filler;
 
 /// Derive macro to implement the [builder pattern](https://refactoring.guru/design-patterns/builder)
 /// for an arbitrary struct with named fields.
@@ -24,4 +25,9 @@ mod builder;
 #[proc_macro_derive(Builder)]
 pub fn derive_builder(input: TokenStream) -> TokenStream {
     builder::derive(input)
+}
+
+#[proc_macro_derive(Filler)]
+pub fn derive_filler(input: TokenStream) -> TokenStream {
+    filler::derive(input)
 }
