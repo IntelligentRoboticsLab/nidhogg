@@ -11,7 +11,7 @@ pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
         ..
     } = parse_macro_input!(input);
     match parse_fields(data, &ident) {
-        Ok((fields, field_type)) => gen_filler_impl(&generics, ident, fields, field_type),
+        Ok((fields, field_type)) => gen_filler_impl(&generics, &ident, &fields, &field_type),
         Err(err) => err,
     }
     .into()
@@ -19,9 +19,9 @@ pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 
 fn gen_filler_impl(
     generics: &Generics,
-    struct_name: Ident,
-    fields: Vec<TokenStream>,
-    field_type: Type,
+    struct_name: &Ident,
+    fields: &Vec<TokenStream>,
+    field_type: &Type,
 ) -> TokenStream {
     match generics.params.first() {
         Some(_) => {
