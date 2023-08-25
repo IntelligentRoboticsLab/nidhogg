@@ -1,7 +1,7 @@
 //! Convenience types used to make interacting with the NAO more convenient.
 //!
 
-use nidhogg_derive::Builder;
+use nidhogg_derive::{Builder, Filler};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -34,7 +34,7 @@ pub trait FillExt<T> {
 /// Struct representing the LEDs on top of the NAO robot's head.  
 ///
 /// Each value represents the intensity of a white LED.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Skull {
     pub left_front_0: f32,
@@ -52,25 +52,6 @@ pub struct Skull {
     pub right_rear_2: f32,
 }
 
-impl FillExt<f32> for Skull {
-    fn fill(intensity: f32) -> Skull {
-        Skull {
-            left_front_0: intensity,
-            left_front_1: intensity,
-            left_middle_0: intensity,
-            left_rear_0: intensity,
-            left_rear_1: intensity,
-            left_rear_2: intensity,
-            right_front_0: intensity,
-            right_front_1: intensity,
-            right_middle_0: intensity,
-            right_rear_0: intensity,
-            right_rear_1: intensity,
-            right_rear_2: intensity,
-        }
-    }
-}
-
 /// Struct representing the LED intensities in the left ear of the robot.
 ///
 /// ## LED order:
@@ -83,7 +64,7 @@ impl FillExt<f32> for Skull {
 ///  216  144
 ///    180
 /// ```  
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct LeftEar {
     pub intensity_0_deg: f32,
@@ -98,23 +79,6 @@ pub struct LeftEar {
     pub intensity_324_deg: f32,
 }
 
-impl FillExt<f32> for LeftEar {
-    fn fill(intensity: f32) -> LeftEar {
-        LeftEar {
-            intensity_0_deg: intensity,
-            intensity_36_deg: intensity,
-            intensity_72_deg: intensity,
-            intensity_108_deg: intensity,
-            intensity_144_deg: intensity,
-            intensity_180_deg: intensity,
-            intensity_216_deg: intensity,
-            intensity_252_deg: intensity,
-            intensity_288_deg: intensity,
-            intensity_324_deg: intensity,
-        }
-    }
-}
-
 /// Struct representing the LED intensities in the right ear of the robot.
 ///
 /// ## LED order:
@@ -127,7 +91,7 @@ impl FillExt<f32> for LeftEar {
 ///  216  144
 ///    180
 /// ```  
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct RightEar {
     pub intensity_0_deg: f32,
@@ -140,23 +104,6 @@ pub struct RightEar {
     pub intensity_252_deg: f32,
     pub intensity_288_deg: f32,
     pub intensity_324_deg: f32,
-}
-
-impl FillExt<f32> for RightEar {
-    fn fill(intensity: f32) -> RightEar {
-        RightEar {
-            intensity_0_deg: intensity,
-            intensity_36_deg: intensity,
-            intensity_72_deg: intensity,
-            intensity_108_deg: intensity,
-            intensity_144_deg: intensity,
-            intensity_180_deg: intensity,
-            intensity_216_deg: intensity,
-            intensity_252_deg: intensity,
-            intensity_288_deg: intensity,
-            intensity_324_deg: intensity,
-        }
-    }
 }
 
 /// Struct representing an RGB color.
@@ -317,7 +264,7 @@ impl Color {
 ///  135   225
 ///    180
 /// ```  
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct LeftEye {
     pub color_0_deg: Color,
@@ -330,21 +277,6 @@ pub struct LeftEye {
     pub color_315_deg: Color,
 }
 
-impl FillExt<Color> for LeftEye {
-    fn fill(color: Color) -> LeftEye {
-        LeftEye {
-            color_0_deg: color,
-            color_45_deg: color,
-            color_90_deg: color,
-            color_135_deg: color,
-            color_180_deg: color,
-            color_225_deg: color,
-            color_270_deg: color,
-            color_315_deg: color,
-        }
-    }
-}
-
 /// Struct representing the RGB LEDs in the left eye of the robot.
 /// ## LED order:
 /// These LEDs are placed in the following order:
@@ -355,7 +287,7 @@ impl FillExt<Color> for LeftEye {
 ///  135   225
 ///    180
 /// ```  
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct RightEye {
     pub color_0_deg: Color,
@@ -366,21 +298,6 @@ pub struct RightEye {
     pub color_225_deg: Color,
     pub color_270_deg: Color,
     pub color_315_deg: Color,
-}
-
-impl FillExt<Color> for RightEye {
-    fn fill(color: Color) -> RightEye {
-        RightEye {
-            color_0_deg: color,
-            color_45_deg: color,
-            color_90_deg: color,
-            color_135_deg: color,
-            color_180_deg: color,
-            color_225_deg: color,
-            color_270_deg: color,
-            color_315_deg: color,
-        }
-    }
 }
 
 /// Struct representing the battery status of the robot.
@@ -500,23 +417,14 @@ pub struct Touch {
 }
 
 /// Wrapper struct containing the head joints of the robot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Filler)]
 pub struct HeadJoints<T> {
     pub yaw: T,
     pub pitch: T,
 }
 
-impl<T: Clone> FillExt<T> for HeadJoints<T> {
-    fn fill(value: T) -> HeadJoints<T> {
-        HeadJoints {
-            yaw: value.clone(),
-            pitch: value.clone(),
-        }
-    }
-}
-
 /// Wrapper struct containing the left leg joints of the robot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Filler)]
 pub struct LeftLegJoints<T> {
     pub hip_yaw_pitch: T,
     pub hip_roll: T,
@@ -526,21 +434,8 @@ pub struct LeftLegJoints<T> {
     pub ankle_roll: T,
 }
 
-impl<T: Clone> FillExt<T> for LeftLegJoints<T> {
-    fn fill(value: T) -> LeftLegJoints<T> {
-        LeftLegJoints {
-            hip_yaw_pitch: value.clone(),
-            hip_roll: value.clone(),
-            hip_pitch: value.clone(),
-            knee_pitch: value.clone(),
-            ankle_pitch: value.clone(),
-            ankle_roll: value.clone(),
-        }
-    }
-}
-
 /// Wrapper struct containing right left leg joints of the robot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Filler)]
 pub struct RightLegJoints<T> {
     // This value does not exist
     // pub hip_yaw_pitch: T,
@@ -549,19 +444,6 @@ pub struct RightLegJoints<T> {
     pub knee_pitch: T,
     pub ankle_pitch: T,
     pub ankle_roll: T,
-}
-
-impl<T: Clone> FillExt<T> for RightLegJoints<T> {
-    fn fill(value: T) -> RightLegJoints<T> {
-        RightLegJoints {
-            // hip_yaw_pitch: value.clone(),
-            hip_roll: value.clone(),
-            hip_pitch: value.clone(),
-            knee_pitch: value.clone(),
-            ankle_pitch: value.clone(),
-            ankle_roll: value.clone(),
-        }
-    }
 }
 
 /// Wrapper struct containing joint values for both legs of the robot.
@@ -581,7 +463,7 @@ impl<T: Clone> FillExt<T> for LegJoints<T> {
 }
 
 /// Wrapper struct containing the joints for a single arm of the robot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, Filler)]
 pub struct SingleArmJoints<T> {
     pub shoulder_pitch: T,
     pub shoulder_roll: T,
@@ -589,19 +471,6 @@ pub struct SingleArmJoints<T> {
     pub elbow_roll: T,
     pub wrist_yaw: T,
     pub hand: T,
-}
-
-impl<T: Clone> FillExt<T> for SingleArmJoints<T> {
-    fn fill(value: T) -> SingleArmJoints<T> {
-        SingleArmJoints {
-            shoulder_pitch: value.clone(),
-            shoulder_roll: value.clone(),
-            elbow_yaw: value.clone(),
-            elbow_roll: value.clone(),
-            wrist_yaw: value.clone(),
-            hand: value.clone(),
-        }
-    }
 }
 
 /// Type definition for the left arm joints of the robot.
