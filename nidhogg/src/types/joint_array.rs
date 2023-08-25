@@ -245,7 +245,7 @@ impl<T: Clone> FillExt<T> for JointArray<T> {
 
 impl<T> JointArrayBuilder<T> {
     /// Set all the joint values to the corresponding values from the provided [`JointArray`].
-    pub fn from_joint_array(mut self, joints: JointArray<T>) {
+    pub fn joints(mut self, joints: JointArray<T>) {
         self.head_pitch = Some(joints.head_pitch);
         self.head_yaw = Some(joints.head_yaw);
 
