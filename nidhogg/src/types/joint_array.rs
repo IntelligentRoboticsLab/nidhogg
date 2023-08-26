@@ -1,4 +1,4 @@
-//! Implements `JointArray` type and associated functions, for manipulating joint values.
+//! Implements [`JointArray`] type and associated functions, for manipulating joint values.
 //!
 
 use crate::types::{
@@ -145,7 +145,20 @@ impl<T> JointArray<T> {
         }
     }
 
-    /// Applies a function to all joint values.
+    /// Transforms each element in the [`JointArray`] using the provided closure `f`,
+    /// producing a new [`JointArray`] with the transformed values.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let joints = JointArray::<u32>::default();
+    ///
+    /// let transformed = joints.map(|x| x + 1);
+    ///
+    /// assert_eq!(transformed.head_yaw, 1);
+    /// ```
     pub fn map<F, U>(self, mut f: F) -> JointArray<U>
     where
         F: FnMut(T) -> U,
@@ -179,7 +192,18 @@ impl<T> JointArray<T> {
         }
     }
 
-    /// Zips two joint arrays together.
+    /// Zips two [`JointArray`] instances element-wise, creating a new [`JointArray`]
+    /// containing tuples of corresponding elements from the two arrays.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let zipped = JointArray::<u32>::default().zip(JointArray::<f32>::default());
+    ///
+    /// assert_eq!(zipped.head_yaw, (0_u32, 0_f32));
+    /// ```
     pub fn zip<U>(self, other: JointArray<U>) -> JointArray<(T, U)> {
         JointArray {
             head_yaw: (self.head_yaw, other.head_yaw),
