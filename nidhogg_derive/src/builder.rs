@@ -137,7 +137,13 @@ struct ParsedFieldData {
 
 /// Extract the field names, types and visibilities from a [`Data`] struct.
 fn parse_field_data(input: Data) -> Option<ParsedFieldData> {
-    let Data::Struct(DataStruct {fields: Fields::Named(FieldsNamed { named, .. }), .. }) = input else { return None };
+    let Data::Struct(DataStruct {
+        fields: Fields::Named(FieldsNamed { named, .. }),
+        ..
+    }) = input
+    else {
+        return None;
+    };
 
     let (field_names, field_visibilities, field_types) = named
         .into_iter()
