@@ -511,7 +511,7 @@ impl ForceSensitiveResistorFoot {
 pub struct SonarValues {
     /// Left Sonar Value.
     ///
-    /// The value is in meter ranging from 0 to 5 meters.
+    /// The value ranges from 0 to 5 meters.
     /// A value of 0 means an error. A value of Max Detection range means no echo.
     ///
     /// Be aware that:
@@ -520,7 +520,7 @@ pub struct SonarValues {
     pub left: f32,
     /// Right Sonar Value.
     ///
-    /// The value is in meter ranging from 0 to 5 meter.
+    /// The value ranges from 0 to 5 meters.
     /// A value of 0 means an error. A value of Max Detection range means no echo.
     ///
     /// Be aware that:
