@@ -395,21 +395,12 @@ pub struct SonarValues {
     pub right: f32,
 }
 
-/// Enabled state of the left and right sonar sensor.
-#[derive(Builder, Clone, Debug)]
+/// Enabled state of the left and right sonar sensors.
+#[derive(Builder, Clone, Default, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct SonarEnabled {
     pub left: bool,
     pub right: bool,
-}
-
-impl Default for SonarEnabled {
-    fn default() -> Self {
-        Self {
-            left: true,
-            right: true,
-        }
-    }
 }
 
 /// Struct containing the touch activiation value for each touch sensor on the robot.

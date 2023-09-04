@@ -141,8 +141,8 @@ pub struct NaoControlMessage {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
     /// The sonar state for the left and right sonar.
-    /// They can either be enabled or disabled.
-    /// In the default state both sonars are enabled.
+    ///
+    /// In the default state both sonars are disabled.
     pub sonar: SonarEnabled,
 
     // LEDs
