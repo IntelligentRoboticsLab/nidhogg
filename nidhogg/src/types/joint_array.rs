@@ -451,4 +451,24 @@ mod tests {
         assert_eq!(t3.head_pitch, (1, 2));
         assert_eq!(t3.left_elbow_yaw, (1, 2));
     }
+
+    #[test]
+    fn test_joint_array_all() {
+        let t1: JointArray<i32> = JointArray::fill(1);
+        let mut t2: JointArray<i32> = JointArray::fill(1);
+        t2.head_pitch = -1;
+
+        assert_eq!(t1.all(|elem| elem > 0), true);
+        assert_eq!(t2.all(|elem| elem > 0), false);
+    }
+
+    #[test]
+    fn test_joint_array_any() {
+        let t1: JointArray<i32> = JointArray::fill(1);
+        let mut t2: JointArray<i32> = JointArray::fill(1);
+        t2.head_pitch = 3;
+
+        assert_eq!(t1.any(|elem| elem > 2), false);
+        assert_eq!(t2.any(|elem| elem > 2), true);
+    }
 }
