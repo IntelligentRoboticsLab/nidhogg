@@ -1,5 +1,4 @@
-//! Implements `JointArray` type and associated functions, for manipulating joint values.
-//!
+//! Implements [`JointArray`] type and associated functions, for manipulating joint values.
 
 use crate::types::{
     ArmJoints, FillExt, HeadJoints, LeftArmJoints, LeftLegJoints, LegJoints, RightArmJoints,
@@ -145,7 +144,20 @@ impl<T> JointArray<T> {
         }
     }
 
-    /// Applies a function to all joint values.
+    /// Transforms each element in the [`JointArray`] using the provided closure `f`,
+    /// producing a new [`JointArray`] with the transformed values.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let joints = JointArray::<u32>::default();
+    ///
+    /// let transformed = joints.map(|x| x + 1);
+    ///
+    /// assert_eq!(transformed.head_yaw, 1);
+    /// ```
     pub fn map<F, U>(self, mut f: F) -> JointArray<U>
     where
         F: FnMut(T) -> U,
@@ -179,7 +191,18 @@ impl<T> JointArray<T> {
         }
     }
 
-    /// Zips two joint arrays together.
+    /// Zips two [`JointArray`] instances element-wise, creating a new [`JointArray`]
+    /// containing tuples of corresponding elements from the two arrays.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let zipped = JointArray::<u32>::default().zip(JointArray::<f32>::default());
+    ///
+    /// assert_eq!(zipped.head_yaw, (0_u32, 0_f32));
+    /// ```
     pub fn zip<U>(self, other: JointArray<U>) -> JointArray<(T, U)> {
         JointArray {
             head_yaw: (self.head_yaw, other.head_yaw),
@@ -210,41 +233,39 @@ impl<T> JointArray<T> {
         }
     }
 
-    // Checks if all elements of a joint array satisfy a certain condition.
-    pub fn all<F>(self, f: F) -> bool
+    /// Checks if all elements of a joint array satisfy a certain condition.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let mut t1: JointArray<i32> = JointArray::default();
+    /// assert_eq!(t1.clone().all(|elem| elem > -1), true);
+    ///
+    /// t1.right_hand = -2;
+    /// assert_eq!(t1.all(|elem| elem > -1), false);
+    /// ```
+    pub fn all<F>(self, mut f: F) -> bool
     where
         F: FnMut(T) -> bool,
     {
-        let t = self.map(f);
-
-        t.head_yaw
-            && t.head_pitch
-            && t.left_shoulder_pitch
-            && t.left_shoulder_roll
-            && t.left_elbow_yaw
-            && t.left_elbow_roll
-            && t.left_wrist_yaw
-            && t.left_hip_yaw_pitch
-            && t.left_hip_roll
-            && t.left_hip_pitch
-            && t.left_knee_pitch
-            && t.left_ankle_pitch
-            && t.left_ankle_roll
-            && t.right_shoulder_pitch
-            && t.right_shoulder_roll
-            && t.right_elbow_yaw
-            && t.right_elbow_roll
-            && t.right_wrist_yaw
-            && t.right_hip_roll
-            && t.right_hip_pitch
-            && t.right_knee_pitch
-            && t.right_ankle_pitch
-            && t.right_ankle_roll
-            && t.left_hand
-            && t.right_hand
+        !self.any(|elem| !f(elem))
     }
 
-    // Checks if any elements of a joint array satisfy a certain condition.
+    /// Checks if any elements of a joint array satisfy a certain condition.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let mut t1: JointArray<i32> = JointArray::default();
+    /// assert_eq!(t1.clone().any(|elem| elem > 2), false);
+    ///
+    /// t1.head_pitch = 3;
+    /// assert_eq!(t1.any(|elem| elem > 2), true);
+    /// ```
     pub fn any<F>(self, f: F) -> bool
     where
         F: FnMut(T) -> bool,
@@ -313,7 +334,7 @@ impl<T: Clone> FillExt<T> for JointArray<T> {
 
 impl<T> JointArrayBuilder<T> {
     /// Set all the joint values to the corresponding values from the provided [`JointArray`].
-    pub fn from_joint_array(mut self, joints: JointArray<T>) {
+    pub fn joints(mut self, joints: JointArray<T>) {
         self.head_pitch = Some(joints.head_pitch);
         self.head_yaw = Some(joints.head_yaw);
 
@@ -450,25 +471,5 @@ mod tests {
         let t3 = t1.zip(t2);
         assert_eq!(t3.head_pitch, (1, 2));
         assert_eq!(t3.left_elbow_yaw, (1, 2));
-    }
-
-    #[test]
-    fn test_joint_array_all() {
-        let t1: JointArray<i32> = JointArray::fill(1);
-        let mut t2: JointArray<i32> = JointArray::fill(1);
-        t2.head_pitch = -1;
-
-        assert_eq!(t1.all(|elem| elem > 0), true);
-        assert_eq!(t2.all(|elem| elem > 0), false);
-    }
-
-    #[test]
-    fn test_joint_array_any() {
-        let t1: JointArray<i32> = JointArray::fill(1);
-        let mut t2: JointArray<i32> = JointArray::fill(1);
-        t2.head_pitch = 3;
-
-        assert_eq!(t1.any(|elem| elem > 2), false);
-        assert_eq!(t2.any(|elem| elem > 2), true);
     }
 }

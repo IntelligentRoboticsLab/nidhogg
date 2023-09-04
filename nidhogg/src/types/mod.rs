@@ -5,7 +5,7 @@ use nidhogg_derive::{Builder, Filler};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-pub mod joint_array;
+mod joint_array;
 pub use joint_array::JointArray;
 
 /// Struct containing two values of type `T`
