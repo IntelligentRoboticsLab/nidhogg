@@ -378,7 +378,8 @@ pub struct SonarValues {
     /// Left Sonar Value.
     ///
     /// The value ranges from 0 to 5 meters.
-    /// A value of 0 means an error. A value of Max Detection range means no echo.
+    /// A value of 0 means an error.
+    /// A value equal to the max detection range means no echo.
     ///
     /// Be aware that:
     /// - The ground will likely be detected before the maximum distance for detection is reached.
@@ -387,7 +388,8 @@ pub struct SonarValues {
     /// Right Sonar Value.
     ///
     /// The value ranges from 0 to 5 meters.
-    /// A value of 0 means an error. A value of Max Detection range means no echo.
+    /// A value of 0 means an error.
+    /// A value equal to the max detection range means no echo.
     ///
     /// Be aware that:
     /// - The ground will likely be detected before the maximum distance for detection is reached.
