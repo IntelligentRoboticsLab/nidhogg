@@ -209,6 +209,74 @@ impl<T> JointArray<T> {
             right_hand: (self.right_hand, other.right_hand),
         }
     }
+
+    // Checks if all elements of a joint array satisfy a certain condition.
+    pub fn all<F>(self, f: F) -> bool
+    where
+        F: FnMut(T) -> bool,
+    {
+        let t = self.map(f);
+
+        t.head_yaw
+            && t.head_pitch
+            && t.left_shoulder_pitch
+            && t.left_shoulder_roll
+            && t.left_elbow_yaw
+            && t.left_elbow_roll
+            && t.left_wrist_yaw
+            && t.left_hip_yaw_pitch
+            && t.left_hip_roll
+            && t.left_hip_pitch
+            && t.left_knee_pitch
+            && t.left_ankle_pitch
+            && t.left_ankle_roll
+            && t.right_shoulder_pitch
+            && t.right_shoulder_roll
+            && t.right_elbow_yaw
+            && t.right_elbow_roll
+            && t.right_wrist_yaw
+            && t.right_hip_roll
+            && t.right_hip_pitch
+            && t.right_knee_pitch
+            && t.right_ankle_pitch
+            && t.right_ankle_roll
+            && t.left_hand
+            && t.right_hand
+    }
+
+    // Checks if any elements of a joint array satisfy a certain condition.
+    pub fn any<F>(self, f: F) -> bool
+    where
+        F: FnMut(T) -> bool,
+    {
+        let t = self.map(f);
+
+        t.head_yaw
+            || t.head_pitch
+            || t.left_shoulder_pitch
+            || t.left_shoulder_roll
+            || t.left_elbow_yaw
+            || t.left_elbow_roll
+            || t.left_wrist_yaw
+            || t.left_hip_yaw_pitch
+            || t.left_hip_roll
+            || t.left_hip_pitch
+            || t.left_knee_pitch
+            || t.left_ankle_pitch
+            || t.left_ankle_roll
+            || t.right_shoulder_pitch
+            || t.right_shoulder_roll
+            || t.right_elbow_yaw
+            || t.right_elbow_roll
+            || t.right_wrist_yaw
+            || t.right_hip_roll
+            || t.right_hip_pitch
+            || t.right_knee_pitch
+            || t.right_ankle_pitch
+            || t.right_ankle_roll
+            || t.left_hand
+            || t.right_hand
+    }
 }
 
 impl<T: Clone> FillExt<T> for JointArray<T> {
