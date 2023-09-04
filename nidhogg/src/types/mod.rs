@@ -375,25 +375,34 @@ impl ForceSensitiveResistorFoot {
 #[derive(Builder, Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct SonarValues {
+    /// Left Sonar Value.
+    ///
+    /// The value ranges from 0 to 5 meters.
+    /// A value of 0 means an error.
+    /// A value equal to the max detection range means no echo.
+    ///
+    /// Be aware that:
+    /// - The ground will likely be detected before the maximum distance for detection is reached.
+    /// - Robot arms might be detected.
     pub left: f32,
+    /// Right Sonar Value.
+    ///
+    /// The value ranges from 0 to 5 meters.
+    /// A value of 0 means an error.
+    /// A value equal to the max detection range means no echo.
+    ///
+    /// Be aware that:
+    /// - The ground will likely be detected before the maximum distance for detection is reached.
+    /// - Robot arms might be detected.
     pub right: f32,
 }
 
-/// Enabled state of the left and right sonar sensor.
-#[derive(Builder, Clone, Debug)]
+/// Enabled state of the left and right sonar sensors.
+#[derive(Builder, Clone, Default, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct SonarEnabled {
     pub left: bool,
     pub right: bool,
-}
-
-impl Default for SonarEnabled {
-    fn default() -> Self {
-        Self {
-            left: true,
-            right: true,
-        }
-    }
 }
 
 /// Struct containing the touch activiation value for each touch sensor on the robot.

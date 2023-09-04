@@ -115,6 +115,15 @@ pub struct NaoState {
     ///
     /// These angles represent the orientation of the robot and are measured in radians.
     pub angles: Vector2<f32>,
+    /// Sonar:
+    ///
+    /// The values measured by the sonar sensors located in the Nao's torso.
+    ///
+    /// The values represent the distance measured in meters.
+    /// There are three different kinds of waves, that might impact the value measured,
+    /// which can be configured in [`NaoControlMessage`].
+    ///
+    /// A more detailed explanation of the diferent wave kinds can be found [here](http://doc.aldebaran.com/2-8/family/nao_technical/lola/actuator_sensor_names.html#sonars).
     pub sonar: SonarValues,
     pub force_sensitive_resistors: ForceSensitiveResistors,
     pub touch: Touch,
@@ -131,6 +140,9 @@ pub struct NaoState {
 pub struct NaoControlMessage {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
+    /// The sonar state for the left and right sonar.
+    ///
+    /// In the default state both sonars are disabled.
     pub sonar: SonarEnabled,
 
     // LEDs
