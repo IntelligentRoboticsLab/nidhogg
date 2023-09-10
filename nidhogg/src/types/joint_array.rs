@@ -294,6 +294,18 @@ impl<T> JointArray<T> {
     }
 }
 
+impl<'a, T> From<&'a JointArray<T>> for JointArray<&'a T> {
+    fn from(value: &'a JointArray<T>) -> Self {
+        value.as_ref()
+    }
+}
+
+impl<'a, T> From<&'a mut JointArray<T>> for JointArray<&'a mut T> {
+    fn from(value: &'a mut JointArray<T>) -> Self {
+        value.as_mut()
+    }
+}
+
 impl<T: Clone> FillExt<T> for JointArray<T> {
     fn fill(value: T) -> JointArray<T> {
         JointArray {
