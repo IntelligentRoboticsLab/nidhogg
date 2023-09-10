@@ -233,6 +233,65 @@ impl<T> JointArray<T> {
             right_hand: (self.right_hand, other.right_hand),
         }
     }
+
+    pub fn as_ref(&self) -> JointArray<&T> {
+        JointArray {
+            head_yaw: &self.head_yaw,
+            head_pitch: &self.head_pitch,
+            left_shoulder_pitch: &self.left_shoulder_pitch,
+            left_shoulder_roll: &self.left_shoulder_roll,
+            left_elbow_yaw: &self.left_elbow_yaw,
+            left_elbow_roll: &self.left_elbow_roll,
+            left_wrist_yaw: &self.left_wrist_yaw,
+            left_hip_yaw_pitch: &self.left_hip_yaw_pitch,
+            left_hip_roll: &self.left_hip_roll,
+            left_hip_pitch: &self.left_hip_pitch,
+            left_knee_pitch: &self.left_knee_pitch,
+            left_ankle_pitch: &self.left_ankle_pitch,
+            left_ankle_roll: &self.left_ankle_roll,
+            right_shoulder_pitch: &self.right_shoulder_pitch,
+            right_shoulder_roll: &self.right_shoulder_roll,
+            right_elbow_yaw: &self.right_elbow_yaw,
+            right_elbow_roll: &self.right_elbow_roll,
+            right_wrist_yaw: &self.right_wrist_yaw,
+            right_hip_roll: &self.right_hip_roll,
+            right_hip_pitch: &self.right_hip_pitch,
+            right_knee_pitch: &self.right_knee_pitch,
+            right_ankle_pitch: &self.right_ankle_pitch,
+            right_ankle_roll: &self.right_ankle_roll,
+            left_hand: &self.left_hand,
+            right_hand: &self.right_hand,
+        }
+    }
+    pub fn as_mut(&mut self) -> JointArray<&mut T> {
+        JointArray {
+            head_yaw: &mut self.head_yaw,
+            head_pitch: &mut self.head_pitch,
+            left_shoulder_pitch: &mut self.left_shoulder_pitch,
+            left_shoulder_roll: &mut self.left_shoulder_roll,
+            left_elbow_yaw: &mut self.left_elbow_yaw,
+            left_elbow_roll: &mut self.left_elbow_roll,
+            left_wrist_yaw: &mut self.left_wrist_yaw,
+            left_hip_yaw_pitch: &mut self.left_hip_yaw_pitch,
+            left_hip_roll: &mut self.left_hip_roll,
+            left_hip_pitch: &mut self.left_hip_pitch,
+            left_knee_pitch: &mut self.left_knee_pitch,
+            left_ankle_pitch: &mut self.left_ankle_pitch,
+            left_ankle_roll: &mut self.left_ankle_roll,
+            right_shoulder_pitch: &mut self.right_shoulder_pitch,
+            right_shoulder_roll: &mut self.right_shoulder_roll,
+            right_elbow_yaw: &mut self.right_elbow_yaw,
+            right_elbow_roll: &mut self.right_elbow_roll,
+            right_wrist_yaw: &mut self.right_wrist_yaw,
+            right_hip_roll: &mut self.right_hip_roll,
+            right_hip_pitch: &mut self.right_hip_pitch,
+            right_knee_pitch: &mut self.right_knee_pitch,
+            right_ankle_pitch: &mut self.right_ankle_pitch,
+            right_ankle_roll: &mut self.right_ankle_roll,
+            left_hand: &mut self.left_hand,
+            right_hand: &mut self.right_hand,
+        }
+    }
 }
 
 impl<T: Clone> FillExt<T> for JointArray<T> {
