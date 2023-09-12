@@ -1,8 +1,6 @@
 [workspace]
-members = [
-    "nidhogg",
-    "nidhogg_derive"
-]
+resolver = "2"
+members = ["nidhogg", "nidhogg_derive"]
 
 [workspace.dependencies]
-nidhogg_derive = { path = "nidhogg_derive"}
+nidhogg_derive = { path = "nidhogg_derive" }
