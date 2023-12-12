@@ -4,6 +4,7 @@
 use nidhogg_derive::{Builder, Filler};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use std::ops::Add;
 
 mod joint_array;
 pub use joint_array::JointArray;
@@ -23,6 +24,18 @@ pub struct Vector3<T> {
     pub x: T,
     pub y: T,
     pub z: T,
+}
+
+impl Add for Vector3<f32> {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Vector3 {
+            y: self.y + rhs.y,
+            x: self.x + rhs.x,
+            z: self.z + rhs.z,
+        }
+    }
 }
 
 /// Trait that introduces the [`fill`](`FillExt::fill`) method for a type, which allows filling in all fields with the same value.
