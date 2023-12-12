@@ -4,7 +4,7 @@
 use nidhogg_derive::{Builder, Filler};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::ops::{Add, Sub};
+use std::ops::{Add, Div, Mul, Sub};
 
 mod joint_array;
 pub use joint_array::JointArray;
@@ -46,6 +46,30 @@ impl Sub for Vector3<f32> {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
             z: self.z - rhs.z,
+        }
+    }
+}
+
+impl Div for Vector3<f32> {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x / rhs.x,
+            y: self.y / rhs.y,
+            z: self.z / rhs.z,
+        }
+    }
+}
+
+impl Mul for Vector3<f32> {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z,
         }
     }
 }
