@@ -9,6 +9,8 @@ use std::ops::{Add, Div, Mul, Sub};
 mod joint_array;
 pub use joint_array::JointArray;
 
+use forward_ref::forward_ref_binop;
+
 /// Struct containing two values of type `T`
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -18,7 +20,7 @@ pub struct Vector2<T> {
 }
 
 /// Struct containing three values of type `T`
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Vector3<T> {
     pub x: T,
@@ -37,6 +39,8 @@ impl Add for Vector3<f32> {
         }
     }
 }
+
+forward_ref_binop! { impl Add, add for Vector3<f32>, Vector3<f32>}
 
 impl Sub for Vector3<f32> {
     type Output = Self;
