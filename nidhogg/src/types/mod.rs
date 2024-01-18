@@ -28,11 +28,14 @@ pub struct Vector3<T> {
     pub z: T,
 }
 
-impl Add for Vector3<f32> {
+impl<T> Add for Vector3<T>
+where
+    T: Add<Output = T>,
+{
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Vector3 {
+        Self {
             y: self.y + rhs.y,
             x: self.x + rhs.x,
             z: self.z + rhs.z,
