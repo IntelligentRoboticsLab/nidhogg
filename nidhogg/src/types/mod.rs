@@ -2,6 +2,7 @@
 //!
 
 use nidhogg_derive::{Builder, Filler};
+use num::traits::Zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::iter::Sum;
@@ -89,23 +90,19 @@ where
 
 impl<T> Sum for Vector3<T>
 where
-    T: Add<Output = T>,
+    T: Add<Output = T> + Default,
 {
     fn sum<I>(iter: I) -> Vector3<T>
     where
         I: Iterator<Item = Vector3<T>>,
     {
         iter.fold(
-            Self {
-                x: 0.0,
-                y: 0.0,
-                z: 0.0,
+            Vector3 {
+                x: T::default(),
+                y: T::default(),
+                z: T::default(),
             },
-            |a, b| Self {
-                x: a.x + b.x,
-                y: a.y + b.y,
-                z: a.z + b.z,
-            },
+            |acc, elem| acc + elem,
         )
     }
 }
