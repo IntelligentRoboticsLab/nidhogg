@@ -2,7 +2,7 @@
 //!
 
 use nidhogg_derive::{Builder, Filler};
-use num::traits::Zero;
+use num::traits::{Pow, PrimInt};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::iter::Sum;
@@ -84,6 +84,22 @@ where
             x: self.x * rhs.x,
             y: self.y * rhs.y,
             z: self.z * rhs.z,
+        }
+    }
+}
+
+impl<T, EXP> Pow<EXP> for Vector3<T>
+where
+    T: Pow<EXP, Output = T>,
+    EXP: PrimInt,
+{
+    type Output = Self;
+
+    fn pow(self, exponent: EXP) -> Self::Output {
+        Self {
+            x: self.x.pow(exponent),
+            y: self.y.pow(exponent),
+            z: self.z.pow(exponent),
         }
     }
 }
