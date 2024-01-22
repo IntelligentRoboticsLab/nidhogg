@@ -4,6 +4,7 @@
 use nidhogg_derive::{Builder, Filler};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use std::iter::Sum;
 use std::ops::{Add, Div, Mul, Sub};
 
 mod joint_array;
@@ -26,7 +27,10 @@ pub struct Vector3<T> {
     pub z: T,
 }
 
-impl Add for Vector3<f32> {
+impl<T> Add for Vector3<T>
+where
+    T: Add<Output = T>,
+{
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -38,7 +42,10 @@ impl Add for Vector3<f32> {
     }
 }
 
-impl Sub for Vector3<f32> {
+impl<T> Sub for Vector3<T>
+where
+    T: Sub<Output = T>,
+{
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -50,7 +57,10 @@ impl Sub for Vector3<f32> {
     }
 }
 
-impl Div for Vector3<f32> {
+impl<T> Div for Vector3<T>
+where
+    T: Div<Output = T>,
+{
     type Output = Self;
 
     fn div(self, rhs: Self) -> Self::Output {
@@ -62,7 +72,10 @@ impl Div for Vector3<f32> {
     }
 }
 
-impl Mul for Vector3<f32> {
+impl<T> Mul for Vector3<T>
+where
+    T: Mul<Output = T>,
+{
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
@@ -71,6 +84,29 @@ impl Mul for Vector3<f32> {
             y: self.y * rhs.y,
             z: self.z * rhs.z,
         }
+    }
+}
+
+impl<T> Sum for Vector3<T>
+where
+    T: Add<Output = T>,
+{
+    fn sum<I>(iter: I) -> Vector3<T>
+    where
+        I: Iterator<Item = Vector3<T>>,
+    {
+        iter.fold(
+            Self {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            |a, b| Self {
+                x: a.x + b.x,
+                y: a.y + b.y,
+                z: a.z + b.z,
+            },
+        )
     }
 }
 
