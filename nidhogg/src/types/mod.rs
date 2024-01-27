@@ -606,10 +606,8 @@ pub struct ArmJoints<T> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::types::{Color, FillExt, LeftEye};
-
-    use super::ForceSensitiveResistorFoot;
-    use super::ForceSensitiveResistors;
 
     #[test]
     fn test_average_force_feet() {
@@ -673,5 +671,35 @@ mod tests {
         assert_eq!(color.color_0_deg.red, 0.5);
         assert_eq!(color.color_0_deg.green, 0.5);
         assert_eq!(color.color_0_deg.blue, 0.5);
+    }
+
+    #[test]
+    fn test_vector3_sum() {
+        let vec1 = Vector3::<f32> {
+            x: 1f32,
+            y: 1f32,
+            z: 1f32,
+        };
+        let vec2 = Vector3::<f32> {
+            x: 2f32,
+            y: 2f32,
+            z: 2f32,
+        };
+        let vec3 = Vector3::<f32> {
+            x: 3f32,
+            y: 3f32,
+            z: 3f32,
+        };
+
+        let array = [vec1, vec2, vec3];
+
+        assert_eq!(
+            array.iter().sum::<Vector3<f32>>(),
+            Vector3 {
+                x: 6f32,
+                y: 6f32,
+                z: 6f32,
+            },
+        );
     }
 }
