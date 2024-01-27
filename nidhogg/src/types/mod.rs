@@ -1,7 +1,7 @@
 //! Convenience types used to make interacting with the NAO more convenient.
 //!
 
-use forward_ref::forward_ref_binop;
+use forward_ref_generic::forward_ref_binop;
 use nidhogg_derive::{Builder, Filler};
 use num::traits::{Pow, PrimInt};
 #[cfg(feature = "serde")]
@@ -21,7 +21,7 @@ pub struct Vector2<T> {
 }
 
 /// Struct containing three values of type `T`
-#[derive(Debug, Clone, Default, Copy)]
+#[derive(Debug, Clone, Default, Copy, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Vector3<T> {
     pub x: T,
@@ -44,7 +44,7 @@ where
     }
 }
 
-forward_ref_binop! { impl Add, add for Vector3<f32>, Vector3<f32>}
+forward_ref_binop! { [T] impl Add for Vector3<T> where T: Copy + Add<Output = T>}
 
 impl<T> Sub for Vector3<T>
 where
@@ -61,7 +61,7 @@ where
     }
 }
 
-forward_ref_binop! { impl Sub, sub for Vector3<f32>, Vector3<f32>}
+forward_ref_binop! { [T] impl Sub for Vector3<T> where T: Copy + Sub<Output = T>}
 
 impl<T> Div for Vector3<T>
 where
@@ -78,7 +78,7 @@ where
     }
 }
 
-forward_ref_binop! { impl Div, div for Vector3<f32>, Vector3<f32>}
+forward_ref_binop! { [T] impl Div for Vector3<T> where T: Copy + Div<Output = T>}
 
 impl<T> Mul for Vector3<T>
 where
@@ -95,7 +95,7 @@ where
     }
 }
 
-forward_ref_binop! { impl Mul, mul for Vector3<f32>, Vector3<f32>}
+forward_ref_binop! { [T] impl Mul for Vector3<T> where T: Copy + Mul<Output = T>}
 
 impl<T, EXP> Pow<EXP> for Vector3<T>
 where
@@ -121,14 +121,20 @@ where
     where
         I: Iterator<Item = Vector3<T>>,
     {
-        iter.fold(
-            Vector3 {
-                x: T::default(),
-                y: T::default(),
-                z: T::default(),
-            },
-            |acc, elem| acc + elem,
-        )
+        iter.fold(Vector3::default(), |acc, elem| acc + elem)
+    }
+}
+
+impl<'a, T> Sum<&'a Vector3<T>> for Vector3<T>
+where
+    T: Default + Copy + Add<Output = T>,
+{
+    fn sum<I>(iter: I) -> Vector3<T>
+    where
+        T: Default + Copy + Add,
+        I: Iterator<Item = &'a Vector3<T>>,
+    {
+        iter.fold(Vector3::default(), |acc, elem| acc + elem)
     }
 }
 
