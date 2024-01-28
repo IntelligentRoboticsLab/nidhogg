@@ -1,142 +1,15 @@
 //! Convenience types used to make interacting with the NAO more convenient.
 //!
 
-use forward_ref_generic::forward_ref_binop;
 use nidhogg_derive::{Builder, Filler};
-use num::traits::{Pow, PrimInt};
+
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::iter::Sum;
-use std::ops::{Add, Div, Mul, Sub};
 
 mod joint_array;
+mod vector;
 pub use joint_array::JointArray;
-
-/// Struct containing two values of type `T`
-#[derive(Debug, Clone, Default)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Vector2<T> {
-    pub x: T,
-    pub y: T,
-}
-
-/// Struct containing three values of type `T`
-#[derive(Debug, Clone, Default, Copy, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Vector3<T> {
-    pub x: T,
-    pub y: T,
-    pub z: T,
-}
-
-impl<T> Add for Vector3<T>
-where
-    T: Add<Output = T>,
-{
-    type Output = Self;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        Vector3 {
-            y: self.y + rhs.y,
-            x: self.x + rhs.x,
-            z: self.z + rhs.z,
-        }
-    }
-}
-
-forward_ref_binop! { [T] impl Add for Vector3<T> where T: Copy + Add<Output = T>}
-
-impl<T> Sub for Vector3<T>
-where
-    T: Sub<Output = T>,
-{
-    type Output = Self;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        Self {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-            z: self.z - rhs.z,
-        }
-    }
-}
-
-forward_ref_binop! { [T] impl Sub for Vector3<T> where T: Copy + Sub<Output = T>}
-
-impl<T> Div for Vector3<T>
-where
-    T: Div<Output = T>,
-{
-    type Output = Self;
-
-    fn div(self, rhs: Self) -> Self::Output {
-        Self {
-            x: self.x / rhs.x,
-            y: self.y / rhs.y,
-            z: self.z / rhs.z,
-        }
-    }
-}
-
-forward_ref_binop! { [T] impl Div for Vector3<T> where T: Copy + Div<Output = T>}
-
-impl<T> Mul for Vector3<T>
-where
-    T: Mul<Output = T>,
-{
-    type Output = Self;
-
-    fn mul(self, rhs: Self) -> Self::Output {
-        Self {
-            x: self.x * rhs.x,
-            y: self.y * rhs.y,
-            z: self.z * rhs.z,
-        }
-    }
-}
-
-forward_ref_binop! { [T] impl Mul for Vector3<T> where T: Copy + Mul<Output = T>}
-
-impl<T, EXP> Pow<EXP> for Vector3<T>
-where
-    T: Pow<EXP, Output = T>,
-    EXP: PrimInt,
-{
-    type Output = Self;
-
-    fn pow(self, exponent: EXP) -> Self::Output {
-        Self {
-            x: self.x.pow(exponent),
-            y: self.y.pow(exponent),
-            z: self.z.pow(exponent),
-        }
-    }
-}
-
-impl<T> Sum for Vector3<T>
-where
-    T: Add<Output = T> + Default,
-{
-    fn sum<I>(iter: I) -> Vector3<T>
-    where
-        I: Iterator<Item = Vector3<T>>,
-    {
-        iter.fold(Vector3::default(), |acc, elem| acc + elem)
-    }
-}
-
-impl<'a, T> Sum<&'a Vector3<T>> for Vector3<T>
-where
-    T: Default + Copy + Add<Output = T>,
-{
-    fn sum<I>(iter: I) -> Vector3<T>
-    where
-        T: Default + Copy + Add,
-        I: Iterator<Item = &'a Vector3<T>>,
-    {
-        iter.fold(Vector3::default(), |acc, elem| acc + elem)
-    }
-}
+pub use vector::{Vector2, Vector3};
 
 /// Trait that introduces the [`fill`](`FillExt::fill`) method for a type, which allows filling in all fields with the same value.
 pub trait FillExt<T> {
@@ -677,35 +550,5 @@ mod tests {
         assert_eq!(color.color_0_deg.red, 0.5);
         assert_eq!(color.color_0_deg.green, 0.5);
         assert_eq!(color.color_0_deg.blue, 0.5);
-    }
-
-    #[test]
-    fn test_vector3_sum() {
-        let vec1 = Vector3::<f32> {
-            x: 1f32,
-            y: 1f32,
-            z: 1f32,
-        };
-        let vec2 = Vector3::<f32> {
-            x: 2f32,
-            y: 2f32,
-            z: 2f32,
-        };
-        let vec3 = Vector3::<f32> {
-            x: 3f32,
-            y: 3f32,
-            z: 3f32,
-        };
-
-        let array = [vec1, vec2, vec3];
-
-        assert_eq!(
-            array.iter().sum::<Vector3<f32>>(),
-            Vector3 {
-                x: 6f32,
-                y: 6f32,
-                z: 6f32,
-            },
-        );
     }
 }
