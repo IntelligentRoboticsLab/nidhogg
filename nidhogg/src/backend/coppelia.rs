@@ -1,5 +1,5 @@
 use crate::{Error, NaoBackend, NaoControlMessage, NaoState, Result};
-use zmq_remote_api::{RemoteApiClient, RemoteApiClientParams};
+use coppeliasim_zmq_remote_api::{RemoteApiClient, RemoteApiClientParams};
 
 use super::ConnectWithRetry;
 
