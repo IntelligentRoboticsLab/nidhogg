@@ -28,6 +28,18 @@ pub struct Vector3<T> {
 }
 
 /// Element-wise addition for [`Vector2`] struct
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector2;
+///
+/// let one = Vector2{x: 1, y: 1};
+/// let two = Vector2{x: 2, y: 2};
+/// let three = Vector2{x: 3, y: 3};
+///
+/// assert_eq!(one + two, three);
+/// ```
 impl<T> Add for Vector2<T>
 where
     T: Add<Output = T>,
@@ -45,6 +57,18 @@ where
 forward_ref_binop! { [T] impl Add for Vector2<T> where T: Copy + Add<Output = T>}
 
 /// Element-wise subtraction for [`Vector2`] struct
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector2;
+///
+/// let one = Vector2{x: 1, y: 1};
+/// let two = Vector2{x: 2, y: 2};
+/// let three = Vector2{x: 3, y: 3};
+///
+/// assert_eq!(three - two, one);
+/// ```
 impl<T> Sub for Vector2<T>
 where
     T: Sub<Output = T>,
@@ -62,6 +86,17 @@ where
 forward_ref_binop! { [T] impl Sub for Vector2<T> where T: Copy + Sub<Output = T>}
 
 /// Element-wise division for [`Vector2`] struct
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector2;
+///
+/// let two = Vector2{x: 2, y: 2};
+/// let four = Vector2{x: 4, y: 4};
+///
+/// assert_eq!(four / two, two);
+/// ```
 impl<T> Div for Vector2<T>
 where
     T: Div<Output = T>,
@@ -79,6 +114,17 @@ where
 forward_ref_binop! { [T] impl Div for Vector2<T> where T: Copy + Div<Output = T>}
 
 /// Element-wise multiplication for [`Vector2`] struct
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector2;
+///
+/// let two = Vector2{x: 2, y: 2};
+/// let four = Vector2{x: 4, y: 4};
+///
+/// assert_eq!(two * two, four);
+/// ```
 impl<T> Mul for Vector2<T>
 where
     T: Mul<Output = T>,
@@ -96,6 +142,18 @@ where
 forward_ref_binop! { [T] impl Mul for Vector2<T> where T: Copy + Mul<Output = T>}
 
 /// Element-wise exponentiation for [`Vector2`] struct
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector2;
+/// use num::traits::Pow;
+///
+/// let two = Vector2{x: 2, y: 2};
+/// let four = Vector2{x: 4, y: 4};
+///
+/// assert_eq!(two.pow(2u32), four);
+/// ```
 impl<T, EXP> Pow<EXP> for Vector2<T>
 where
     T: Pow<EXP, Output = T>,
@@ -112,6 +170,18 @@ where
 }
 
 /// Implements the sum trait for [`Vector2`] struct, addition will be conducted element-wise
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector2;
+///
+/// let two = Vector2{x: 2, y: 2};
+/// let six = Vector2{x: 6, y: 6};
+/// let array = [two, two, two];
+///
+/// assert_eq!(array.into_iter().sum::<Vector2<i32>>(), six);
+/// ```
 impl<T> Sum for Vector2<T>
 where
     T: Add<Output = T> + Default,
@@ -125,6 +195,18 @@ where
 }
 
 /// Implements the sum trait for a reference to a [`Vector2`] struct, addition will be conducted element-wise
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector2;
+///
+/// let two = Vector2{x: 2, y: 2};
+/// let six = Vector2{x: 6, y: 6};
+/// let array = [two, two, two];
+///
+/// assert_eq!(array.iter().sum::<Vector2<i32>>(), six);
+/// ```
 impl<'a, T> Sum<&'a Vector2<T>> for Vector2<T>
 where
     T: Default + Copy + Add<Output = T>,
@@ -138,6 +220,16 @@ where
     }
 }
 
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector2;
+/// use nidhogg::types::FillExt;
+///
+/// let two = Vector2{x: 2, y: 2};
+///
+/// assert_eq!(two, Vector2::fill(2));
+/// ```
 impl<T: Clone> FillExt<T> for Vector2<T> {
     fn fill(value: T) -> Vector2<T> {
         Self {
@@ -148,6 +240,18 @@ impl<T: Clone> FillExt<T> for Vector2<T> {
 }
 
 /// Element-wise addition for [`Vector3`] struct
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector3;
+///
+/// let one = Vector3{x: 1, y: 1, z: 1};
+/// let two = Vector3{x: 2, y: 2, z: 2};
+/// let three = Vector3{x: 3, y: 3, z: 3};
+///
+/// assert_eq!(one + two, three);
+/// ```
 impl<T> Add for Vector3<T>
 where
     T: Add<Output = T>,
@@ -166,6 +270,18 @@ where
 forward_ref_binop! { [T] impl Add for Vector3<T> where T: Copy + Add<Output = T>}
 
 /// Element-wise subtraction for [`Vector3`] struct
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector3;
+///
+/// let one = Vector3{x: 1, y: 1, z: 1};
+/// let two = Vector3{x: 2, y: 2, z: 2};
+/// let three = Vector3{x: 3, y: 3, z: 3};
+///
+/// assert_eq!(three - two, one);
+/// ```
 impl<T> Sub for Vector3<T>
 where
     T: Sub<Output = T>,
@@ -184,6 +300,17 @@ where
 forward_ref_binop! { [T] impl Sub for Vector3<T> where T: Copy + Sub<Output = T>}
 
 /// Element-wise division for [`Vector3`] struct
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector3;
+///
+/// let two = Vector3{x: 2, y: 2, z: 2};
+/// let four = Vector3{x: 4, y: 4, z: 4};
+///
+/// assert_eq!(four / two, two);
+/// ```
 impl<T> Div for Vector3<T>
 where
     T: Div<Output = T>,
@@ -202,6 +329,17 @@ where
 forward_ref_binop! { [T] impl Div for Vector3<T> where T: Copy + Div<Output = T>}
 
 /// Element-wise multiplication for [`Vector3`] struct
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector3;
+///
+/// let two = Vector3{x: 2, y: 2, z: 2};
+/// let four = Vector3{x: 4, y: 4, z: 4};
+///
+/// assert_eq!(two * two, four);
+/// ```
 impl<T> Mul for Vector3<T>
 where
     T: Mul<Output = T>,
@@ -220,6 +358,18 @@ where
 forward_ref_binop! { [T] impl Mul for Vector3<T> where T: Copy + Mul<Output = T>}
 
 /// Element-wise exponentiation for [`Vector3`] struct
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector3;
+/// use num::traits::Pow;
+///
+/// let two = Vector3{x: 2, y: 2, z: 2};
+/// let four = Vector3{x: 4, y: 4, z: 4};
+///
+/// assert_eq!(two.pow(2u32), four);
+/// ```
 impl<T, EXP> Pow<EXP> for Vector3<T>
 where
     T: Pow<EXP, Output = T>,
@@ -237,6 +387,18 @@ where
 }
 
 /// Implements the sum trait for [`Vector3`] struct, addition will be conducted element-wise
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector3;
+///
+/// let two = Vector3{x: 2, y: 2, z: 2};
+/// let six = Vector3{x: 6, y: 6, z: 6};
+/// let array = [two, two, two];
+///
+/// assert_eq!(array.into_iter().sum::<Vector3<i32>>(), six);
+/// ```
 impl<T> Sum for Vector3<T>
 where
     T: Add<Output = T> + Default,
@@ -250,6 +412,18 @@ where
 }
 
 /// Implements the sum trait for a reference to a [`Vector3`] struct, addition will be conducted element-wise
+///
+/// # Examples
+///
+/// ```
+/// use nidhogg::types::Vector3;
+///
+/// let two = Vector3{x: 2, y: 2, z: 2};
+/// let six = Vector3{x: 6, y: 6, z: 6};
+/// let array = [two, two, two];
+///
+/// assert_eq!(array.iter().sum::<Vector3<i32>>(), six);
+/// ```
 impl<'a, T> Sum<&'a Vector3<T>> for Vector3<T>
 where
     T: Default + Copy + Add<Output = T>,
