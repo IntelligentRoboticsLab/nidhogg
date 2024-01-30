@@ -617,6 +617,15 @@ mod tests {
                 z: 6f32,
             },
         );
+
+        assert_eq!(
+            array.into_iter().sum::<Vector3<f32>>(),
+            Vector3 {
+                x: 6f32,
+                y: 6f32,
+                z: 6f32,
+            },
+        );
     }
 
     #[test]
