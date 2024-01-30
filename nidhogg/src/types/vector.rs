@@ -2,8 +2,6 @@
 
 use crate::types::FillExt;
 
-use crate::types::FillExt;
-
 use forward_ref_generic::forward_ref_binop;
 use num::traits::{Pow, PrimInt};
 use serde::{Deserialize, Serialize};
@@ -223,8 +221,7 @@ where
 /// # Examples
 ///
 /// ```
-/// use nidhogg::types::Vector2;
-/// use nidhogg::types::FillExt;
+/// use nidhogg::types::{Vector2, FillExt};
 ///
 /// let two = Vector2{x: 2, y: 2};
 ///
