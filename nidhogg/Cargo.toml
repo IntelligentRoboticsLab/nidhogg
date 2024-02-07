@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+forward_ref_generic = "0.2.1"
 rmp-serde = { version = "1.1.1", optional = true }
 serde = { version = "1.0.150", features = ["derive"] }
 thiserror = "1.0.38"
@@ -13,6 +14,7 @@ miette = { version = "5.10.0" }
 tracing = "0.1.37"
 nidhogg_derive = { workspace = true }
 coppeliasim_zmq_remote_api = { git = "https://github.com/samuel-cavalcanti/rust_zmqRemoteApi", optional = true }
+num = "0.4.1"
 
 [dev-dependencies]
 tracing-subscriber = "0.3.16"

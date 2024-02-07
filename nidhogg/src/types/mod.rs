@@ -2,28 +2,14 @@
 //!
 
 use nidhogg_derive::{Builder, Filler};
+
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 mod joint_array;
+mod vector;
 pub use joint_array::JointArray;
-
-/// Struct containing two values of type `T`
-#[derive(Debug, Clone, Default)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Vector2<T> {
-    pub x: T,
-    pub y: T,
-}
-
-/// Struct containing three values of type `T`
-#[derive(Debug, Clone, Default)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Vector3<T> {
-    pub x: T,
-    pub y: T,
-    pub z: T,
-}
+pub use vector::{Vector2, Vector3};
 
 /// Trait that introduces the [`fill`](`FillExt::fill`) method for a type, which allows filling in all fields with the same value.
 pub trait FillExt<T> {
@@ -499,10 +485,8 @@ pub struct ArmJoints<T> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::types::{Color, FillExt, LeftEye};
-
-    use super::ForceSensitiveResistorFoot;
-    use super::ForceSensitiveResistors;
 
     #[test]
     fn test_average_force_feet() {
