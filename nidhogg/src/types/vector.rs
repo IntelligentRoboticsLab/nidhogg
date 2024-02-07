@@ -275,10 +275,7 @@ impl<T: Clone> FillExt<T> for Vector3<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::types::FillExt;
-    use crate::types::Vector2;
-    use crate::types::Vector3;
-    use num::traits::pow::Pow;
+    use super::*;
 
     #[test]
     fn test_vector2_add_sub() {
