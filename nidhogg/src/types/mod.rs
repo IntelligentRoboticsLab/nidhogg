@@ -394,21 +394,21 @@ pub struct SonarEnabled {
 /// Struct containing the touch activiation value for each touch sensor on the robot.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Touch {
-    pub chest_board: f32,
-    pub head_front: f32,
-    pub head_middle: f32,
-    pub head_rear: f32,
-    pub left_foot_left: f32,
-    pub left_foot_right: f32,
-    pub left_hand_back: f32,
-    pub left_hand_left: f32,
-    pub left_hand_right: f32,
-    pub right_foot_left: f32,
-    pub right_foot_right: f32,
-    pub right_hand_back: f32,
-    pub right_hand_left: f32,
-    pub right_hand_right: f32,
+pub struct Touch<T> {
+    pub chest_board: T,
+    pub head_front: T,
+    pub head_middle: T,
+    pub head_rear: T,
+    pub left_foot_left: T,
+    pub left_foot_right: T,
+    pub left_hand_back: T,
+    pub left_hand_left: T,
+    pub left_hand_right: T,
+    pub right_foot_left: T,
+    pub right_foot_right: T,
+    pub right_hand_back: T,
+    pub right_hand_left: T,
+    pub right_hand_right: T,
 }
 
 /// Wrapper struct containing the head joints of the robot.
