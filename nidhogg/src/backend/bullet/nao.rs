@@ -88,11 +88,21 @@ macro_rules! to_nidhogg {
 
 macro_rules! control_command {
     ($physics_client: ident, $self: ident, $joint_name: tt, $positions: ident, $stiffness: ident) => {
+        if to_nidhogg!($stiffness, $joint_name) as f64 > 0.0 {
+
+            println!("{}: {} * {} == {}", $joint_name, $self.joint_map.get($joint_name).unwrap().0.joint_max_velocity, to_nidhogg!($stiffness, $joint_name), (to_nidhogg!($stiffness, $joint_name) as f64 * $self.joint_map.get($joint_name).unwrap().0.joint_max_velocity).max(0.0));
+        }
         $physics_client.set_joint_motor_control(
             $self.id,
             $self.joint_map.get($joint_name).unwrap().0.joint_index,
-            rubullet::ControlCommand::Position(to_nidhogg!($positions, $joint_name) as f64),
-            Some(to_nidhogg!($stiffness, $joint_name) as f64),
+            rubullet::ControlCommand::Pd {
+                target_position: to_nidhogg!($positions, $joint_name) as f64, 
+                target_velocity: (to_nidhogg!($stiffness, $joint_name) as f64 * $self.joint_map.get($joint_name).unwrap().0.joint_max_velocity).max(0.0),
+                position_gain: 1.0, 
+                velocity_gain: 1.5, 
+                maximum_velocity: Some($self.joint_map.get($joint_name).unwrap().0.joint_max_velocity)
+            },
+            None,
         );
     };
 }
@@ -120,6 +130,7 @@ impl BulletNao {
                 ..Default::default()
             },
         )?;
+
 
         let balance_constraint = physics_client.create_constraint(
             id,
@@ -403,37 +414,48 @@ impl BulletNao {
         })
     }
 
-    pub fn get_fsr(&self, physics_client: &mut PhysicsClient) -> Result<ForceSensitiveResistors> {
+    pub fn get_fsr(
+        &self,
+        physics_client: &mut PhysicsClient,
+        plane_id: &BodyId,
+    ) -> Result<ForceSensitiveResistors> {
+        // hacky way to get the fsr values, as the links in the nao urdf barely resemble the actual links
+        let left = self.get_fsr_value(physics_client, plane_id, "l_ankle")? / 4.0;
+        let right = self.get_fsr_value(physics_client, plane_id, "r_ankle")? / 4.0;
+
         Ok(ForceSensitiveResistors {
             left_foot: ForceSensitiveResistorFoot {
-                front_left: self.get_fsr_value(physics_client, "LFsrFL_frame")?,
-                front_right: self.get_fsr_value(physics_client, "LFsrFR_frame")?,
-                rear_left: self.get_fsr_value(physics_client, "LFsrRL_frame")?,
-                rear_right: self.get_fsr_value(physics_client, "LFsrRR_frame")?,
+                front_left: left,
+                front_right: left,
+                rear_left: left,
+                rear_right: left,
             },
             right_foot: ForceSensitiveResistorFoot {
-                front_left: self.get_fsr_value(physics_client, "RFsrFL_frame")?,
-                front_right: self.get_fsr_value(physics_client, "RFsrFR_frame")?,
-                rear_left: self.get_fsr_value(physics_client, "RFsrRL_frame")?,
-                rear_right: self.get_fsr_value(physics_client, "RFsrRR_frame")?,
+                front_left: right,
+                front_right: right,
+                rear_left: right,
+                rear_right: right,
             },
         })
     }
 
-    fn get_fsr_value(&self, physics_client: &mut PhysicsClient, fsr_link: &str) -> Result<f32> {
+    fn get_fsr_value(
+        &self,
+        physics_client: &mut PhysicsClient,
+        plane_id: &BodyId,
+        fsr_link: &str,
+    ) -> Result<f32> {
         let contact_points = physics_client.get_contact_points(
             self.id,
-            None,
-            Some(self.link_map.get(fsr_link).map(|f| f.joint_index)),
+            *plane_id,
+            Some(self.link_map.get(fsr_link).map(|link| link.joint_index)),
             None,
         )?;
 
-        let mut total_force = 0f32;
-        for contact in contact_points {
-            total_force += contact.normal_force.unwrap_or(0.0) as f32;
-        }
-
-        Ok(total_force)
+        let total_force = contact_points
+            .iter()
+            .fold(0.0, |acc, f| acc + f.normal_force.unwrap_or(0.0) as f32);
+        Ok(total_force / 9.81)
     }
 }
 #[derive(Debug)]

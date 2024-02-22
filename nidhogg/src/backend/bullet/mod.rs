@@ -1,7 +1,8 @@
 #![allow(missing_debug_implementations)]
 use crate::{
     types::{Vector2, Vector3},
-    NaoBackend, NaoControlMessage, NaoState, Result,
+    backend::ReadHardwareInfo,
+    HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
 };
 use environment::NaoBulletEnvironment;
 use rubullet::{nalgebra::Isometry3, Mode, PhysicsClient, SetPhysicsEngineParameterOptions};
@@ -17,6 +18,9 @@ pub struct BulletBackend {
     pub environment: NaoBulletEnvironment,
     pub nao: BulletNao,
 }
+
+unsafe impl Send for BulletBackend {}
+unsafe impl Sync for BulletBackend {}
 
 impl NaoBackend for BulletBackend {
     fn connect() -> Result<Self> {
@@ -43,12 +47,12 @@ impl NaoBackend for BulletBackend {
     fn send_control_msg(&mut self, update: NaoControlMessage) -> Result<()> {
         self.nao
             .set_angles(&mut self.physics_client, update.position, update.stiffness);
-        self.physics_client.step_simulation()?;
         Ok(())
     }
 
     fn read_nao_state(&mut self) -> Result<NaoState> {
         let vel = self.physics_client.get_base_velocity(self.nao.id)?;
+        self.physics_client.step_simulation()?;
         Ok(NaoState {
             position: Default::default(),
             stiffness: Default::default(),
@@ -65,12 +69,24 @@ impl NaoBackend for BulletBackend {
             },
             angles: Vector2 { x: 0.0, y: 0.0 },
             sonar: Default::default(),
-            force_sensitive_resistors: Default::default(),
+            force_sensitive_resistors: self.nao.get_fsr(&mut self.physics_client, &self.environment.plane_id)?,
             touch: self.nao.get_touch(&mut self.physics_client)?,
             battery: Default::default(),
             temperature: Default::default(),
             current: Default::default(),
             status: Default::default(),
+        })
+    }
+}
+
+impl ReadHardwareInfo for BulletBackend {
+    fn read_hardware_info(&mut self) -> Result<HardwareInfo> {
+        let hardware_info = "bullet".to_string();
+        Ok(HardwareInfo {
+            body_id: hardware_info.clone(),
+            body_version: hardware_info.clone(),
+            head_id: hardware_info.clone(),
+            head_version: hardware_info.clone(),
         })
     }
 }
