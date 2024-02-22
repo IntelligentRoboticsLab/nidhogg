@@ -10,7 +10,7 @@ pub mod color;
 mod joint_array;
 mod vector;
 
-pub use color::{Rgb, Rgb8, RgbF32};
+pub use color::{Rgb, RgbF32, RgbU8};
 pub use joint_array::JointArray;
 pub use vector::{Vector2, Vector3};
 
@@ -90,6 +90,7 @@ pub struct RightEar {
 /// These LEDs are placed in the following order:
 ///
 /// ![Left Eye][eyeleds]
+/// ![Left Eye Host](https://docs.dutchnao.team/api/attachments.redirect?id=0ef41d4e-f579-4445-b314-ec42f9deed88)
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[embed_doc_image::embed_doc_image("eyeleds", "docs/hardware_led_left_eye.png")]
@@ -367,7 +368,7 @@ mod tests {
 
     #[test]
     fn test_color_new_u8() {
-        let color = Rgb8::new(255, 255, 255);
+        let color = RgbU8::new(255, 255, 255);
         assert_eq!(color.red, 255);
         assert_eq!(color.green, 255);
         assert_eq!(color.blue, 255);
@@ -375,7 +376,7 @@ mod tests {
 
     #[test]
     fn test_color_new_int() {
-        let color = Rgb8::from(0xFFFFFF);
+        let color = RgbU8::from(0xFFFFFF);
         assert_eq!(color.red, 255);
         assert_eq!(color.green, 255);
         assert_eq!(color.blue, 255);

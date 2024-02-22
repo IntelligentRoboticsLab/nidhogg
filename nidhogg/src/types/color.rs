@@ -1,7 +1,7 @@
 use nidhogg_derive::Builder;
 use serde::{Deserialize, Serialize};
 
-pub type Rgb8 = Rgb<u8>;
+pub type RgbU8 = Rgb<u8>;
 pub type RgbF32 = Rgb<f32>;
 
 #[derive(Debug, Default, Clone, Copy, Builder)]
@@ -19,9 +19,9 @@ impl<T> Rgb<T> {
     }
 }
 
-impl From<u32> for Rgb8 {
+impl From<u32> for RgbU8 {
     fn from(color: u32) -> Self {
-        Rgb8 {
+        RgbU8 {
             red: ((color >> 16) & 0xFF) as u8,
             green: ((color >> 8) & 0xFF) as u8,
             blue: (color & 0xFF) as u8,
@@ -29,8 +29,8 @@ impl From<u32> for Rgb8 {
     }
 }
 
-impl From<Rgb8> for RgbF32 {
-    fn from(value: Rgb8) -> Self {
+impl From<RgbU8> for RgbF32 {
+    fn from(value: RgbU8) -> Self {
         RgbF32 {
             red: value.red as f32 / 255.0,
             green: value.green as f32 / 255.0,
@@ -39,9 +39,9 @@ impl From<Rgb8> for RgbF32 {
     }
 }
 
-impl From<RgbF32> for Rgb8 {
+impl From<RgbF32> for RgbU8 {
     fn from(value: RgbF32) -> Self {
-        Rgb8 {
+        RgbU8 {
             red: (value.red * 255.0) as u8,
             green: (value.green * 255.0) as u8,
             blue: (value.blue * 255.0) as u8,
