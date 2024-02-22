@@ -6,8 +6,11 @@ use nidhogg_derive::{Builder, Filler};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+pub mod color;
 mod joint_array;
 mod vector;
+
+pub use color::{Rgb, Rgb8, RgbF32};
 pub use joint_array::JointArray;
 pub use vector::{Vector2, Vector3};
 
@@ -82,153 +85,6 @@ pub struct RightEar {
     pub r9: f32,
 }
 
-/// Struct representing an RGB color.
-#[derive(Debug, Default, Clone, Copy, Builder)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Color<T> {
-    pub red: T,
-    pub green: T,
-    pub blue: T,
-}
-
-impl<T> Color<T> {
-    #[must_use]
-    pub fn new(red: T, green: T, blue: T) -> Color<T> {
-        Color { red, green, blue }
-    }
-
-    /// The color blue
-    pub const BLUE: Color<f32> = Color {
-        red: 0.0,
-        green: 0.0,
-        blue: 1.0,
-    };
-
-    /// The color cyan
-    pub const CYAN: Color<f32> = Color {
-        red: 0.0,
-        green: 1.0,
-        blue: 1.0,
-    };
-
-    /// No color
-    ///
-    /// This color will result in the LEDs being turned off.
-    pub const EMPTY: Color<f32> = Color {
-        red: 0.0,
-        green: 0.0,
-        blue: 0.0,
-    };
-
-    /// The color gray
-    pub const GRAY: Color<f32> = Color {
-        red: 0.5,
-        green: 0.5,
-        blue: 0.5,
-    };
-
-    /// The color green
-    pub const GREEN: Color<f32> = Color {
-        red: 0.0,
-        green: 0.5,
-        blue: 0.0,
-    };
-
-    /// The color lime
-    pub const LIME: Color<f32> = Color {
-        red: 0.0,
-        green: 1.0,
-        blue: 0.0,
-    };
-
-    /// The color magenta
-    pub const MAGENTA: Color<f32> = Color {
-        red: 1.0,
-        green: 0.0,
-        blue: 1.0,
-    };
-
-    /// The color maroon
-    pub const MAROON: Color<f32> = Color {
-        red: 0.5,
-        green: 0.0,
-        blue: 0.0,
-    };
-
-    /// The color navy
-    pub const NAVY: Color<f32> = Color {
-        red: 0.0,
-        green: 0.0,
-        blue: 0.5,
-    };
-
-    /// The color olive
-    pub const OLIVE: Color<f32> = Color {
-        red: 0.5,
-        green: 0.5,
-        blue: 0.0,
-    };
-
-    /// The color purple
-    pub const PURPLE: Color<f32> = Color {
-        red: 0.5,
-        green: 0.0,
-        blue: 0.5,
-    };
-
-    /// The color red
-    pub const RED: Color<f32> = Color {
-        red: 1.0,
-        green: 0.0,
-        blue: 0.0,
-    };
-
-    /// The color silver
-    pub const SILVER: Color<f32> = Color {
-        red: 0.75,
-        green: 0.75,
-        blue: 0.75,
-    };
-
-    /// The color teal
-    pub const TEAL: Color<f32> = Color {
-        red: 0.0,
-        green: 0.5,
-        blue: 0.5,
-    };
-
-    /// The color white
-    pub const WHITE: Color<f32> = Color {
-        red: 1.0,
-        green: 1.0,
-        blue: 1.0,
-    };
-
-    /// The color yellow
-    pub const YELLOW: Color<f32> = Color {
-        red: 1.0,
-        green: 1.0,
-        blue: 0.0,
-    };
-
-    /// The color orange
-    pub const ORANGE: Color<f32> = Color {
-        red: 1.0,
-        green: 0.25,
-        blue: 0.0,
-    };
-}
-
-impl From<u32> for Color<u8> {
-    fn from(value: u32) -> Self {
-        Color::new(
-            ((value >> 16) & 0xFF) as u8,
-            ((value >> 8) & 0xFF) as u8,
-            (value & 0xFF) as u8,
-        )
-    }
-}
-
 /// Struct representing the RGB LEDs in the left eye of the robot.
 /// ## LED order:
 /// These LEDs are placed in the following order:
@@ -238,14 +94,14 @@ impl From<u32> for Color<u8> {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[embed_doc_image::embed_doc_image("eyeleds", "docs/hardware_led_left_eye.png")]
 pub struct LeftEye {
-    pub l0: Color<f32>,
-    pub l7: Color<f32>,
-    pub l6: Color<f32>,
-    pub l5: Color<f32>,
-    pub l4: Color<f32>,
-    pub l3: Color<f32>,
-    pub l2: Color<f32>,
-    pub l1: Color<f32>,
+    pub l0: RgbF32,
+    pub l7: RgbF32,
+    pub l6: RgbF32,
+    pub l5: RgbF32,
+    pub l4: RgbF32,
+    pub l3: RgbF32,
+    pub l2: RgbF32,
+    pub l1: RgbF32,
 }
 
 /// Struct representing the RGB LEDs in the left eye of the robot.
@@ -253,25 +109,18 @@ pub struct LeftEye {
 /// These LEDs are placed in the following order:
 ///
 /// ![Right Eye][eyeleds]
-/// ```text
-///     0
-///  45    315
-/// 90      270
-///  135   225
-///    180
-/// ```
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[embed_doc_image::embed_doc_image("eyeleds", "docs/hardware_led_right_eye.png")]
 pub struct RightEye {
-    pub r0: Color<f32>,
-    pub r7: Color<f32>,
-    pub r6: Color<f32>,
-    pub r5: Color<f32>,
-    pub r4: Color<f32>,
-    pub r3: Color<f32>,
-    pub r2: Color<f32>,
-    pub r1: Color<f32>,
+    pub r0: RgbF32,
+    pub r7: RgbF32,
+    pub r6: RgbF32,
+    pub r5: RgbF32,
+    pub r4: RgbF32,
+    pub r3: RgbF32,
+    pub r2: RgbF32,
+    pub r1: RgbF32,
 }
 
 /// Struct representing the battery status of the robot.
@@ -474,7 +323,7 @@ pub struct ArmJoints<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::types::{Color, FillExt, LeftEye};
+    use crate::types::{FillExt, LeftEye, RgbF32};
 
     #[test]
     fn test_average_force_feet() {
@@ -510,7 +359,7 @@ mod tests {
 
     #[test]
     fn test_color_new() {
-        let color = Color::new(0.5, 0.5, 0.5);
+        let color = RgbF32::new(0.5, 0.5, 0.5);
         assert_eq!(color.red, 0.5);
         assert_eq!(color.green, 0.5);
         assert_eq!(color.blue, 0.5);
@@ -518,7 +367,7 @@ mod tests {
 
     #[test]
     fn test_color_new_u8() {
-        let color = Color::new(255, 255, 255);
+        let color = Rgb8::new(255, 255, 255);
         assert_eq!(color.red, 255);
         assert_eq!(color.green, 255);
         assert_eq!(color.blue, 255);
@@ -526,7 +375,7 @@ mod tests {
 
     #[test]
     fn test_color_new_int() {
-        let color = Color::from(0xFFFFFF);
+        let color = Rgb8::from(0xFFFFFF);
         assert_eq!(color.red, 255);
         assert_eq!(color.green, 255);
         assert_eq!(color.blue, 255);
@@ -534,7 +383,7 @@ mod tests {
 
     #[test]
     fn test_color_fill() {
-        let color = LeftEye::fill(Color::new(0.5, 0.5, 0.5));
+        let color = LeftEye::fill(RgbF32::new(0.5, 0.5, 0.5));
         assert_eq!(color.l0.red, 0.5);
         assert_eq!(color.l0.green, 0.5);
         assert_eq!(color.l0.blue, 0.5);

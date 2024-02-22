@@ -42,8 +42,8 @@ pub use error::{Error, Result};
 use nidhogg_derive::Builder;
 use serde::Serialize;
 use types::{
-    Battery, Color, ForceSensitiveResistors, JointArray, LeftEar, LeftEye, RightEar, RightEye,
-    Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
+    color::RgbF32, Battery, ForceSensitiveResistors, JointArray, LeftEar, LeftEye, RightEar,
+    RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
 };
 
 /// Generic backend trait used for implementing a NAO interface.
@@ -63,12 +63,12 @@ pub trait NaoBackend: Sized {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::Color};
+    /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::color};
     ///
     /// let mut nao = LolaBackend::connect().unwrap();
     ///
     /// // First, create a new control message where we set the chest color
-    /// let msg = NaoControlMessage::builder().chest(Color::MAGENTA).build();
+    /// let msg = NaoControlMessage::builder().chest(color::f32::MAGENTA).build();
     ///
     /// // Now we send it to the NAO!
     /// nao.send_control_msg(msg).expect("Failed to write control message to backend!");
@@ -148,11 +148,11 @@ pub struct NaoControlMessage {
     // LEDs
     pub left_ear: LeftEar,
     pub right_ear: RightEar,
-    pub chest: Color<f32>,
+    pub chest: RgbF32,
     pub left_eye: LeftEye,
     pub right_eye: RightEye,
-    pub left_foot: Color<f32>,
-    pub right_foot: Color<f32>,
+    pub left_foot: RgbF32,
+    pub right_foot: RgbF32,
     pub skull: Skull,
 }
 

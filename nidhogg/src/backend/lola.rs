@@ -3,8 +3,8 @@
 
 use crate::{
     types::{
-        Battery, Color, ForceSensitiveResistorFoot, ForceSensitiveResistors, JointArray, LeftEar,
-        LeftEye, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
+        Battery, ForceSensitiveResistorFoot, ForceSensitiveResistors, JointArray, LeftEar, LeftEye,
+        RgbF32, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
     },
     Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
 };
@@ -45,12 +45,12 @@ impl NaoBackend for LolaBackend {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::Color};
+    /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::color};
     ///
     /// let mut nao = LolaBackend::connect().unwrap();
     ///
     /// // First, create a new control message where we set the chest color
-    /// let msg = NaoControlMessage::builder().chest(Color::MAGENTA).build();
+    /// let msg = NaoControlMessage::builder().chest(color::f32::MAGENTA).build();
     ///
     /// // Now we send it to the NAO!
     /// nao.send_control_msg(msg).expect("Failed to write control message to backend!");
@@ -168,8 +168,8 @@ impl FromNidhogg<RightEar> for [f32; 10] {
     }
 }
 
-impl FromNidhogg<Color<f32>> for [f32; 3] {
-    fn from_nidhogg(value: Color<f32>) -> Self {
+impl FromNidhogg<RgbF32> for [f32; 3] {
+    fn from_nidhogg(value: RgbF32) -> Self {
         [value.red, value.green, value.blue]
     }
 }

@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use nidhogg::{
     backend::{ConnectWithRetry, LolaBackend},
-    types::{Color, LeftEye},
+    types::{LeftEye, RgbF32},
     NaoBackend, NaoControlMessage, NaoState,
 };
 
@@ -47,7 +47,7 @@ fn main() -> Result<()> {
     let update = NaoControlMessage::builder()
         .left_eye(
             LeftEye::builder()
-                .l0(Color::builder().red(1.0).green(1.0).build())
+                .l0(RgbF32::builder().red(1.0).green(1.0).build())
                 .build(),
         )
         .build();
