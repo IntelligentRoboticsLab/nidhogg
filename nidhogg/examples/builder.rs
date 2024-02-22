@@ -5,7 +5,7 @@ use nidhogg::{types::*, NaoControlMessage};
 fn main() -> Result<()> {
     let cool_float = 1337.0;
     let cool_bool = false;
-    let cool_color = Color::GRAY;
+    let cool_color = Color::<f32>::GRAY;
 
     let _build = JointArray::<f32>::builder().leg_joints(LegJoints::default());
 
@@ -125,26 +125,26 @@ fn main() -> Result<()> {
         .chest(cool_color)
         .left_eye(
             LeftEye::builder()
-                .color_0_deg(cool_color)
-                .color_45_deg(cool_color)
-                .color_90_deg(cool_color)
-                .color_135_deg(cool_color)
-                .color_180_deg(cool_color)
-                .color_225_deg(cool_color)
-                .color_270_deg(cool_color)
-                .color_315_deg(cool_color)
+                .l0(cool_color)
+                .l7(cool_color)
+                .l6(cool_color)
+                .l5(cool_color)
+                .l4(cool_color)
+                .l3(cool_color)
+                .l2(cool_color)
+                .l1(cool_color)
                 .build(),
         )
         .right_eye(
             RightEye::builder()
-                .color_0_deg(cool_color)
-                .color_45_deg(cool_color)
-                .color_90_deg(cool_color)
-                .color_135_deg(cool_color)
-                .color_180_deg(cool_color)
-                .color_225_deg(cool_color)
-                .color_270_deg(cool_color)
-                .color_315_deg(cool_color)
+                .r0(cool_color)
+                .r1(cool_color)
+                .r2(cool_color)
+                .r3(cool_color)
+                .r4(cool_color)
+                .r5(cool_color)
+                .r6(cool_color)
+                .r7(cool_color)
                 .build(),
         )
         .left_foot(cool_color)

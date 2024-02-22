@@ -47,7 +47,7 @@ fn main() -> Result<()> {
     let update = NaoControlMessage::builder()
         .left_eye(
             LeftEye::builder()
-                .color_0_deg(Color::builder().red(1.0).green(1.0).build())
+                .l0(Color::builder().red(1.0).green(1.0).build())
                 .build(),
         )
         .build();
