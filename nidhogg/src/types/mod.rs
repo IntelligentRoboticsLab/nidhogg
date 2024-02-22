@@ -51,16 +51,16 @@ pub struct Skull {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[embed_doc_image::embed_doc_image("earleds", "docs/hardware_led_left_ear.png")]
 pub struct LeftEar {
-    pub l9: f32,
-    pub l8: f32,
-    pub l7: f32,
-    pub l6: f32,
-    pub l5: f32,
-    pub l4: f32,
-    pub l3: f32,
-    pub l2: f32,
-    pub l1: f32,
     pub l0: f32,
+    pub l1: f32,
+    pub l2: f32,
+    pub l3: f32,
+    pub l4: f32,
+    pub l5: f32,
+    pub l6: f32,
+    pub l7: f32,
+    pub l8: f32,
+    pub l9: f32,
 }
 
 /// Struct representing the LED intensities in the right ear of the robot.
@@ -95,13 +95,13 @@ pub struct RightEar {
 #[embed_doc_image::embed_doc_image("eyeleds", "docs/hardware_led_left_eye.png")]
 pub struct LeftEye {
     pub l0: RgbF32,
-    pub l7: RgbF32,
-    pub l6: RgbF32,
-    pub l5: RgbF32,
-    pub l4: RgbF32,
-    pub l3: RgbF32,
-    pub l2: RgbF32,
     pub l1: RgbF32,
+    pub l2: RgbF32,
+    pub l3: RgbF32,
+    pub l4: RgbF32,
+    pub l5: RgbF32,
+    pub l6: RgbF32,
+    pub l7: RgbF32,
 }
 
 /// Struct representing the RGB LEDs in the left eye of the robot.
@@ -114,13 +114,13 @@ pub struct LeftEye {
 #[embed_doc_image::embed_doc_image("eyeleds", "docs/hardware_led_right_eye.png")]
 pub struct RightEye {
     pub r0: RgbF32,
-    pub r7: RgbF32,
-    pub r6: RgbF32,
-    pub r5: RgbF32,
-    pub r4: RgbF32,
-    pub r3: RgbF32,
-    pub r2: RgbF32,
     pub r1: RgbF32,
+    pub r2: RgbF32,
+    pub r3: RgbF32,
+    pub r4: RgbF32,
+    pub r5: RgbF32,
+    pub r6: RgbF32,
+    pub r7: RgbF32,
 }
 
 /// Struct representing the battery status of the robot.
