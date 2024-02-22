@@ -16,7 +16,7 @@
 //! | `LoLA` | ✅ | `lola` |
 //! | `CoppeliaSim` | 🚧 | `coppelia` |
 //!
-//! ✅: Fully supported!  
+//! ✅: Fully supported!
 //! 🚧: Work in progress
 //!
 //! # Example
@@ -148,11 +148,11 @@ pub struct NaoControlMessage {
     // LEDs
     pub left_ear: LeftEar,
     pub right_ear: RightEar,
-    pub chest: Color,
+    pub chest: Color<f32>,
     pub left_eye: LeftEye,
     pub right_eye: RightEye,
-    pub left_foot: Color,
-    pub right_foot: Color,
+    pub left_foot: Color<f32>,
+    pub right_foot: Color<f32>,
     pub skull: Skull,
 }
 
