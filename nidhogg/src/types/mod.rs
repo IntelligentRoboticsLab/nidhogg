@@ -46,10 +46,9 @@ pub struct Skull {
 /// ## LED order:
 /// These LEDs are placed in the following order:
 ///
-/// ![Left Ear][earleds]
+/// ![Left Ear](https://cdn.dutchnao.team/nidhogg/hardware_led_left_ear.png)
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[embed_doc_image::embed_doc_image("earleds", "docs/hardware_led_left_ear.png")]
 pub struct LeftEar {
     pub l0: f32,
     pub l1: f32,
@@ -68,10 +67,9 @@ pub struct LeftEar {
 /// ## LED order:
 /// These LEDs are placed in the following order:
 ///
-/// ![Right Ear][earleds]
+/// ![Right Ear](https://cdn.dutchnao.team/nidhogg/hardware_led_right_ear.png)
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[embed_doc_image::embed_doc_image("earleds", "docs/hardware_led_right_ear.png")]
 pub struct RightEar {
     pub r0: f32,
     pub r1: f32,
@@ -89,11 +87,9 @@ pub struct RightEar {
 /// ## LED order:
 /// These LEDs are placed in the following order:
 ///
-/// ![Left Eye][eyeleds]
-/// ![Left Eye Host](https://docs.dutchnao.team/api/attachments.redirect?id=0ef41d4e-f579-4445-b314-ec42f9deed88)
+/// ![Left Eye](https://cdn.dutchnao.team/nidhogg/hardware_led_left_eye.png)
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[embed_doc_image::embed_doc_image("eyeleds", "docs/hardware_led_left_eye.png")]
 pub struct LeftEye {
     pub l0: RgbF32,
     pub l1: RgbF32,
@@ -109,10 +105,9 @@ pub struct LeftEye {
 /// ## LED order:
 /// These LEDs are placed in the following order:
 ///
-/// ![Right Eye][eyeleds]
+/// ![Right Eye](https://cdn.dutchnao.team/nidhogg/hardware_led_right_eye.png)
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[embed_doc_image::embed_doc_image("eyeleds", "docs/hardware_led_right_eye.png")]
 pub struct RightEye {
     pub r0: RgbF32,
     pub r1: RgbF32,

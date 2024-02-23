@@ -60,7 +60,7 @@ macro_rules! impl_consts {
     };
     ($name:ident, $r:expr, $g:expr, $b:expr, u8) => {
         #[doc = concat!("The color ", stringify!($name), " as an 8-bit RGB value.")]
-        pub const $name: Rgb8 = Rgb8 {
+        pub const $name: RgbU8 = RgbU8 {
             red: ($r * 255.0) as u8,
             green: ($g * 255.0) as u8,
             blue: ($b * 255.0) as u8,
@@ -76,7 +76,7 @@ macro_rules! impl_consts {
         }
         #[doc = "A module containing color constants for 8-bit RGB values."]
         pub mod u8 {
-            use super::Rgb8;
+            use super::RgbU8;
             $(
                 impl_consts!{ $name, $r, $g, $b, u8}
             )*
