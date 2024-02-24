@@ -49,6 +49,22 @@ impl From<RgbF32> for RgbU8 {
     }
 }
 
+impl<T> From<Rgb<T>> for [T; 3] {
+    fn from(value: Rgb<T>) -> Self {
+        [value.red, value.green, value.blue]
+    }
+}
+
+impl<T: Copy> From<[T; 3]> for Rgb<T> {
+    fn from(value: [T; 3]) -> Self {
+        Rgb {
+            red: value[0],
+            green: value[1],
+            blue: value[2],
+        }
+    }
+}
+
 macro_rules! impl_consts {
     ($name:ident, $r:expr, $g:expr, $b:expr, f32) => {
         #[doc = concat!("The color ", stringify!($name), " as an f32 RGB value.")]
