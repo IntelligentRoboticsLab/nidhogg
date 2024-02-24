@@ -1,10 +1,10 @@
-//! `LoLA` backend that communicates through the socket at `/tmp/robocup`.  
+//! `LoLA` backend that communicates through the socket at `/tmp/robocup`.
 //!
 
 use crate::{
     types::{
-        Battery, Color, ForceSensitiveResistorFoot, ForceSensitiveResistors, JointArray, LeftEar,
-        LeftEye, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
+        Battery, ForceSensitiveResistorFoot, ForceSensitiveResistors, JointArray, LeftEar, LeftEye,
+        RgbF32, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
     },
     Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
 };
@@ -45,12 +45,12 @@ impl NaoBackend for LolaBackend {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::Color};
+    /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::color};
     ///
     /// let mut nao = LolaBackend::connect().unwrap();
     ///
     /// // First, create a new control message where we set the chest color
-    /// let msg = NaoControlMessage::builder().chest(Color::MAGENTA).build();
+    /// let msg = NaoControlMessage::builder().chest(color::f32::MAGENTA).build();
     ///
     /// // Now we send it to the NAO!
     /// nao.send_control_msg(msg).expect("Failed to write control message to backend!");
@@ -153,16 +153,8 @@ impl<L, N: FromLoLA<L>> IntoNidhogg<N> for L {
 impl FromNidhogg<LeftEar> for [f32; 10] {
     fn from_nidhogg(value: LeftEar) -> Self {
         [
-            value.intensity_0_deg,
-            value.intensity_36_deg,
-            value.intensity_72_deg,
-            value.intensity_108_deg,
-            value.intensity_144_deg,
-            value.intensity_180_deg,
-            value.intensity_216_deg,
-            value.intensity_252_deg,
-            value.intensity_288_deg,
-            value.intensity_324_deg,
+            value.l9, value.l9, value.l8, value.l7, value.l6, value.l5, value.l4, value.l3,
+            value.l2, value.l1,
         ]
     }
 }
@@ -170,22 +162,14 @@ impl FromNidhogg<LeftEar> for [f32; 10] {
 impl FromNidhogg<RightEar> for [f32; 10] {
     fn from_nidhogg(value: RightEar) -> Self {
         [
-            value.intensity_324_deg,
-            value.intensity_288_deg,
-            value.intensity_252_deg,
-            value.intensity_216_deg,
-            value.intensity_180_deg,
-            value.intensity_144_deg,
-            value.intensity_108_deg,
-            value.intensity_72_deg,
-            value.intensity_36_deg,
-            value.intensity_0_deg,
+            value.r9, value.r8, value.r7, value.r6, value.r5, value.r4, value.r3, value.r2,
+            value.r1, value.r0,
         ]
     }
 }
 
-impl FromNidhogg<Color> for [f32; 3] {
-    fn from_nidhogg(value: Color) -> Self {
+impl FromNidhogg<RgbF32> for [f32; 3] {
+    fn from_nidhogg(value: RgbF32) -> Self {
         [value.red, value.green, value.blue]
     }
 }
@@ -193,32 +177,32 @@ impl FromNidhogg<Color> for [f32; 3] {
 impl FromNidhogg<LeftEye> for [f32; 24] {
     fn from_nidhogg(value: LeftEye) -> Self {
         [
-            value.color_45_deg.red,
-            value.color_0_deg.red,
-            value.color_315_deg.red,
-            value.color_270_deg.red,
-            value.color_225_deg.red,
-            value.color_180_deg.red,
-            value.color_135_deg.red,
-            value.color_90_deg.red,
+            value.l7.red,
+            value.l0.red,
+            value.l1.red,
+            value.l2.red,
+            value.l3.red,
+            value.l4.red,
+            value.l5.red,
+            value.l6.red,
             // bad rustfmt
-            value.color_45_deg.green,
-            value.color_0_deg.green,
-            value.color_315_deg.green,
-            value.color_270_deg.green,
-            value.color_225_deg.green,
-            value.color_180_deg.green,
-            value.color_135_deg.green,
-            value.color_90_deg.green,
+            value.l7.green,
+            value.l0.green,
+            value.l1.green,
+            value.l2.green,
+            value.l3.green,
+            value.l4.green,
+            value.l5.green,
+            value.l6.green,
             // bad rustfmt
-            value.color_45_deg.blue,
-            value.color_0_deg.blue,
-            value.color_315_deg.blue,
-            value.color_270_deg.blue,
-            value.color_225_deg.blue,
-            value.color_180_deg.blue,
-            value.color_135_deg.blue,
-            value.color_90_deg.blue,
+            value.l7.blue,
+            value.l0.blue,
+            value.l1.blue,
+            value.l2.blue,
+            value.l3.blue,
+            value.l4.blue,
+            value.l5.blue,
+            value.l6.blue,
         ]
     }
 }
@@ -226,32 +210,32 @@ impl FromNidhogg<LeftEye> for [f32; 24] {
 impl FromNidhogg<RightEye> for [f32; 24] {
     fn from_nidhogg(value: RightEye) -> Self {
         [
-            value.color_0_deg.red,
-            value.color_45_deg.red,
-            value.color_90_deg.red,
-            value.color_135_deg.red,
-            value.color_180_deg.red,
-            value.color_225_deg.red,
-            value.color_270_deg.red,
-            value.color_315_deg.red,
+            value.r0.red,
+            value.r7.red,
+            value.r6.red,
+            value.r5.red,
+            value.r4.red,
+            value.r3.red,
+            value.r2.red,
+            value.r1.red,
             // bad rustfmt
-            value.color_0_deg.green,
-            value.color_45_deg.green,
-            value.color_90_deg.green,
-            value.color_135_deg.green,
-            value.color_180_deg.green,
-            value.color_225_deg.green,
-            value.color_270_deg.green,
-            value.color_315_deg.green,
+            value.r0.green,
+            value.r7.green,
+            value.r6.green,
+            value.r5.green,
+            value.r4.green,
+            value.r3.green,
+            value.r2.green,
+            value.r1.green,
             // bad rustfmt
-            value.color_0_deg.blue,
-            value.color_45_deg.blue,
-            value.color_90_deg.blue,
-            value.color_135_deg.blue,
-            value.color_180_deg.blue,
-            value.color_225_deg.blue,
-            value.color_270_deg.blue,
-            value.color_315_deg.blue,
+            value.r0.blue,
+            value.r7.blue,
+            value.r6.blue,
+            value.r5.blue,
+            value.r4.blue,
+            value.r3.blue,
+            value.r2.blue,
+            value.r1.blue,
         ]
     }
 }

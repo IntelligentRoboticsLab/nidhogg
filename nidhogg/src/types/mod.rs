@@ -6,8 +6,11 @@ use nidhogg_derive::{Builder, Filler};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+pub mod color;
 mod joint_array;
 mod vector;
+
+pub use color::{Rgb, RgbF32, RgbU8};
 pub use joint_array::JointArray;
 pub use vector::{Vector2, Vector3};
 
@@ -17,7 +20,7 @@ pub trait FillExt<T> {
     fn fill(value: T) -> Self;
 }
 
-/// Struct representing the LEDs on top of the NAO robot's head.  
+/// Struct representing the LEDs on top of the NAO robot's head.
 ///
 /// Each value represents the intensity of a white LED.
 #[derive(Builder, Clone, Debug, Default, Filler)]
@@ -42,248 +45,78 @@ pub struct Skull {
 ///
 /// ## LED order:
 /// These LEDs are placed in the following order:
-/// ```text
-///        0
-///    324  36
-///  288     72
-/// 252     108
-///  216  144
-///    180
-/// ```  
+///
+/// ![Left Ear](https://cdn.dutchnao.team/nidhogg/hardware_led_left_ear.png)
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct LeftEar {
-    pub intensity_0_deg: f32,
-    pub intensity_36_deg: f32,
-    pub intensity_72_deg: f32,
-    pub intensity_108_deg: f32,
-    pub intensity_144_deg: f32,
-    pub intensity_180_deg: f32,
-    pub intensity_216_deg: f32,
-    pub intensity_252_deg: f32,
-    pub intensity_288_deg: f32,
-    pub intensity_324_deg: f32,
+    pub l0: f32,
+    pub l1: f32,
+    pub l2: f32,
+    pub l3: f32,
+    pub l4: f32,
+    pub l5: f32,
+    pub l6: f32,
+    pub l7: f32,
+    pub l8: f32,
+    pub l9: f32,
 }
 
 /// Struct representing the LED intensities in the right ear of the robot.
 ///
 /// ## LED order:
 /// These LEDs are placed in the following order:
-/// ```text
-///        0
-///    324  36
-///  288     72
-/// 252     108
-///  216  144
-///    180
-/// ```  
+///
+/// ![Right Ear](https://cdn.dutchnao.team/nidhogg/hardware_led_right_ear.png)
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct RightEar {
-    pub intensity_0_deg: f32,
-    pub intensity_36_deg: f32,
-    pub intensity_72_deg: f32,
-    pub intensity_108_deg: f32,
-    pub intensity_144_deg: f32,
-    pub intensity_180_deg: f32,
-    pub intensity_216_deg: f32,
-    pub intensity_252_deg: f32,
-    pub intensity_288_deg: f32,
-    pub intensity_324_deg: f32,
-}
-
-/// Struct representing an RGB color.
-#[derive(Debug, Default, Clone, Copy, Builder)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Color {
-    pub red: f32,
-    pub green: f32,
-    pub blue: f32,
-}
-
-impl Color {
-    #[must_use]
-    pub fn new(red: f32, green: f32, blue: f32) -> Self {
-        Self { red, green, blue }
-    }
-
-    /// Create a new color from three `u8` values.
-    pub fn new_u8(red: u8, green: u8, blue: u8) -> Self {
-        Self {
-            red: red as f32 / 255.0,
-            green: green as f32 / 255.0,
-            blue: blue as f32 / 255.0,
-        }
-    }
-
-    /// Create a new color from a u32 value.
-    pub fn new_u32(color: u32) -> Self {
-        Color::new_u8(
-            ((color >> 16) & 0xFF) as u8,
-            ((color >> 8) & 0xFF) as u8,
-            (color & 0xFF) as u8,
-        )
-    }
-
-    /// The color blue
-    pub const BLUE: Color = Color {
-        red: 0.0,
-        green: 0.0,
-        blue: 1.0,
-    };
-
-    /// The color cyan
-    pub const CYAN: Color = Color {
-        red: 0.0,
-        green: 1.0,
-        blue: 1.0,
-    };
-
-    /// No color
-    ///
-    /// This color will result in the LEDs being turned off.
-    pub const EMPTY: Color = Color {
-        red: 0.0,
-        green: 0.0,
-        blue: 0.0,
-    };
-
-    /// The color gray
-    pub const GRAY: Color = Color {
-        red: 0.5,
-        green: 0.5,
-        blue: 0.5,
-    };
-
-    /// The color green
-    pub const GREEN: Color = Color {
-        red: 0.0,
-        green: 0.5,
-        blue: 0.0,
-    };
-
-    /// The color lime
-    pub const LIME: Color = Color {
-        red: 0.0,
-        green: 1.0,
-        blue: 0.0,
-    };
-
-    /// The color magenta
-    pub const MAGENTA: Color = Color {
-        red: 1.0,
-        green: 0.0,
-        blue: 1.0,
-    };
-
-    /// The color maroon
-    pub const MAROON: Color = Color {
-        red: 0.5,
-        green: 0.0,
-        blue: 0.0,
-    };
-
-    /// The color navy
-    pub const NAVY: Color = Color {
-        red: 0.0,
-        green: 0.0,
-        blue: 0.5,
-    };
-
-    /// The color olive
-    pub const OLIVE: Color = Color {
-        red: 0.5,
-        green: 0.5,
-        blue: 0.0,
-    };
-
-    /// The color purple
-    pub const PURPLE: Color = Color {
-        red: 0.5,
-        green: 0.0,
-        blue: 0.5,
-    };
-
-    /// The color red
-    pub const RED: Color = Color {
-        red: 1.0,
-        green: 0.0,
-        blue: 0.0,
-    };
-
-    /// The color silver
-    pub const SILVER: Color = Color {
-        red: 0.75,
-        green: 0.75,
-        blue: 0.75,
-    };
-
-    /// The color teal
-    pub const TEAL: Color = Color {
-        red: 0.0,
-        green: 0.5,
-        blue: 0.5,
-    };
-
-    /// The color white
-    pub const WHITE: Color = Color {
-        red: 1.0,
-        green: 1.0,
-        blue: 1.0,
-    };
-
-    /// The color yellow
-    pub const YELLOW: Color = Color {
-        red: 1.0,
-        green: 1.0,
-        blue: 0.0,
-    };
+    pub r0: f32,
+    pub r1: f32,
+    pub r2: f32,
+    pub r3: f32,
+    pub r4: f32,
+    pub r5: f32,
+    pub r6: f32,
+    pub r7: f32,
+    pub r8: f32,
+    pub r9: f32,
 }
 
 /// Struct representing the RGB LEDs in the left eye of the robot.
 /// ## LED order:
 /// These LEDs are placed in the following order:
-/// ```text
-///     0
-///  45    315
-/// 90      270
-///  135   225
-///    180
-/// ```  
+///
+/// ![Left Eye](https://cdn.dutchnao.team/nidhogg/hardware_led_left_eye.png)
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct LeftEye {
-    pub color_0_deg: Color,
-    pub color_45_deg: Color,
-    pub color_90_deg: Color,
-    pub color_135_deg: Color,
-    pub color_180_deg: Color,
-    pub color_225_deg: Color,
-    pub color_270_deg: Color,
-    pub color_315_deg: Color,
+    pub l0: RgbF32,
+    pub l1: RgbF32,
+    pub l2: RgbF32,
+    pub l3: RgbF32,
+    pub l4: RgbF32,
+    pub l5: RgbF32,
+    pub l6: RgbF32,
+    pub l7: RgbF32,
 }
 
 /// Struct representing the RGB LEDs in the left eye of the robot.
 /// ## LED order:
 /// These LEDs are placed in the following order:
-/// ```text
-///     0
-///  45    315
-/// 90      270
-///  135   225
-///    180
-/// ```  
+///
+/// ![Right Eye](https://cdn.dutchnao.team/nidhogg/hardware_led_right_eye.png)
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct RightEye {
-    pub color_0_deg: Color,
-    pub color_45_deg: Color,
-    pub color_90_deg: Color,
-    pub color_135_deg: Color,
-    pub color_180_deg: Color,
-    pub color_225_deg: Color,
-    pub color_270_deg: Color,
-    pub color_315_deg: Color,
+    pub r0: RgbF32,
+    pub r1: RgbF32,
+    pub r2: RgbF32,
+    pub r3: RgbF32,
+    pub r4: RgbF32,
+    pub r5: RgbF32,
+    pub r6: RgbF32,
+    pub r7: RgbF32,
 }
 
 /// Struct representing the battery status of the robot.
@@ -486,7 +319,7 @@ pub struct ArmJoints<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::types::{Color, FillExt, LeftEye};
+    use crate::types::{FillExt, LeftEye, RgbF32};
 
     #[test]
     fn test_average_force_feet() {
@@ -522,7 +355,7 @@ mod tests {
 
     #[test]
     fn test_color_new() {
-        let color = Color::new(0.5, 0.5, 0.5);
+        let color = RgbF32::new(0.5, 0.5, 0.5);
         assert_eq!(color.red, 0.5);
         assert_eq!(color.green, 0.5);
         assert_eq!(color.blue, 0.5);
@@ -530,25 +363,25 @@ mod tests {
 
     #[test]
     fn test_color_new_u8() {
-        let color = Color::new_u8(255, 255, 255);
-        assert_eq!(color.red, 1.0);
-        assert_eq!(color.green, 1.0);
-        assert_eq!(color.blue, 1.0);
+        let color = RgbU8::new(255, 255, 255);
+        assert_eq!(color.red, 255);
+        assert_eq!(color.green, 255);
+        assert_eq!(color.blue, 255);
     }
 
     #[test]
     fn test_color_new_int() {
-        let color = Color::new_u32(0xFFFFFF);
-        assert_eq!(color.red, 1.0);
-        assert_eq!(color.green, 1.0);
-        assert_eq!(color.blue, 1.0);
+        let color = RgbU8::from(0xFFFFFF);
+        assert_eq!(color.red, 255);
+        assert_eq!(color.green, 255);
+        assert_eq!(color.blue, 255);
     }
 
     #[test]
     fn test_color_fill() {
-        let color = LeftEye::fill(Color::new(0.5, 0.5, 0.5));
-        assert_eq!(color.color_0_deg.red, 0.5);
-        assert_eq!(color.color_0_deg.green, 0.5);
-        assert_eq!(color.color_0_deg.blue, 0.5);
+        let color = LeftEye::fill(RgbF32::new(0.5, 0.5, 0.5));
+        assert_eq!(color.l0.red, 0.5);
+        assert_eq!(color.l0.green, 0.5);
+        assert_eq!(color.l0.blue, 0.5);
     }
 }
