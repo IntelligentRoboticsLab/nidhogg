@@ -6,7 +6,7 @@ use crate::{
         Battery, ForceSensitiveResistorFoot, ForceSensitiveResistors, JointArray, LeftEar, LeftEye,
         RgbF32, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
     },
-    Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
+    DisconnectExt, Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
 };
 
 use rmp_serde::{encode, from_slice};
@@ -78,6 +78,25 @@ impl NaoBackend for LolaBackend {
         let mut buf = [0; LOLA_BUFFER_SIZE];
 
         Ok(self.read_lola_nao_state(&mut buf)?.into())
+    }
+}
+
+impl DisconnectExt for LolaBackend {
+    /// Disconnects a NAO backend
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use nidhogg::{NaoBackend, backend::LolaBackend};
+    ///
+    /// // We connect to a real NAO using the `LoLA` backend
+    /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
+    ///
+    /// // Now we can disconnect using the [`DisconnectExt`].
+    /// nao.disconnect().expect("Failed to shutdown connection!");
+    /// ```
+
+    fn disconnect(self) -> Result<()> {
+        Ok(self.0.shutdown(std::net::Shutdown::Both)?)
     }
 }
 
