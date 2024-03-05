@@ -91,7 +91,7 @@ pub trait NaoBackend: Sized {
 
 /// Generic backend extension to support disconnecting.
 pub trait DisconnectExt {
-    /// Connects to a NAO backend
+    /// Disconnects a NAO backend
     ///
     /// # Examples
     /// ```no_run
