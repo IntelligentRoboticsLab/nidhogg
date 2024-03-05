@@ -95,7 +95,7 @@ pub trait DisconnectExt {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, backend::LolaBackend};
+    /// use nidhogg::{DisconnectExt, NaoBackend, backend::LolaBackend};
     ///
     /// // We connect to a real NAO using the LoLA backend
     /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
