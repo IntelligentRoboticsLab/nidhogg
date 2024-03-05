@@ -94,7 +94,6 @@ impl DisconnectExt for LolaBackend {
     /// // Now we can disconnect using the [`DisconnectExt`].
     /// nao.disconnect().expect("Failed to shutdown connection!");
     /// ```
-
     fn disconnect(self) -> Result<()> {
         Ok(self.0.shutdown(std::net::Shutdown::Both)?)
     }
