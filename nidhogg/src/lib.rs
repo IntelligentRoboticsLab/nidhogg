@@ -89,6 +89,23 @@ pub trait NaoBackend: Sized {
     fn read_nao_state(&mut self) -> Result<NaoState>;
 }
 
+/// Generic backend extension to support disconnecting.
+pub trait DisconnectExt {
+    /// Disconnects a NAO backend
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use nidhogg::{DisconnectExt, NaoBackend, backend::LolaBackend};
+    ///
+    /// // We connect to a real NAO using the LoLA backend
+    /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
+    ///
+    /// // Then we disconnect again to release the unix socket.
+    /// nao.disconnect().expect("Could not disconnect from the NAO!");
+    /// ```
+    fn disconnect(self) -> Result<()>;
+}
+
 /// High level representation of the `LoLA` state message.
 #[derive(Debug, Clone, Serialize)]
 pub struct NaoState {
