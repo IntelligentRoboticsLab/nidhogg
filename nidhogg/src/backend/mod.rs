@@ -23,7 +23,7 @@ use crate::{error::Result, HardwareInfo, NaoBackend};
 use tracing::info;
 
 /// Trait that introduces [`ConnectWithRetry::connect_with_retry`] to a type that implements [`NaoBackend`].
-pub trait ConnectWithRetry: NaoBackend + std::fmt::Debug {
+pub trait ConnectWithRetry: NaoBackend {
     /// Connects to a NAO by trying multiple times with an interval in between.
     ///
     /// # Examples
