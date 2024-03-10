@@ -23,7 +23,7 @@ const LOLA_BUFFER_SIZE: usize = 896;
 
 /// `LoLA` backend that communicates with a real NAO V6 through the socket at `/tmp/robocup`
 #[derive(Debug)]
-pub struct LolaBackend(UnixStream);
+pub struct LolaBackend(pub UnixStream);
 
 impl NaoBackend for LolaBackend {
     /// Connects to a NAO backend
