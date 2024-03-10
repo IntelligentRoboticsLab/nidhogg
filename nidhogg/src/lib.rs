@@ -57,7 +57,7 @@ pub trait NaoBackend: Sized {
     /// // We connect to a real NAO using the LoLA backend
     /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
     /// ```
-    fn connect() -> Result<Self>;
+    fn connect(socket_path: Option<&str>) -> Result<Self>;
 
     /// Converts a control message to the format required by the backend and writes it to that backend.
     ///

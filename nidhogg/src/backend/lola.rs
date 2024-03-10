@@ -33,10 +33,16 @@ impl NaoBackend for LolaBackend {
     /// use nidhogg::{NaoBackend, backend::LolaBackend};
     ///
     /// // We connect to a real NAO using the `LoLA` backend
-    /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
+    /// let mut nao = LolaBackend::connect(None).expect("Could not connect to the NAO! 😪");
     /// ```
-    fn connect() -> Result<Self> {
-        let stream = UnixStream::connect(ROBOCUP_SOCKET_PATH).map_err(Error::NoLoLAConnection)?;
+    fn connect(socket_path: Option<&str>) -> Result<Self> {
+        let socket_path = if let Some(path) = socket_path {
+            path
+        } else {
+            ROBOCUP_SOCKET_PATH
+        };
+
+        let stream = UnixStream::connect(socket_path).map_err(Error::NoLoLAConnection)?;
 
         Ok(LolaBackend(stream))
     }
@@ -69,7 +75,7 @@ impl NaoBackend for LolaBackend {
     /// ```no_run
     /// use nidhogg::{NaoBackend, backend::LolaBackend};
     ///
-    /// let mut nao = LolaBackend::connect().unwrap();
+    /// let mut nao = LolaBackend::connect(None).unwrap();
     ///
     /// // Get the current state of the robot
     /// let state = nao.read_nao_state().expect("Failed to retrieve sensor data!");
@@ -89,7 +95,7 @@ impl DisconnectExt for LolaBackend {
     /// use nidhogg::{DisconnectExt, NaoBackend, backend::LolaBackend};
     ///
     /// // We connect to a real NAO using the `LoLA` backend
-    /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
+    /// let mut nao = LolaBackend::connect(None).expect("Could not connect to the NAO! 😪");
     ///
     /// // Now we can disconnect using the [`DisconnectExt`].
     /// nao.disconnect().expect("Failed to shutdown connection!");
