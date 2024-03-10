@@ -36,11 +36,7 @@ impl NaoBackend for LolaBackend {
     /// let mut nao = LolaBackend::connect(None).expect("Could not connect to the NAO! 😪");
     /// ```
     fn connect(socket_path: Option<&str>) -> Result<Self> {
-        let socket_path = if let Some(path) = socket_path {
-            path
-        } else {
-            ROBOCUP_SOCKET_PATH
-        };
+        let socket_path = socket_path.unwrap_or(ROBOCUP_SOCKET_PATH);
 
         let stream = UnixStream::connect(socket_path).map_err(Error::NoLoLAConnection)?;
 
