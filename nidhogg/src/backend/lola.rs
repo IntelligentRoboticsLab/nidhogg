@@ -53,7 +53,7 @@ impl NaoBackend for LolaBackend {
     /// ```no_run
     /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::color};
     ///
-    /// let mut nao = LolaBackend::connect().unwrap();
+    /// let mut nao = LolaBackend::connect(None).unwrap();
     ///
     /// // First, create a new control message where we set the chest color
     /// let msg = NaoControlMessage::builder().chest(color::f32::MAGENTA).build();

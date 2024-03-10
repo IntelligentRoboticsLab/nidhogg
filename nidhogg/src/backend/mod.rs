@@ -73,7 +73,7 @@ pub trait ReadHardwareInfo: NaoBackend {
     /// use nidhogg::{NaoBackend, backend::{LolaBackend, ReadHardwareInfo}};
     /// use std::time::Duration;
     ///
-    /// let mut nao = LolaBackend::connect().unwrap();
+    /// let mut nao = LolaBackend::connect(None).unwrap();
     ///
     /// nao.read_hardware_info().expect("Failed to get hardware info!");
     /// ```

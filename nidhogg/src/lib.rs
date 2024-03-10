@@ -27,7 +27,7 @@
 //! };
 //!
 //! // We use the LoLA backend to connect to a LoLA socket on a real NAO V6.
-//! let mut nao = LolaBackend::connect().unwrap();
+//! let mut nao = LolaBackend::connect(None).unwrap();
 //!
 //! // We can now get the current state of the robot!
 //! let state = nao.read_nao_state().expect("Failed to retrieve sensor data!");
@@ -55,7 +55,7 @@ pub trait NaoBackend: Sized {
     /// use nidhogg::{NaoBackend, backend::LolaBackend};
     ///
     /// // We connect to a real NAO using the LoLA backend
-    /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
+    /// let mut nao = LolaBackend::connect(None).expect("Could not connect to the NAO! 😪");
     /// ```
     fn connect(socket_path: Option<&str>) -> Result<Self>;
 
@@ -65,7 +65,7 @@ pub trait NaoBackend: Sized {
     /// ```no_run
     /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::color};
     ///
-    /// let mut nao = LolaBackend::connect().unwrap();
+    /// let mut nao = LolaBackend::connect(None).unwrap();
     ///
     /// // First, create a new control message where we set the chest color
     /// let msg = NaoControlMessage::builder().chest(color::f32::MAGENTA).build();
@@ -81,7 +81,7 @@ pub trait NaoBackend: Sized {
     /// ```no_run
     /// use nidhogg::{NaoBackend, backend::LolaBackend};
     ///
-    /// let mut nao = LolaBackend::connect().unwrap();
+    /// let mut nao = LolaBackend::connect(None).unwrap();
     ///
     /// // Get the current state of the robot
     /// let state = nao.read_nao_state().expect("Failed to retrieve sensor data!");
@@ -98,7 +98,7 @@ pub trait DisconnectExt {
     /// use nidhogg::{DisconnectExt, NaoBackend, backend::LolaBackend};
     ///
     /// // We connect to a real NAO using the LoLA backend
-    /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
+    /// let mut nao = LolaBackend::connect(None).expect("Could not connect to the NAO! 😪");
     ///
     /// // Then we disconnect again to release the unix socket.
     /// nao.disconnect().expect("Could not disconnect from the NAO!");
