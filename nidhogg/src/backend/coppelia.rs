@@ -10,7 +10,7 @@ pub struct CoppeliaBackend {
 }
 
 impl NaoBackend for CoppeliaBackend {
-    fn connect() -> Result<Self> {
+    fn connect(socket_path: Option<&str>) -> Result<Self> {
         let client = RemoteApiClient::new(RemoteApiClientParams {
             host: "localhost".to_string(),
             ..RemoteApiClientParams::default()
