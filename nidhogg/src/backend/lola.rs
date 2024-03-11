@@ -503,9 +503,9 @@ impl From<LolaNaoState<'_>> for HardwareInfo {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
-struct LolaControlMsg {
+pub struct LolaControlMsg {
     position: [f32; 25],
     stiffness: [f32; 25],
     r_ear: [f32; 10],
