@@ -677,17 +677,17 @@ impl FromLoLA<[f32; 24]> for LeftEye {
 impl FromLoLA<[f32; 24]> for RightEye {
     fn from_lola(value: [f32; 24]) -> RightEye {
         let [
-            r7_r, 
-            r6_r, 
-            r5_r, 
-            r4_r, 
-            r3_r, 
+            r7_r,
+            r6_r,
+            r5_r,
+            r4_r,
+            r3_r,
             r2_r,
-            r1_r, 
-            r0_r, 
-            r7_g, 
-            r6_g, 
-            r5_g, 
+            r1_r,
+            r0_r,
+            r7_g,
+            r6_g,
+            r5_g,
             r4_g,
             r3_g,
             r2_g,
@@ -767,6 +767,19 @@ impl FromLoLA<[f32; 12]> for Skull {
             // bad rustfmt
         ] = value;
 
-        Skull { left_front_0, left_front_1, left_middle_0, left_rear_0, left_rear_1, left_rear_2, right_front_0, right_front_1, right_middle_0, right_rear_0, right_rear_1, right_rear_2 }
+        Skull {
+            left_front_0,
+            left_front_1,
+            left_middle_0,
+            left_rear_0,
+            left_rear_1,
+            left_rear_2,
+            right_front_0,
+            right_front_1,
+            right_middle_0,
+            right_rear_0,
+            right_rear_1,
+            right_rear_2,
+        }
     }
 }
