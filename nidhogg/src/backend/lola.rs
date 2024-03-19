@@ -21,12 +21,15 @@ use super::{ConnectWithRetry, ReadHardwareInfo};
 const ROBOCUP_SOCKET_PATH: &str = "/tmp/robocup";
 const LOLA_BUFFER_SIZE: usize = 896;
 
-/// `LoLA` backend that communicates with a real NAO V6 through the socket at `/tmp/robocup`
+/// `LoLA` backend that communicates with a real NAO V6 through a provided socket
 #[derive(Debug)]
 pub struct LolaBackend(pub UnixStream);
 
 impl NaoBackend for LolaBackend {
-    /// Connects to a NAO backend
+    /// Connects to a NAO backend.
+    ///
+    /// If the provided `socket_path` is `None`, the default LoLA socket path
+    /// `/tmp/robocup` is used.
     ///
     /// # Examples
     /// ```no_run
