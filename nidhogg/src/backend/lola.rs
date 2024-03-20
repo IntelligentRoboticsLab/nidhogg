@@ -12,7 +12,7 @@ use crate::{
 use rmp_serde::{encode, from_slice};
 use serde::{Deserialize, Serialize};
 use std::{
-    io::{BufWriter, Read},
+    io::{BufWriter, Read, Write},
     os::unix::net::UnixStream,
 };
 
@@ -23,7 +23,7 @@ const LOLA_BUFFER_SIZE: usize = 896;
 
 /// `LoLA` backend that communicates with a real NAO V6 through a provided socket
 #[derive(Debug)]
-pub struct LolaBackend(pub UnixStream);
+pub struct LolaBackend(UnixStream);
 
 impl NaoBackend for LolaBackend {
     /// Connects to a NAO backend.
@@ -122,6 +122,22 @@ impl LolaBackend {
     ) -> Result<LolaNaoState<'a>> {
         self.0.read_exact(buf)?;
         from_slice::<LolaNaoState<'_>>(buf).map_err(Error::MsgPackDecodeError)
+    }
+}
+
+impl Read for LolaBackend {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        self.0.read(buf)
+    }
+}
+
+impl Write for LolaBackend {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        self.0.write(buf)
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        self.0.flush()
     }
 }
 
