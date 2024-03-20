@@ -74,9 +74,7 @@ impl NaoBackend for LolaBackend {
     /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
     /// ```
     fn connect() -> Result<Self> {
-        let stream = UnixStream::connect(ROBOCUP_SOCKET_PATH).map_err(Error::NoLoLAConnection)?;
-
-        Ok(LolaBackend(stream))
+        Self::connect_with_path(ROBOCUP_SOCKET_PATH)
     }
 
     /// Converts a control message to the format required by the backend and writes it to that backend.
