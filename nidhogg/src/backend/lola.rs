@@ -4,7 +4,7 @@
 use crate::{
     types::{
         Battery, ForceSensitiveResistorFoot, ForceSensitiveResistors, JointArray, LeftEar, LeftEye,
-        RgbF32, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
+        Rgb, RgbF32, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
     },
     DisconnectExt, Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
 };
@@ -12,11 +12,15 @@ use crate::{
 use rmp_serde::{encode, from_slice};
 use serde::{Deserialize, Serialize};
 use std::{
-    io::{BufWriter, Read},
+    io::{BufWriter, Read, Write},
     os::unix::net::UnixStream,
+    time::Duration,
 };
 
 use super::{ConnectWithRetry, ReadHardwareInfo};
+use std::any::type_name;
+use std::thread;
+use tracing::info;
 
 const ROBOCUP_SOCKET_PATH: &str = "/tmp/robocup";
 const LOLA_BUFFER_SIZE: usize = 896;
@@ -24,6 +28,40 @@ const LOLA_BUFFER_SIZE: usize = 896;
 /// `LoLA` backend that communicates with a real NAO V6 through the socket at `/tmp/robocup`
 #[derive(Debug)]
 pub struct LolaBackend(UnixStream);
+
+impl LolaBackend {
+    fn connect_with_path(socket_path: &str) -> Result<Self> {
+        let stream = UnixStream::connect(socket_path).map_err(Error::NoLoLAConnection)?;
+
+        Ok(LolaBackend(stream))
+    }
+
+    pub fn connect_with_path_with_retry(
+        retry_count: u32,
+        retry_interval: Duration,
+        socket_path: &str,
+    ) -> Result<Self> {
+        for i in 0..=retry_count {
+            info!(
+                "[{}/{}] Connecting to {}",
+                i,
+                retry_count,
+                type_name::<Self>()
+            );
+
+            let maybe_backend = Self::connect_with_path(socket_path);
+
+            // We connected or this was the last try
+            if maybe_backend.is_ok() || i == retry_count {
+                return maybe_backend;
+            }
+
+            thread::sleep(retry_interval);
+        }
+
+        unreachable!()
+    }
+}
 
 impl NaoBackend for LolaBackend {
     /// Connects to a NAO backend
@@ -36,9 +74,7 @@ impl NaoBackend for LolaBackend {
     /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
     /// ```
     fn connect() -> Result<Self> {
-        let stream = UnixStream::connect(ROBOCUP_SOCKET_PATH).map_err(Error::NoLoLAConnection)?;
-
-        Ok(LolaBackend(stream))
+        Self::connect_with_path(ROBOCUP_SOCKET_PATH)
     }
 
     /// Converts a control message to the format required by the backend and writes it to that backend.
@@ -120,6 +156,22 @@ impl LolaBackend {
     }
 }
 
+impl Read for LolaBackend {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        self.0.read(buf)
+    }
+}
+
+impl Write for LolaBackend {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        self.0.write(buf)
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        self.0.flush()
+    }
+}
+
 /// A trait that provides conversions from nidhogg data to `LoLA` data
 ///
 /// ## 🗒️ Note:
@@ -171,8 +223,8 @@ impl<L, N: FromLoLA<L>> IntoNidhogg<N> for L {
 impl FromNidhogg<LeftEar> for [f32; 10] {
     fn from_nidhogg(value: LeftEar) -> Self {
         [
-            value.l9, value.l9, value.l8, value.l7, value.l6, value.l5, value.l4, value.l3,
-            value.l2, value.l1,
+            value.l0, value.l1, value.l2, value.l3, value.l4, value.l5, value.l6, value.l7,
+            value.l8, value.l9,
         ]
     }
 }
@@ -501,9 +553,9 @@ impl From<LolaNaoState<'_>> for HardwareInfo {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
-struct LolaControlMsg {
+pub struct LolaControlMsg {
     position: [f32; 25],
     stiffness: [f32; 25],
     r_ear: [f32; 10],
@@ -531,6 +583,253 @@ impl From<NaoControlMessage> for LolaControlMsg {
             r_foot: value.right_foot.into_lola(),
             skull: value.skull.into_lola(),
             sonar: value.sonar.into_lola(),
+        }
+    }
+}
+
+impl From<LolaControlMsg> for NaoControlMessage {
+    fn from(value: LolaControlMsg) -> Self {
+        Self {
+            position: value.position.into_nidhogg(),
+            stiffness: value.stiffness.into_nidhogg(),
+            right_ear: value.r_ear.into_nidhogg(),
+            left_ear: value.l_ear.into_nidhogg(),
+            chest: value.chest.into_nidhogg(),
+            left_eye: value.l_eye.into_nidhogg(),
+            right_eye: value.r_eye.into_nidhogg(),
+            left_foot: value.l_foot.into_nidhogg(),
+            right_foot: value.r_foot.into_nidhogg(),
+            skull: value.skull.into_nidhogg(),
+            sonar: value.sonar.into_nidhogg(),
+        }
+    }
+}
+
+impl FromLoLA<[f32; 10]> for LeftEar {
+    fn from_lola(value: [f32; 10]) -> LeftEar {
+        LeftEar {
+            l0: value[0],
+            l1: value[1],
+            l2: value[2],
+            l3: value[3],
+            l4: value[4],
+            l5: value[5],
+            l6: value[6],
+            l7: value[7],
+            l8: value[8],
+            l9: value[9],
+        }
+    }
+}
+
+impl FromLoLA<[f32; 10]> for RightEar {
+    fn from_lola(value: [f32; 10]) -> RightEar {
+        RightEar {
+            r0: value[9],
+            r1: value[8],
+            r2: value[7],
+            r3: value[6],
+            r4: value[5],
+            r5: value[4],
+            r6: value[3],
+            r7: value[2],
+            r8: value[1],
+            r9: value[0],
+        }
+    }
+}
+
+impl FromLoLA<[f32; 3]> for Rgb<f32> {
+    fn from_lola(value: [f32; 3]) -> Self {
+        Rgb {
+            red: value[0],
+            green: value[1],
+            blue: value[2],
+        }
+    }
+}
+
+impl FromLoLA<[f32; 24]> for LeftEye {
+    fn from_lola(value: [f32; 24]) -> LeftEye {
+        let [
+            l7_r,
+            l0_r,
+            l1_r,
+            l2_r,
+            l3_r,
+            l4_r,
+            l5_r,
+            l6_r,
+            l7_g,
+            l0_g,
+            l1_g,
+            l2_g,
+            l3_g,
+            l4_g,
+            l5_g,
+            l6_g,
+            l7_b,
+            l0_b,
+            l1_b,
+            l2_b,
+            l3_b,
+            l4_b,
+            l5_b,
+            l6_b,
+            // bad rustfmt
+        ] = value;
+
+        LeftEye {
+            l0: Rgb {
+                red: l0_r,
+                green: l0_g,
+                blue: l0_b,
+            },
+            l1: Rgb {
+                red: l1_r,
+                green: l1_g,
+                blue: l1_b,
+            },
+            l2: Rgb {
+                red: l2_r,
+                green: l2_g,
+                blue: l2_b,
+            },
+            l3: Rgb {
+                red: l3_r,
+                green: l3_g,
+                blue: l3_b,
+            },
+            l4: Rgb {
+                red: l4_r,
+                green: l4_g,
+                blue: l4_b,
+            },
+            l5: Rgb {
+                red: l5_r,
+                green: l5_g,
+                blue: l5_b,
+            },
+            l6: Rgb {
+                red: l6_r,
+                green: l6_g,
+                blue: l6_b,
+            },
+            l7: Rgb {
+                red: l7_r,
+                green: l7_g,
+                blue: l7_b,
+            },
+        }
+    }
+}
+
+impl FromLoLA<[f32; 24]> for RightEye {
+    fn from_lola(value: [f32; 24]) -> RightEye {
+        let [
+            r7_r,
+            r6_r,
+            r5_r,
+            r4_r,
+            r3_r,
+            r2_r,
+            r1_r,
+            r0_r,
+            r7_g,
+            r6_g,
+            r5_g,
+            r4_g,
+            r3_g,
+            r2_g,
+            r1_g,
+            r0_g,
+            r7_b,
+            r6_b,
+            r5_b,
+            r4_b,
+            r3_b,
+            r2_b,
+            r1_b,
+            r0_b
+            // bad rustfmt
+        ] = value;
+
+        RightEye {
+            r0: Rgb {
+                red: r0_r,
+                green: r0_g,
+                blue: r0_b,
+            },
+            r1: Rgb {
+                red: r1_r,
+                green: r1_g,
+                blue: r1_b,
+            },
+            r2: Rgb {
+                red: r2_r,
+                green: r2_g,
+                blue: r2_b,
+            },
+            r3: Rgb {
+                red: r3_r,
+                green: r3_g,
+                blue: r3_b,
+            },
+            r4: Rgb {
+                red: r4_r,
+                green: r4_g,
+                blue: r4_b,
+            },
+            r5: Rgb {
+                red: r5_r,
+                green: r5_g,
+                blue: r5_b,
+            },
+            r6: Rgb {
+                red: r6_r,
+                green: r6_g,
+                blue: r6_b,
+            },
+            r7: Rgb {
+                red: r7_r,
+                green: r7_g,
+                blue: r7_b,
+            },
+        }
+    }
+}
+
+impl FromLoLA<[f32; 12]> for Skull {
+    fn from_lola(value: [f32; 12]) -> Skull {
+        let [
+            left_front_1,
+            left_front_0,
+            left_middle_0,
+            left_rear_0,
+            left_rear_1,
+            left_rear_2,
+            right_rear_2,
+            right_rear_1,
+            right_rear_0,
+            right_middle_0,
+            right_front_0,
+            right_front_1,
+            // bad rustfmt
+        ] = value;
+
+        Skull {
+            left_front_0,
+            left_front_1,
+            left_middle_0,
+            left_rear_0,
+            left_rear_1,
+            left_rear_2,
+            right_front_0,
+            right_front_1,
+            right_middle_0,
+            right_rear_0,
+            right_rear_1,
+            right_rear_2,
         }
     }
 }

@@ -11,6 +11,7 @@ pub use coppelia::CoppeliaBackend;
 
 #[cfg(feature = "lola")]
 mod lola;
+pub use lola::LolaControlMsg;
 
 #[cfg(feature = "lola")]
 pub use lola::LolaBackend;
