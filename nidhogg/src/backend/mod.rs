@@ -33,14 +33,10 @@ pub trait ConnectWithRetry: NaoBackend {
     /// use std::time::Duration;
     ///
     /// // Try to connect, potentially retrying 10 times, with a 1 second interval
-    /// let mut nao = LolaBackend::connect_with_retry(10, Duration::from_secs(1), None)
+    /// let mut nao = LolaBackend::connect_with_retry(10, Duration::from_secs(1))
     ///     .expect("Could not connect to the NAO! 😪");
     /// ```
-    fn connect_with_retry(
-        retry_count: u32,
-        retry_interval: Duration,
-        socket_path: Option<&str>,
-    ) -> Result<Self> {
+    fn connect_with_retry(retry_count: u32, retry_interval: Duration) -> Result<Self> {
         for i in 0..=retry_count {
             info!(
                 "[{}/{}] Connecting to {}",
@@ -49,7 +45,7 @@ pub trait ConnectWithRetry: NaoBackend {
                 type_name::<Self>()
             );
 
-            let maybe_backend = Self::connect(socket_path);
+            let maybe_backend = Self::connect();
 
             // We connected or this was the last try
             if maybe_backend.is_ok() || i == retry_count {
@@ -74,7 +70,7 @@ pub trait ReadHardwareInfo: NaoBackend {
     /// use nidhogg::{NaoBackend, backend::{LolaBackend, ReadHardwareInfo}};
     /// use std::time::Duration;
     ///
-    /// let mut nao = LolaBackend::connect(None).unwrap();
+    /// let mut nao = LolaBackend::connect().unwrap();
     ///
     /// nao.read_hardware_info().expect("Failed to get hardware info!");
     /// ```

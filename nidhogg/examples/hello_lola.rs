@@ -11,7 +11,7 @@ use miette::Result;
 fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
 
-    let mut nao = LolaBackend::connect_with_retry(10, Duration::from_millis(500), None)?;
+    let mut nao = LolaBackend::connect_with_retry(10, Duration::from_millis(500))?;
 
     let state = nao.read_nao_state()?;
     let hw_info = nao.read_hardware_info()?;
