@@ -25,7 +25,7 @@ use tracing::info;
 const ROBOCUP_SOCKET_PATH: &str = "/tmp/robocup";
 const LOLA_BUFFER_SIZE: usize = 896;
 
-/// `LoLA` backend that communicates with a real NAO V6 through a provided socket
+/// `LoLA` backend that communicates with a real NAO V6 through the socket at `/tmp/robocup`
 #[derive(Debug)]
 pub struct LolaBackend(UnixStream);
 
@@ -64,10 +64,7 @@ impl LolaBackend {
 }
 
 impl NaoBackend for LolaBackend {
-    /// Connects to a NAO backend.
-    ///
-    /// If the provided `socket_path` is `None`, the default LoLA socket path
-    /// `/tmp/robocup` is used.
+    /// Connects to a NAO backend
     ///
     /// # Examples
     /// ```no_run
