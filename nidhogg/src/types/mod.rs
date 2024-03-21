@@ -316,6 +316,15 @@ pub struct ArmJoints<T> {
     pub right_arm: SingleArmJoints<T>,
 }
 
+impl<T: Clone> FillExt<T> for ArmJoints<T> {
+    fn fill(value: T) -> ArmJoints<T> {
+        ArmJoints {
+            left_arm: LeftArmJoints::fill(value.clone()),
+            right_arm: RightArmJoints::fill(value.clone()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
