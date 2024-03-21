@@ -42,8 +42,8 @@ pub use error::{Error, Result};
 use nidhogg_derive::Builder;
 use serde::Serialize;
 use types::{
-    color::RgbF32, Battery, ForceSensitiveResistors, JointArray, LeftEar, LeftEye, RightEar,
-    RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
+    color::RgbF32, Battery, FillExt, ForceSensitiveResistors, JointArray, LeftEar, LeftEye,
+    RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
 };
 
 /// Generic backend trait used for implementing a NAO interface.
@@ -153,7 +153,7 @@ pub struct NaoState {
 }
 
 /// High level representation of the `LoLA` update message.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug)]
 pub struct NaoControlMessage {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
@@ -171,6 +171,24 @@ pub struct NaoControlMessage {
     pub left_foot: RgbF32,
     pub right_foot: RgbF32,
     pub skull: Skull,
+}
+
+impl Default for NaoControlMessage {
+    fn default() -> Self {
+        Self {
+            position: JointArray::fill(-1.0),
+            stiffness: JointArray::default(),
+            sonar: SonarEnabled::default(),
+            left_ear: LeftEar::default(),
+            right_ear: RightEar::default(),
+            chest: RgbF32::default(),
+            left_eye: LeftEye::default(),
+            right_eye: RightEye::default(),
+            left_foot: RgbF32::default(),
+            right_foot: RgbF32::default(),
+            skull: Skull::default(),
+        }
+    }
 }
 
 /// Struct containing the hardware identifiers for the NAO V6 robot.
