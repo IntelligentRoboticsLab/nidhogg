@@ -342,7 +342,7 @@ impl<T: Clone> FillExt<T> for JointArray<T> {
 
 impl<T> JointArrayBuilder<T> {
     /// Set all the joint values to the corresponding values from the provided [`JointArray`].
-    pub fn joints(mut self, joints: JointArray<T>) {
+    pub fn joints(mut self, joints: JointArray<T>) -> Self {
         self.head_pitch = Some(joints.head_pitch);
         self.head_yaw = Some(joints.head_yaw);
 
@@ -372,6 +372,8 @@ impl<T> JointArrayBuilder<T> {
         self.right_elbow_roll = Some(joints.right_elbow_roll);
         self.right_wrist_yaw = Some(joints.right_wrist_yaw);
         self.right_hand = Some(joints.right_hand);
+
+        self
     }
 
     /// Set the `head_pitch` and `head_yaw` values to the corresponding values from the provided [`HeadJoints`].
