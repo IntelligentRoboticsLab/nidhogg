@@ -252,6 +252,22 @@ impl<'a, T> From<&'a mut JointArray<T>> for JointArray<&'a mut T> {
 }
 
 impl<T: Clone> JointArray<T> {
+    /// Retrieves leg joints for both left and right legs.
+    pub fn leg_joints(&self) -> LegJoints<T> {
+        LegJoints {
+            left_leg: self.left_leg_joints(),
+            right_leg: self.right_leg_joints(),
+        }
+    }
+
+    /// Retrieves arm joints for both left and right arms.
+    pub fn arm_joints(&self) -> ArmJoints<T> {
+        ArmJoints {
+            left_arm: self.left_arm_joints(),
+            right_arm: self.right_arm_joints(),
+        }
+    }
+
     /// Retrieves the left leg joints.
     pub fn left_leg_joints(&self) -> LeftLegJoints<T> {
         LeftLegJoints {
