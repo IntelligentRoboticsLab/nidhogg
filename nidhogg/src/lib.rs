@@ -16,7 +16,7 @@
 //! | `LoLA` | ✅ | `lola` |
 //! | `CoppeliaSim` | 🚧 | `coppelia` |
 //!
-//! ✅: Fully supported!  
+//! ✅: Fully supported!
 //! 🚧: Work in progress
 //!
 //! # Example
@@ -42,8 +42,8 @@ pub use error::{Error, Result};
 use nidhogg_derive::Builder;
 use serde::Serialize;
 use types::{
-    Battery, Color, ForceSensitiveResistors, JointArray, LeftEar, LeftEye, RightEar, RightEye,
-    Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
+    color::RgbF32, Battery, FillExt, ForceSensitiveResistors, JointArray, LeftEar, LeftEye,
+    RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
 };
 
 /// Generic backend trait used for implementing a NAO interface.
@@ -63,12 +63,12 @@ pub trait NaoBackend: Sized {
     ///
     /// # Examples
     /// ```no_run
-    /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::Color};
+    /// use nidhogg::{NaoBackend, NaoControlMessage, backend::LolaBackend, types::color};
     ///
     /// let mut nao = LolaBackend::connect().unwrap();
     ///
     /// // First, create a new control message where we set the chest color
-    /// let msg = NaoControlMessage::builder().chest(Color::MAGENTA).build();
+    /// let msg = NaoControlMessage::builder().chest(color::f32::MAGENTA).build();
     ///
     /// // Now we send it to the NAO!
     /// nao.send_control_msg(msg).expect("Failed to write control message to backend!");
@@ -87,6 +87,23 @@ pub trait NaoBackend: Sized {
     /// let state = nao.read_nao_state().expect("Failed to retrieve sensor data!");
     /// ```
     fn read_nao_state(&mut self) -> Result<NaoState>;
+}
+
+/// Generic backend extension to support disconnecting.
+pub trait DisconnectExt {
+    /// Disconnects a NAO backend
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use nidhogg::{DisconnectExt, NaoBackend, backend::LolaBackend};
+    ///
+    /// // We connect to a real NAO using the LoLA backend
+    /// let mut nao = LolaBackend::connect().expect("Could not connect to the NAO! 😪");
+    ///
+    /// // Then we disconnect again to release the unix socket.
+    /// nao.disconnect().expect("Could not disconnect from the NAO!");
+    /// ```
+    fn disconnect(self) -> Result<()>;
 }
 
 /// High level representation of the `LoLA` state message.
@@ -136,7 +153,7 @@ pub struct NaoState {
 }
 
 /// High level representation of the `LoLA` update message.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug)]
 pub struct NaoControlMessage {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
@@ -148,12 +165,30 @@ pub struct NaoControlMessage {
     // LEDs
     pub left_ear: LeftEar,
     pub right_ear: RightEar,
-    pub chest: Color,
+    pub chest: RgbF32,
     pub left_eye: LeftEye,
     pub right_eye: RightEye,
-    pub left_foot: Color,
-    pub right_foot: Color,
+    pub left_foot: RgbF32,
+    pub right_foot: RgbF32,
     pub skull: Skull,
+}
+
+impl Default for NaoControlMessage {
+    fn default() -> Self {
+        Self {
+            position: JointArray::fill(-1.0),
+            stiffness: JointArray::default(),
+            sonar: SonarEnabled::default(),
+            left_ear: LeftEar::default(),
+            right_ear: RightEar::default(),
+            chest: RgbF32::default(),
+            left_eye: LeftEye::default(),
+            right_eye: RightEye::default(),
+            left_foot: RgbF32::default(),
+            right_foot: RgbF32::default(),
+            skull: Skull::default(),
+        }
+    }
 }
 
 /// Struct containing the hardware identifiers for the NAO V6 robot.

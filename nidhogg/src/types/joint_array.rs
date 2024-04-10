@@ -1,10 +1,13 @@
 //! Implements [`JointArray`] type and associated functions, for manipulating joint values.
 
+use std::ops::Sub;
+
 use crate::types::{
     ArmJoints, FillExt, HeadJoints, LeftArmJoints, LeftLegJoints, LegJoints, RightArmJoints,
     RightLegJoints,
 };
 use nidhogg_derive::Builder;
+use num::Signed;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -89,61 +92,6 @@ pub struct JointArray<T> {
 }
 
 impl<T> JointArray<T> {
-    /// Retrieves the left leg joints.
-    pub fn left_leg_joints(&self) -> LeftLegJoints<&T> {
-        LeftLegJoints {
-            hip_yaw_pitch: &self.left_hip_yaw_pitch,
-            hip_roll: &self.left_hip_roll,
-            hip_pitch: &self.left_hip_pitch,
-            knee_pitch: &self.left_knee_pitch,
-            ankle_pitch: &self.left_ankle_pitch,
-            ankle_roll: &self.left_ankle_roll,
-        }
-    }
-
-    /// Retrieves the left arm joints.
-    pub fn left_arm_joints(&self) -> LeftArmJoints<&T> {
-        LeftArmJoints {
-            shoulder_pitch: &self.left_shoulder_pitch,
-            shoulder_roll: &self.left_shoulder_roll,
-            elbow_yaw: &self.left_elbow_yaw,
-            elbow_roll: &self.left_elbow_roll,
-            wrist_yaw: &self.left_wrist_yaw,
-            hand: &self.left_hand,
-        }
-    }
-
-    /// Retrieves the right leg joints.
-    pub fn right_leg_joints(&self) -> RightLegJoints<&T> {
-        RightLegJoints {
-            hip_roll: &self.right_hip_roll,
-            hip_pitch: &self.right_hip_pitch,
-            knee_pitch: &self.right_knee_pitch,
-            ankle_pitch: &self.right_ankle_pitch,
-            ankle_roll: &self.right_ankle_roll,
-        }
-    }
-
-    /// Retrieves the right arm joints.
-    pub fn right_arm_joints(&self) -> RightArmJoints<&T> {
-        RightArmJoints {
-            shoulder_pitch: &self.right_shoulder_pitch,
-            shoulder_roll: &self.right_shoulder_roll,
-            elbow_yaw: &self.right_elbow_yaw,
-            elbow_roll: &self.right_elbow_roll,
-            wrist_yaw: &self.right_wrist_yaw,
-            hand: &self.right_hand,
-        }
-    }
-
-    /// Retrieves the head joints.
-    pub fn head_joints(&self) -> HeadJoints<&T> {
-        HeadJoints {
-            yaw: &self.head_yaw,
-            pitch: &self.head_pitch,
-        }
-    }
-
     /// Transforms each element in the [`JointArray`] using the provided closure `f`,
     /// producing a new [`JointArray`] with the transformed values.
     ///
@@ -298,6 +246,162 @@ impl<T> JointArray<T> {
             || t.left_hand
             || t.right_hand
     }
+
+    pub fn diff(&self, other: JointArray<T>) -> JointArray<T>
+    where
+        T: Sub<Output = T> + Signed + Clone,
+    {
+        let diff_array = self
+            .clone()
+            .zip(other.clone())
+            .map(|(curr, target)| (curr - target).abs());
+
+        diff_array
+    }
+
+    pub fn as_ref(&self) -> JointArray<&T> {
+        JointArray {
+            head_yaw: &self.head_yaw,
+            head_pitch: &self.head_pitch,
+            left_shoulder_pitch: &self.left_shoulder_pitch,
+            left_shoulder_roll: &self.left_shoulder_roll,
+            left_elbow_yaw: &self.left_elbow_yaw,
+            left_elbow_roll: &self.left_elbow_roll,
+            left_wrist_yaw: &self.left_wrist_yaw,
+            left_hip_yaw_pitch: &self.left_hip_yaw_pitch,
+            left_hip_roll: &self.left_hip_roll,
+            left_hip_pitch: &self.left_hip_pitch,
+            left_knee_pitch: &self.left_knee_pitch,
+            left_ankle_pitch: &self.left_ankle_pitch,
+            left_ankle_roll: &self.left_ankle_roll,
+            right_shoulder_pitch: &self.right_shoulder_pitch,
+            right_shoulder_roll: &self.right_shoulder_roll,
+            right_elbow_yaw: &self.right_elbow_yaw,
+            right_elbow_roll: &self.right_elbow_roll,
+            right_wrist_yaw: &self.right_wrist_yaw,
+            right_hip_roll: &self.right_hip_roll,
+            right_hip_pitch: &self.right_hip_pitch,
+            right_knee_pitch: &self.right_knee_pitch,
+            right_ankle_pitch: &self.right_ankle_pitch,
+            right_ankle_roll: &self.right_ankle_roll,
+            left_hand: &self.left_hand,
+            right_hand: &self.right_hand,
+        }
+    }
+    pub fn as_mut(&mut self) -> JointArray<&mut T> {
+        JointArray {
+            head_yaw: &mut self.head_yaw,
+            head_pitch: &mut self.head_pitch,
+            left_shoulder_pitch: &mut self.left_shoulder_pitch,
+            left_shoulder_roll: &mut self.left_shoulder_roll,
+            left_elbow_yaw: &mut self.left_elbow_yaw,
+            left_elbow_roll: &mut self.left_elbow_roll,
+            left_wrist_yaw: &mut self.left_wrist_yaw,
+            left_hip_yaw_pitch: &mut self.left_hip_yaw_pitch,
+            left_hip_roll: &mut self.left_hip_roll,
+            left_hip_pitch: &mut self.left_hip_pitch,
+            left_knee_pitch: &mut self.left_knee_pitch,
+            left_ankle_pitch: &mut self.left_ankle_pitch,
+            left_ankle_roll: &mut self.left_ankle_roll,
+            right_shoulder_pitch: &mut self.right_shoulder_pitch,
+            right_shoulder_roll: &mut self.right_shoulder_roll,
+            right_elbow_yaw: &mut self.right_elbow_yaw,
+            right_elbow_roll: &mut self.right_elbow_roll,
+            right_wrist_yaw: &mut self.right_wrist_yaw,
+            right_hip_roll: &mut self.right_hip_roll,
+            right_hip_pitch: &mut self.right_hip_pitch,
+            right_knee_pitch: &mut self.right_knee_pitch,
+            right_ankle_pitch: &mut self.right_ankle_pitch,
+            right_ankle_roll: &mut self.right_ankle_roll,
+            left_hand: &mut self.left_hand,
+            right_hand: &mut self.right_hand,
+        }
+    }
+}
+
+impl<'a, T> From<&'a JointArray<T>> for JointArray<&'a T> {
+    fn from(value: &'a JointArray<T>) -> Self {
+        value.as_ref()
+    }
+}
+
+impl<'a, T> From<&'a mut JointArray<T>> for JointArray<&'a mut T> {
+    fn from(value: &'a mut JointArray<T>) -> Self {
+        value.as_mut()
+    }
+}
+
+impl<T: Clone> JointArray<T> {
+    /// Retrieves leg joints for both left and right legs.
+    pub fn leg_joints(&self) -> LegJoints<T> {
+        LegJoints {
+            left_leg: self.left_leg_joints(),
+            right_leg: self.right_leg_joints(),
+        }
+    }
+
+    /// Retrieves arm joints for both left and right arms.
+    pub fn arm_joints(&self) -> ArmJoints<T> {
+        ArmJoints {
+            left_arm: self.left_arm_joints(),
+            right_arm: self.right_arm_joints(),
+        }
+    }
+
+    /// Retrieves the left leg joints.
+    pub fn left_leg_joints(&self) -> LeftLegJoints<T> {
+        LeftLegJoints {
+            hip_yaw_pitch: self.left_hip_yaw_pitch.clone(),
+            hip_roll: self.left_hip_roll.clone(),
+            hip_pitch: self.left_hip_pitch.clone(),
+            knee_pitch: self.left_knee_pitch.clone(),
+            ankle_pitch: self.left_ankle_pitch.clone(),
+            ankle_roll: self.left_ankle_roll.clone(),
+        }
+    }
+
+    /// Retrieves the left arm joints.
+    pub fn left_arm_joints(&self) -> LeftArmJoints<T> {
+        LeftArmJoints {
+            shoulder_pitch: self.left_shoulder_pitch.clone(),
+            shoulder_roll: self.left_shoulder_roll.clone(),
+            elbow_yaw: self.left_elbow_yaw.clone(),
+            elbow_roll: self.left_elbow_roll.clone(),
+            wrist_yaw: self.left_wrist_yaw.clone(),
+            hand: self.left_hand.clone(),
+        }
+    }
+
+    /// Retrieves the right leg joints.
+    pub fn right_leg_joints(&self) -> RightLegJoints<T> {
+        RightLegJoints {
+            hip_roll: self.right_hip_roll.clone(),
+            hip_pitch: self.right_hip_pitch.clone(),
+            knee_pitch: self.right_knee_pitch.clone(),
+            ankle_pitch: self.right_ankle_pitch.clone(),
+            ankle_roll: self.right_ankle_roll.clone(),
+        }
+    }
+
+    /// Retrieves the right arm joints.
+    pub fn right_arm_joints(&self) -> RightArmJoints<T> {
+        RightArmJoints {
+            shoulder_pitch: self.right_shoulder_pitch.clone(),
+            shoulder_roll: self.right_shoulder_roll.clone(),
+            elbow_yaw: self.right_elbow_yaw.clone(),
+            elbow_roll: self.right_elbow_roll.clone(),
+            wrist_yaw: self.right_wrist_yaw.clone(),
+            hand: self.right_hand.clone(),
+        }
+    }
+
+    /// Retrieves the head joints.
+    pub fn head_joints(&self) -> HeadJoints<T> {
+        HeadJoints {
+            yaw: self.head_yaw.clone(),
+            pitch: self.head_pitch.clone(),
+        }
+    }
 }
 
 impl<T: Clone> FillExt<T> for JointArray<T> {
@@ -447,6 +551,60 @@ impl<T> JointArrayBuilder<T> {
         self.right_wrist_yaw = Some(joints.right_arm.wrist_yaw);
         self.right_hand = Some(joints.right_arm.hand);
         self
+    }
+}
+
+impl<'a, T> IntoIterator for &'a JointArray<T> {
+    type Item = &'a T;
+    type IntoIter = JointArrayIterator<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        JointArrayIterator {
+            jointarray: self,
+            index: 0,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct JointArrayIterator<'a, T> {
+    jointarray: &'a JointArray<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for JointArrayIterator<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<&'a T> {
+        let result = match self.index {
+            0 => &self.jointarray.head_yaw,
+            1 => &self.jointarray.head_pitch,
+            2 => &self.jointarray.left_shoulder_pitch,
+            3 => &self.jointarray.left_shoulder_roll,
+            4 => &self.jointarray.left_elbow_yaw,
+            5 => &self.jointarray.left_elbow_roll,
+            6 => &self.jointarray.left_wrist_yaw,
+            7 => &self.jointarray.left_hip_yaw_pitch,
+            8 => &self.jointarray.left_hip_roll,
+            9 => &self.jointarray.left_hip_pitch,
+            10 => &self.jointarray.left_knee_pitch,
+            11 => &self.jointarray.left_ankle_pitch,
+            12 => &self.jointarray.left_ankle_roll,
+            13 => &self.jointarray.right_shoulder_pitch,
+            14 => &self.jointarray.right_shoulder_roll,
+            15 => &self.jointarray.right_elbow_yaw,
+            16 => &self.jointarray.right_elbow_roll,
+            17 => &self.jointarray.right_wrist_yaw,
+            18 => &self.jointarray.right_hip_roll,
+            19 => &self.jointarray.right_hip_pitch,
+            20 => &self.jointarray.right_knee_pitch,
+            21 => &self.jointarray.right_ankle_pitch,
+            22 => &self.jointarray.right_ankle_roll,
+            23 => &self.jointarray.left_hand,
+            24 => &self.jointarray.right_hand,
+            _ => return None,
+        };
+        self.index += 1;
+        Some(result)
     }
 }
 
