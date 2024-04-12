@@ -247,6 +247,20 @@ impl<T> JointArray<T> {
             || t.right_hand
     }
 
+    /// Calculates the absolute difference between two joint arrays.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    /// use crate::nidhogg::types::FillExt;
+    ///
+    /// let t1: JointArray<f32> = JointArray::<f32>::fill(1.0);
+    /// let t2: JointArray<f32> = JointArray::<f32>::fill(2.0);
+    /// let t3: JointArray<f32> = JointArray::<f32>::fill(3.0);
+    ///
+    /// assert_eq!(t3.diff(t2).zip(t1).any(|(elem1, elem2)| elem1 != elem2), false);
+    /// ```
     pub fn diff(&self, other: JointArray<T>) -> JointArray<T>
     where
         T: Sub<Output = T> + Signed + Clone,
