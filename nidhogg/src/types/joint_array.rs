@@ -265,12 +265,9 @@ impl<T> JointArray<T> {
     where
         T: Sub<Output = T> + Signed + Clone,
     {
-        let diff_array = self
-            .clone()
+        self.clone()
             .zip(other.clone())
-            .map(|(curr, target)| (curr - target).abs());
-
-        diff_array
+            .map(|(curr, target)| (curr - target).abs())
     }
 
     pub fn as_ref(&self) -> JointArray<&T> {
