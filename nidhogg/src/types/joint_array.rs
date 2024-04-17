@@ -1,11 +1,13 @@
 //! Implements [`JointArray`] type and associated functions, for manipulating joint values.
-//!
+
+use std::ops::Sub;
 
 use crate::types::{
     ArmJoints, FillExt, HeadJoints, LeftArmJoints, LeftLegJoints, LegJoints, RightArmJoints,
     RightLegJoints,
 };
 use nidhogg_derive::Builder;
+use num::Signed;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -177,6 +179,95 @@ impl<T> JointArray<T> {
             left_hand: (self.left_hand, other.left_hand),
             right_hand: (self.right_hand, other.right_hand),
         }
+    }
+
+    /// Checks if all elements of a joint array satisfy a certain condition.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let mut t1: JointArray<i32> = JointArray::default();
+    /// assert_eq!(t1.clone().all(|elem| elem > -1), true);
+    ///
+    /// t1.right_hand = -2;
+    /// assert_eq!(t1.all(|elem| elem > -1), false);
+    /// ```
+    pub fn all<F>(self, mut f: F) -> bool
+    where
+        F: FnMut(T) -> bool,
+    {
+        !self.any(|elem| !f(elem))
+    }
+
+    /// Checks if any elements of a joint array satisfy a certain condition.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let mut t1: JointArray<i32> = JointArray::default();
+    /// assert_eq!(t1.clone().any(|elem| elem > 2), false);
+    ///
+    /// t1.head_pitch = 3;
+    /// assert_eq!(t1.any(|elem| elem > 2), true);
+    /// ```
+    pub fn any<F>(self, f: F) -> bool
+    where
+        F: FnMut(T) -> bool,
+    {
+        let t = self.map(f);
+
+        t.head_yaw
+            || t.head_pitch
+            || t.left_shoulder_pitch
+            || t.left_shoulder_roll
+            || t.left_elbow_yaw
+            || t.left_elbow_roll
+            || t.left_wrist_yaw
+            || t.left_hip_yaw_pitch
+            || t.left_hip_roll
+            || t.left_hip_pitch
+            || t.left_knee_pitch
+            || t.left_ankle_pitch
+            || t.left_ankle_roll
+            || t.right_shoulder_pitch
+            || t.right_shoulder_roll
+            || t.right_elbow_yaw
+            || t.right_elbow_roll
+            || t.right_wrist_yaw
+            || t.right_hip_roll
+            || t.right_hip_pitch
+            || t.right_knee_pitch
+            || t.right_ankle_pitch
+            || t.right_ankle_roll
+            || t.left_hand
+            || t.right_hand
+    }
+
+    /// Calculates the absolute difference between two joint arrays.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    /// use crate::nidhogg::types::FillExt;
+    ///
+    /// let t1: JointArray<f32> = JointArray::<f32>::fill(1.0);
+    /// let t2: JointArray<f32> = JointArray::<f32>::fill(2.0);
+    /// let t3: JointArray<f32> = JointArray::<f32>::fill(3.0);
+    ///
+    /// assert_eq!(t3.diff(t2).zip(t1).any(|(elem1, elem2)| elem1 != elem2), false);
+    /// ```
+    pub fn diff(&self, other: JointArray<T>) -> JointArray<T>
+    where
+        T: Sub<Output = T> + Signed + Clone,
+    {
+        self.clone()
+            .zip(other.clone())
+            .map(|(curr, target)| (curr - target).abs())
     }
 
     pub fn as_ref(&self) -> JointArray<&T> {
@@ -473,6 +564,60 @@ impl<T> JointArrayBuilder<T> {
         self.right_wrist_yaw = Some(joints.right_arm.wrist_yaw);
         self.right_hand = Some(joints.right_arm.hand);
         self
+    }
+}
+
+impl<'a, T> IntoIterator for &'a JointArray<T> {
+    type Item = &'a T;
+    type IntoIter = JointArrayIterator<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        JointArrayIterator {
+            jointarray: self,
+            index: 0,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct JointArrayIterator<'a, T> {
+    jointarray: &'a JointArray<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for JointArrayIterator<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<&'a T> {
+        let result = match self.index {
+            0 => &self.jointarray.head_yaw,
+            1 => &self.jointarray.head_pitch,
+            2 => &self.jointarray.left_shoulder_pitch,
+            3 => &self.jointarray.left_shoulder_roll,
+            4 => &self.jointarray.left_elbow_yaw,
+            5 => &self.jointarray.left_elbow_roll,
+            6 => &self.jointarray.left_wrist_yaw,
+            7 => &self.jointarray.left_hip_yaw_pitch,
+            8 => &self.jointarray.left_hip_roll,
+            9 => &self.jointarray.left_hip_pitch,
+            10 => &self.jointarray.left_knee_pitch,
+            11 => &self.jointarray.left_ankle_pitch,
+            12 => &self.jointarray.left_ankle_roll,
+            13 => &self.jointarray.right_shoulder_pitch,
+            14 => &self.jointarray.right_shoulder_roll,
+            15 => &self.jointarray.right_elbow_yaw,
+            16 => &self.jointarray.right_elbow_roll,
+            17 => &self.jointarray.right_wrist_yaw,
+            18 => &self.jointarray.right_hip_roll,
+            19 => &self.jointarray.right_hip_pitch,
+            20 => &self.jointarray.right_knee_pitch,
+            21 => &self.jointarray.right_ankle_pitch,
+            22 => &self.jointarray.right_ankle_roll,
+            23 => &self.jointarray.left_hand,
+            24 => &self.jointarray.right_hand,
+            _ => return None,
+        };
+        self.index += 1;
+        Some(result)
     }
 }
 
