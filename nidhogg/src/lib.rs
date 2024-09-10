@@ -40,11 +40,16 @@ pub mod types;
 
 pub use error::{Error, Result};
 use nidhogg_derive::Builder;
-use serde::Serialize;
 use types::{
     color::RgbF32, Battery, FillExt, ForceSensitiveResistors, JointArray, LeftEar, LeftEye,
     RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
 };
+
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
+#[cfg(feature = "bevy")]
+use bevy_ecs::prelude::Resource;
 
 /// Generic backend trait used for implementing a NAO interface.
 pub trait NaoBackend: Sized {
@@ -107,7 +112,9 @@ pub trait DisconnectExt {
 }
 
 /// High level representation of the `LoLA` state message.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct NaoState {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
@@ -154,6 +161,7 @@ pub struct NaoState {
 
 /// High level representation of the `LoLA` update message.
 #[derive(Builder, Clone, Debug)]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct NaoControlMessage {
     pub position: JointArray<f32>,
     pub stiffness: JointArray<f32>,
@@ -193,6 +201,7 @@ impl Default for NaoControlMessage {
 
 /// Struct containing the hardware identifiers for the NAO V6 robot.
 #[derive(Debug)]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct HardwareInfo {
     pub body_id: String,
     pub body_version: String,
