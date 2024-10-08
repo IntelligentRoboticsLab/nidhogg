@@ -6,6 +6,9 @@ use nidhogg_derive::{Builder, Filler};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "bevy")]
+use bevy_ecs::prelude::Resource;
+
 pub mod color;
 mod joint_array;
 mod vector;
@@ -25,6 +28,7 @@ pub trait FillExt<T> {
 /// Each value represents the intensity of a white LED.
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct Skull {
     pub left_front_0: f32,
     pub left_front_1: f32,
@@ -49,6 +53,7 @@ pub struct Skull {
 /// ![Left Ear](https://cdn.dutchnao.team/nidhogg/hardware_led_left_ear.png)
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct LeftEar {
     pub l0: f32,
     pub l1: f32,
@@ -70,6 +75,7 @@ pub struct LeftEar {
 /// ![Right Ear](https://cdn.dutchnao.team/nidhogg/hardware_led_right_ear.png)
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct RightEar {
     pub r0: f32,
     pub r1: f32,
@@ -90,6 +96,7 @@ pub struct RightEar {
 /// ![Left Eye](https://cdn.dutchnao.team/nidhogg/hardware_led_left_eye.png)
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct LeftEye {
     pub l0: RgbF32,
     pub l1: RgbF32,
@@ -108,6 +115,7 @@ pub struct LeftEye {
 /// ![Right Eye](https://cdn.dutchnao.team/nidhogg/hardware_led_right_eye.png)
 #[derive(Builder, Clone, Debug, Default, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct RightEye {
     pub r0: RgbF32,
     pub r1: RgbF32,
@@ -122,6 +130,7 @@ pub struct RightEye {
 /// Struct representing the battery status of the robot.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct Battery {
     /// The battery percentage
     pub charge: f32,
@@ -137,6 +146,7 @@ pub struct Battery {
 /// Struct containing the [`ForceSensitiveResistorFoot`] value for each foot.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct ForceSensitiveResistors {
     /// FSR values from the four sensors in the left foot.
     pub left_foot: ForceSensitiveResistorFoot,
@@ -159,6 +169,7 @@ impl ForceSensitiveResistors {
 /// Struct representing the force sensitive resistors in one of the feet.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct ForceSensitiveResistorFoot {
     /// FSR value representing the estimated weight in kilograms on the front left foot sensor.
     ///
@@ -193,6 +204,7 @@ impl ForceSensitiveResistorFoot {
 /// Values read by the left and right sonar sensor.
 #[derive(Builder, Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct SonarValues {
     /// Left Sonar Value.
     ///
@@ -219,6 +231,7 @@ pub struct SonarValues {
 /// Enabled state of the left and right sonar sensors.
 #[derive(Builder, Clone, Default, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct SonarEnabled {
     pub left: bool,
     pub right: bool,
@@ -227,6 +240,7 @@ pub struct SonarEnabled {
 /// Struct containing the touch activiation value for each touch sensor on the robot.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct Touch {
     pub chest_board: f32,
     pub head_front: f32,
