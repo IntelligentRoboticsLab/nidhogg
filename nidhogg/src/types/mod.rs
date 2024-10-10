@@ -11,11 +11,9 @@ use bevy_ecs::prelude::Resource;
 
 pub mod color;
 mod joint_array;
-mod vector;
 
 pub use color::{Rgb, RgbF32, RgbU8};
 pub use joint_array::JointArray;
-pub use vector::{Vector2, Vector3};
 
 /// Trait that introduces the [`fill`](`FillExt::fill`) method for a type, which allows filling in all fields with the same value.
 pub trait FillExt<T> {

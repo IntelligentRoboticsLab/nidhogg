@@ -4,10 +4,12 @@
 use crate::{
     types::{
         Battery, ForceSensitiveResistorFoot, ForceSensitiveResistors, JointArray, LeftEar, LeftEye,
-        Rgb, RgbF32, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
+        Rgb, RgbF32, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch,
     },
     DisconnectExt, Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
 };
+
+use nalgebra::{Vector2, Vector3};
 
 use rmp_serde::{encode, from_slice};
 use serde::{Deserialize, Serialize};
@@ -487,20 +489,20 @@ impl FromLoLA<[f32; 14]> for Touch {
 
 impl FromLoLA<[f32; 2]> for Vector2<f32> {
     fn from_lola(value: [f32; 2]) -> Self {
-        Vector2 {
-            x: value[0],
-            y: value[1],
-        }
+        nalgebra::vector! [
+            value[0],
+            value[1],
+        ]
     }
 }
 
 impl FromLoLA<[f32; 3]> for Vector3<f32> {
     fn from_lola(value: [f32; 3]) -> Self {
-        Vector3 {
-            x: value[0],
-            y: value[1],
-            z: value[2],
-        }
+        nalgebra::vector! [
+            value[0],
+            value[1],
+            value[2],
+        ]
     }
 }
 

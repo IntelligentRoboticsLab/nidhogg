@@ -39,10 +39,11 @@ mod error;
 pub mod types;
 
 pub use error::{Error, Result};
+use nalgebra::{Vector2, Vector3};
 use nidhogg_derive::Builder;
 use types::{
     color::RgbF32, Battery, FillExt, ForceSensitiveResistors, JointArray, LeftEar, LeftEye,
-    RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch, Vector2, Vector3,
+    RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch,
 };
 
 #[cfg(feature = "serde")]
