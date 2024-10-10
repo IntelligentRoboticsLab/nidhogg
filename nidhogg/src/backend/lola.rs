@@ -9,7 +9,7 @@ use crate::{
     DisconnectExt, Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
 };
 
-use nalgebra::{Vector2, Vector3};
+use nalgebra::{vector, Vector2, Vector3};
 
 use rmp_serde::{encode, from_slice};
 use serde::{Deserialize, Serialize};
@@ -489,20 +489,13 @@ impl FromLoLA<[f32; 14]> for Touch {
 
 impl FromLoLA<[f32; 2]> for Vector2<f32> {
     fn from_lola(value: [f32; 2]) -> Self {
-        nalgebra::vector! [
-            value[0],
-            value[1],
-        ]
+        vector![value[0], value[1]]
     }
 }
 
 impl FromLoLA<[f32; 3]> for Vector3<f32> {
     fn from_lola(value: [f32; 3]) -> Self {
-        nalgebra::vector! [
-            value[0],
-            value[1],
-            value[2],
-        ]
+        vector![value[0], value[1], value[2]]
     }
 }
 
