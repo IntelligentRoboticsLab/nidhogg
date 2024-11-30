@@ -1,12 +1,56 @@
-name: check, test, lints and build
+name: Continuous Disappointment
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+
+env:
+  OPENVINO_SKIP_LINKING: 1
+  CARGO_NET_GIT_FETCH_WITH_CLI: true
+  CARGO_TERM_COLOR: always
+  RUSTDOCFLAGS: -D warnings
+
+concurrency:
+  group: ${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
 
 jobs:
-  cicd:
-    uses: IntelligentRoboticsLab/bondi/.github/workflows/rust.yml@main
-    secrets: 
-      BONDI_DEPLOY_KEY: ${{ secrets.BONDI_DEPLOY_KEY }}
+  test:
+    name: cargo test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - run: cargo test --all-targets --all-features
+
+  clippy:
+    name: cargo clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: clippy
+      - run: cargo clippy --all-targets --all-features -- -D warnings
+
+  fmt:
+    name: cargo fmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: uncenter/setup-taplo@v1
+        with:
+          version: "0.8.1"
+      - run: cargo fmt --all -- --check
+      - uses: crate-ci/typos@master
+      - run: taplo fmt --check
+
+  doc:
+    name: cargo doc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - run: cargo doc --all-features --no-deps
