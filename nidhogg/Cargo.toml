@@ -14,7 +14,7 @@ tracing = "0.1.37"
 nidhogg_derive = { workspace = true }
 coppeliasim_zmq_remote_api = { git = "https://github.com/samuel-cavalcanti/rust_zmqRemoteApi", optional = true }
 num = "0.4.1"
-nalgebra = { version = "0.32.6", features = ["serde-serialize"] }
+nalgebra = { version = "0.33.2", features = ["serde-serialize"] }
 bevy_ecs = { version = "0.15.0", optional = true }
 
 [dev-dependencies]
