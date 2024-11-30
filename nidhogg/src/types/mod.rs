@@ -158,7 +158,7 @@ impl ForceSensitiveResistors {
         self.left_foot.sum() + self.right_foot.sum()
     }
 
-    /// Calculates the average weigth based on the measurement from the resistors in both feet.
+    /// Calculates the average weight based on the measurement from the resistors in both feet.
     pub fn avg(&self) -> f32 {
         (self.left_foot.avg() + self.right_foot.avg()) / 2.0
     }
@@ -314,11 +314,11 @@ pub struct SingleArmJoints<T> {
 }
 
 /// Type definition for the left arm joints of the robot.
-/// Introduced for api consistenty with [`LeftLegJoints`].
+/// Introduced for api consistency with [`LeftLegJoints`].
 pub type LeftArmJoints<T> = SingleArmJoints<T>;
 
 /// Type definition for the right arm joints of the robot.
-/// Introduced for api consistenty with [`RightLegJoints`].
+/// Introduced for api consistency with [`RightLegJoints`].
 pub type RightArmJoints<T> = SingleArmJoints<T>;
 
 /// Wrapper struct containing the arm joints of the robot.
