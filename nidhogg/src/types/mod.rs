@@ -235,7 +235,7 @@ pub struct SonarEnabled {
     pub right: bool,
 }
 
-/// Struct containing the touch activiation value for each touch sensor on the robot.
+/// Struct containing the touch activation value for each touch sensor on the robot.
 #[derive(Clone, Debug, Default, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
