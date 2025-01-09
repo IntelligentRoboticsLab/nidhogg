@@ -12,7 +12,7 @@ use num::Signed;
 use serde::{Deserialize, Serialize};
 
 /// Struct containing values of type `T` for all the joints
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct JointArray<T> {
     /// The yaw joint of the robot's head, allowing rotation horizontally.

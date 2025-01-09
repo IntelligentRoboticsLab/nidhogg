@@ -113,7 +113,7 @@ pub trait DisconnectExt {
 }
 
 /// High level representation of the `LoLA` state message.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct NaoState {
@@ -161,7 +161,7 @@ pub struct NaoState {
 }
 
 /// High level representation of the `LoLA` update message.
-#[derive(Builder, Clone, Debug)]
+#[derive(Builder, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct NaoControlMessage {
     pub position: JointArray<f32>,

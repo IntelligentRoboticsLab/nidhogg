@@ -24,7 +24,7 @@ pub trait FillExt<T> {
 /// Struct representing the LEDs on top of the NAO robot's head.
 ///
 /// Each value represents the intensity of a white LED.
-#[derive(Builder, Clone, Debug, Default, Filler)]
+#[derive(Builder, Clone, Debug, Default, Filler, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct Skull {
@@ -49,7 +49,7 @@ pub struct Skull {
 /// These LEDs are placed in the following order:
 ///
 /// ![Left Ear](https://cdn.dutchnao.team/nidhogg/hardware_led_left_ear.png)
-#[derive(Builder, Clone, Debug, Default, Filler)]
+#[derive(Builder, Clone, Debug, Default, Filler, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct LeftEar {
@@ -71,7 +71,7 @@ pub struct LeftEar {
 /// These LEDs are placed in the following order:
 ///
 /// ![Right Ear](https://cdn.dutchnao.team/nidhogg/hardware_led_right_ear.png)
-#[derive(Builder, Clone, Debug, Default, Filler)]
+#[derive(Builder, Clone, Debug, Default, Filler, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct RightEar {
@@ -92,7 +92,7 @@ pub struct RightEar {
 /// These LEDs are placed in the following order:
 ///
 /// ![Left Eye](https://cdn.dutchnao.team/nidhogg/hardware_led_left_eye.png)
-#[derive(Builder, Clone, Debug, Default, Filler)]
+#[derive(Builder, Clone, Debug, Default, Filler, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct LeftEye {
@@ -111,7 +111,7 @@ pub struct LeftEye {
 /// These LEDs are placed in the following order:
 ///
 /// ![Right Eye](https://cdn.dutchnao.team/nidhogg/hardware_led_right_eye.png)
-#[derive(Builder, Clone, Debug, Default, Filler)]
+#[derive(Builder, Clone, Debug, Default, Filler, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct RightEye {
@@ -126,7 +126,7 @@ pub struct RightEye {
 }
 
 /// Struct representing the battery status of the robot.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct Battery {
@@ -142,7 +142,7 @@ pub struct Battery {
 }
 
 /// Struct containing the [`ForceSensitiveResistorFoot`] value for each foot.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct ForceSensitiveResistors {
@@ -165,7 +165,7 @@ impl ForceSensitiveResistors {
 }
 
 /// Struct representing the force sensitive resistors in one of the feet.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct ForceSensitiveResistorFoot {
@@ -200,7 +200,7 @@ impl ForceSensitiveResistorFoot {
 }
 
 /// Values read by the left and right sonar sensor.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct SonarValues {
@@ -227,7 +227,7 @@ pub struct SonarValues {
 }
 
 /// Enabled state of the left and right sonar sensors.
-#[derive(Builder, Clone, Default, Debug)]
+#[derive(Builder, Clone, Default, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct SonarEnabled {
@@ -236,7 +236,7 @@ pub struct SonarEnabled {
 }
 
 /// Struct containing the touch activiation value for each touch sensor on the robot.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct Touch {
@@ -257,14 +257,14 @@ pub struct Touch {
 }
 
 /// Wrapper struct containing the head joints of the robot.
-#[derive(Builder, Clone, Debug, Default, Filler)]
+#[derive(Builder, Clone, Debug, Default, Filler, PartialEq, Eq)]
 pub struct HeadJoints<T> {
     pub yaw: T,
     pub pitch: T,
 }
 
 /// Wrapper struct containing the left leg joints of the robot.
-#[derive(Builder, Clone, Debug, Default, Filler)]
+#[derive(Builder, Clone, Debug, Default, Filler, PartialEq, Eq)]
 pub struct LeftLegJoints<T> {
     pub hip_yaw_pitch: T,
     pub hip_roll: T,
@@ -275,7 +275,7 @@ pub struct LeftLegJoints<T> {
 }
 
 /// Wrapper struct containing right left leg joints of the robot.
-#[derive(Builder, Clone, Debug, Default, Filler)]
+#[derive(Builder, Clone, Debug, Default, Filler, PartialEq, Eq)]
 pub struct RightLegJoints<T> {
     // This value does not exist
     // pub hip_yaw_pitch: T,
@@ -287,7 +287,7 @@ pub struct RightLegJoints<T> {
 }
 
 /// Wrapper struct containing joint values for both legs of the robot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, PartialEq, Eq)]
 pub struct LegJoints<T> {
     pub left_leg: LeftLegJoints<T>,
     pub right_leg: RightLegJoints<T>,
@@ -303,7 +303,7 @@ impl<T: Clone> FillExt<T> for LegJoints<T> {
 }
 
 /// Wrapper struct containing the joints for a single arm of the robot.
-#[derive(Builder, Clone, Debug, Default, Filler)]
+#[derive(Builder, Clone, Debug, Default, Filler, PartialEq, Eq)]
 pub struct SingleArmJoints<T> {
     pub shoulder_pitch: T,
     pub shoulder_roll: T,
@@ -322,7 +322,7 @@ pub type LeftArmJoints<T> = SingleArmJoints<T>;
 pub type RightArmJoints<T> = SingleArmJoints<T>;
 
 /// Wrapper struct containing the arm joints of the robot.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, PartialEq, Eq)]
 pub struct ArmJoints<T> {
     pub left_arm: SingleArmJoints<T>,
     pub right_arm: SingleArmJoints<T>,
