@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 pub type RgbU8 = Rgb<u8>;
 pub type RgbF32 = Rgb<f32>;
 
-#[derive(Debug, Default, Clone, Copy, Builder)]
+#[derive(Debug, Default, Clone, Copy, Builder, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Rgb<T> {
     pub red: T,
