@@ -3,8 +3,8 @@
 
 use crate::{
     types::{
-        Battery, ForceSensitiveResistorFoot, ForceSensitiveResistors, JointArray, LeftEar, LeftEye,
-        Rgb, RgbF32, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch,
+        Battery, ForceSensitiveResistors, FsrFoot, JointArray, LeftEar, LeftEye, Rgb, RgbF32,
+        RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch,
     },
     DisconnectExt, Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
 };
@@ -429,7 +429,7 @@ impl FromLoLA<[f32; 8]> for ForceSensitiveResistors {
     }
 }
 
-impl FromLoLA<[f32; 4]> for ForceSensitiveResistorFoot {
+impl FromLoLA<[f32; 4]> for FsrFoot {
     fn from_lola(value: [f32; 4]) -> Self {
         Self {
             front_left: value[0],

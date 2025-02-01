@@ -141,15 +141,15 @@ pub struct Battery {
     pub temperature: f32,
 }
 
-/// Struct containing the [`ForceSensitiveResistorFoot`] value for each foot.
+/// Struct containing the [`FsrFoot`] value for each foot.
 #[derive(Clone, Debug, Default, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct ForceSensitiveResistors {
     /// FSR values from the four sensors in the left foot.
-    pub left_foot: ForceSensitiveResistorFoot,
+    pub left_foot: FsrFoot,
     /// FSR values from the four sensors in the right foot.
-    pub right_foot: ForceSensitiveResistorFoot,
+    pub right_foot: FsrFoot,
 }
 
 impl ForceSensitiveResistors {
@@ -174,7 +174,7 @@ impl ForceSensitiveResistors {
 #[derive(Clone, Debug, Default, PartialEq, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
-pub struct ForceSensitiveResistorFoot {
+pub struct FsrFoot {
     /// FSR value representing the estimated weight in kilograms on the front left foot sensor.
     ///
     /// Please note that this value is approximate.
@@ -193,14 +193,14 @@ pub struct ForceSensitiveResistorFoot {
     pub rear_right: f32,
 }
 
-impl ForceSensitiveResistorFoot {
+impl FsrFoot {
     /// Computes the sum of the FSR sensor values for the foot.
     pub fn sum(&self) -> f32 {
         self.front_left + self.front_right + self.rear_left + self.rear_right
     }
 
     /// Compute the sum of the FSR sensor values, weighted by the provided weights.
-    pub fn weighted_sum(&self, weights: &ForceSensitiveResistorFoot) -> f32 {
+    pub fn weighted_sum(&self, weights: &FsrFoot) -> f32 {
         (weights.front_left * self.front_left)
             + (weights.front_right * self.front_right)
             + (weights.rear_left * self.rear_left)
@@ -233,7 +233,7 @@ impl ForceSensitiveResistorFoot {
     }
 
     /// Compute the element-wise maximum for each sensor value
-    pub fn max_element(&self, other: &ForceSensitiveResistorFoot) -> Self {
+    pub fn max_element(&self, other: &FsrFoot) -> Self {
         Self {
             front_left: self.front_left.max(other.front_left),
             front_right: self.front_right.max(other.front_right),
@@ -243,7 +243,7 @@ impl ForceSensitiveResistorFoot {
     }
 
     /// Compute the element-wise minimum for each sensor value
-    pub fn min_element(&self, other: &ForceSensitiveResistorFoot) -> Self {
+    pub fn min_element(&self, other: &FsrFoot) -> Self {
         Self {
             front_left: self.front_left.min(other.front_left),
             front_right: self.front_right.min(other.front_right),
@@ -398,13 +398,13 @@ mod tests {
 
     #[test]
     fn test_average_force_feet() {
-        let foot1 = ForceSensitiveResistorFoot {
+        let foot1 = FsrFoot {
             front_left: 0.0,
             front_right: 1.0,
             rear_left: 0.32,
             rear_right: 0.76,
         };
-        let foot2 = ForceSensitiveResistorFoot {
+        let foot2 = FsrFoot {
             front_left: 0.54,
             front_right: 1.0,
             rear_left: 0.32,
@@ -419,7 +419,7 @@ mod tests {
 
     #[test]
     fn test_average_weight_foot() {
-        let foot = ForceSensitiveResistorFoot {
+        let foot = FsrFoot {
             front_left: 0.0,
             front_right: 1.0,
             rear_left: 0.32,
