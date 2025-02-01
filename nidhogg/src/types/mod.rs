@@ -158,6 +158,12 @@ impl ForceSensitiveResistors {
         self.left_foot.sum() + self.right_foot.sum()
     }
 
+    /// Compute the sum of the FSR sensor values, weighted by the provided weights.
+    pub fn weighted_sum(&self, weights: &ForceSensitiveResistors) -> f32 {
+        self.left_foot.weighted_sum(&weights.left_foot)
+            + self.right_foot.weighted_sum(&weights.right_foot)
+    }
+
     /// Calculates the average weight based on the measurement from the resistors in both feet.
     pub fn avg(&self) -> f32 {
         (self.left_foot.avg() + self.right_foot.avg()) / 2.0
@@ -191,6 +197,14 @@ impl ForceSensitiveResistorFoot {
     /// Computes the sum of the FSR sensor values for the foot.
     pub fn sum(&self) -> f32 {
         self.front_left + self.front_right + self.rear_left + self.rear_right
+    }
+
+    /// Compute the sum of the FSR sensor values, weighted by the provided weights.
+    pub fn weighted_sum(&self, weights: &ForceSensitiveResistorFoot) -> f32 {
+        (weights.front_left * self.front_left)
+            + (weights.front_right * self.front_right)
+            + (weights.rear_left * self.rear_left)
+            + (weights.rear_right * self.rear_right)
     }
 
     /// Calculates the average weight on the foot.
