@@ -165,7 +165,7 @@ impl ForceSensitiveResistors {
 }
 
 /// Struct representing the force sensitive resistors in one of the feet.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct ForceSensitiveResistorFoot {
@@ -196,6 +196,46 @@ impl ForceSensitiveResistorFoot {
     /// Calculates the average weight on the foot.
     pub fn avg(&self) -> f32 {
         self.sum() / 4.0
+    }
+
+    /// Compute the pressure leaning forward
+    pub fn forward_pressure(&self) -> f32 {
+        self.front_left + self.front_right
+    }
+
+    /// Compute the pressure leaning backward
+    pub fn backward_pressure(&self) -> f32 {
+        self.rear_left + self.rear_right
+    }
+
+    /// Compute the pressure leaning left
+    pub fn left_pressure(&self) -> f32 {
+        self.front_left + self.rear_left
+    }
+
+    /// Compute the pressure leaning right
+    pub fn right_pressure(&self) -> f32 {
+        self.front_right + self.rear_right
+    }
+
+    /// Compute the element-wise maximum for each sensor value
+    pub fn max_element(&self, other: &ForceSensitiveResistorFoot) -> Self {
+        Self {
+            front_left: self.front_left.max(other.front_left),
+            front_right: self.front_right.max(other.front_right),
+            rear_left: self.rear_left.max(other.rear_left),
+            rear_right: self.rear_right.max(other.rear_right),
+        }
+    }
+
+    /// Compute the element-wise minimum for each sensor value
+    pub fn min_element(&self, other: &ForceSensitiveResistorFoot) -> Self {
+        Self {
+            front_left: self.front_left.min(other.front_left),
+            front_right: self.front_right.min(other.front_right),
+            rear_left: self.rear_left.min(other.rear_left),
+            rear_right: self.rear_right.min(other.rear_right),
+        }
     }
 }
 
