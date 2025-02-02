@@ -150,7 +150,7 @@ pub struct NaoState {
     ///
     /// A more detailed explanation of the different wave kinds can be found [here](http://doc.aldebaran.com/2-8/family/nao_technical/lola/actuator_sensor_names.html#sonars).
     pub sonar: SonarValues,
-    pub force_sensitive_resistors: Fsr,
+    pub fsr: Fsr,
     pub touch: Touch,
 
     // Diagnostics

@@ -530,7 +530,7 @@ impl From<LolaNaoState<'_>> for NaoState {
             gyroscope: value.gyroscope.into_nidhogg(),
             angles: value.angles.into_nidhogg(),
             sonar: value.sonar.into_nidhogg(),
-            force_sensitive_resistors: value.f_s_r.into_nidhogg(),
+            fsr: value.f_s_r.into_nidhogg(),
             touch: value.touch.into_nidhogg(),
             status: value.status.into_nidhogg(),
         }
