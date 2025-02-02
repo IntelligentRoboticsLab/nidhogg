@@ -147,21 +147,21 @@ pub struct Battery {
 #[derive(Clone, Debug, Default, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Resource))]
-pub struct ForceSensitiveResistors {
+pub struct Fsr {
     /// FSR values from the four sensors in the left foot.
     pub left_foot: FsrFoot,
     /// FSR values from the four sensors in the right foot.
     pub right_foot: FsrFoot,
 }
 
-impl ForceSensitiveResistors {
+impl Fsr {
     /// Computes the sum of the FSR sensor values for both feet.
     pub fn sum(&self) -> f32 {
         self.left_foot.sum() + self.right_foot.sum()
     }
 
     /// Compute the sum of the FSR sensor values, weighted by the provided weights.
-    pub fn weighted_sum(&self, weights: &ForceSensitiveResistors) -> f32 {
+    pub fn weighted_sum(&self, weights: &Fsr) -> f32 {
         self.left_foot.weighted_sum(&weights.left_foot)
             + self.right_foot.weighted_sum(&weights.right_foot)
     }
@@ -172,7 +172,7 @@ impl ForceSensitiveResistors {
     }
 }
 
-impl Add for ForceSensitiveResistors {
+impl Add for Fsr {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -183,7 +183,7 @@ impl Add for ForceSensitiveResistors {
     }
 }
 
-impl Sub for ForceSensitiveResistors {
+impl Sub for Fsr {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -194,7 +194,7 @@ impl Sub for ForceSensitiveResistors {
     }
 }
 
-impl Mul for ForceSensitiveResistors {
+impl Mul for Fsr {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
@@ -205,7 +205,7 @@ impl Mul for ForceSensitiveResistors {
     }
 }
 
-impl Div for ForceSensitiveResistors {
+impl Div for Fsr {
     type Output = Self;
 
     fn div(self, rhs: Self) -> Self::Output {
@@ -216,7 +216,7 @@ impl Div for ForceSensitiveResistors {
     }
 }
 
-impl Neg for ForceSensitiveResistors {
+impl Neg for Fsr {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
@@ -570,7 +570,7 @@ mod tests {
             rear_left: 0.32,
             rear_right: 0.95,
         };
-        let feet = ForceSensitiveResistors {
+        let feet = Fsr {
             left_foot: foot1,
             right_foot: foot2,
         };
