@@ -1,6 +1,8 @@
 //! Convenience types used to make interacting with the NAO more convenient.
 //!
 
+use std::ops::{Add, Div, Mul, Neg, Sub};
+
 use nidhogg_derive::{Builder, Filler};
 
 #[cfg(feature = "serde")]
@@ -170,6 +172,61 @@ impl ForceSensitiveResistors {
     }
 }
 
+impl Add for ForceSensitiveResistors {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            left_foot: self.left_foot + rhs.left_foot,
+            right_foot: self.right_foot + rhs.right_foot,
+        }
+    }
+}
+
+impl Sub for ForceSensitiveResistors {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            left_foot: self.left_foot - rhs.left_foot,
+            right_foot: self.right_foot - rhs.right_foot,
+        }
+    }
+}
+
+impl Mul for ForceSensitiveResistors {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            left_foot: self.left_foot * rhs.left_foot,
+            right_foot: self.right_foot * rhs.right_foot,
+        }
+    }
+}
+
+impl Div for ForceSensitiveResistors {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            left_foot: self.left_foot / rhs.left_foot,
+            right_foot: self.right_foot / rhs.right_foot,
+        }
+    }
+}
+
+impl Neg for ForceSensitiveResistors {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self::Output {
+            left_foot: -self.left_foot,
+            right_foot: -self.right_foot,
+        }
+    }
+}
+
 /// Struct representing the force sensitive resistors in one of the feet.
 #[derive(Clone, Debug, Default, PartialEq, Filler)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -212,28 +269,48 @@ impl FsrFoot {
         self.sum() / 4.0
     }
 
-    /// Compute the pressure leaning forward
+    /// Computes the total pressure on the front sensors of the foot.
+    ///
+    /// # Note
+    ///
+    /// Since this value is the sum of two sensors, it can be up to twice as large
+    /// as the reading from a single sensor.
     pub fn forward_pressure(&self) -> f32 {
         self.front_left + self.front_right
     }
 
-    /// Compute the pressure leaning backward
+    /// Computes the total pressure on the rear sensors of the foot.
+    ///
+    /// # Note
+    ///
+    /// Since this value is the sum of two sensors, it can be up to twice as large
+    /// as the reading from a single sensor.
     pub fn backward_pressure(&self) -> f32 {
         self.rear_left + self.rear_right
     }
 
-    /// Compute the pressure leaning left
+    /// Computes the total pressure on the left sensors of the foot.
+    ///
+    /// # Note
+    ///
+    /// Since this value is the sum of two sensors, it can be up to twice as large
+    /// as the reading from a single sensor.
     pub fn left_pressure(&self) -> f32 {
         self.front_left + self.rear_left
     }
 
-    /// Compute the pressure leaning right
+    /// Computes the total pressure on the right sensors of the foot.
+    ///
+    /// # Note
+    ///
+    /// Since this value is the sum of two sensors, it can be up to twice as large
+    /// as the reading from a single sensor.
     pub fn right_pressure(&self) -> f32 {
         self.front_right + self.rear_right
     }
 
-    /// Compute the element-wise maximum for each sensor value
-    pub fn max_element(&self, other: &FsrFoot) -> Self {
+    /// Compute the supremum (element-wise maximum) for each sensor value.
+    pub fn sup(&self, other: &FsrFoot) -> Self {
         Self {
             front_left: self.front_left.max(other.front_left),
             front_right: self.front_right.max(other.front_right),
@@ -242,13 +319,96 @@ impl FsrFoot {
         }
     }
 
-    /// Compute the element-wise minimum for each sensor value
-    pub fn min_element(&self, other: &FsrFoot) -> Self {
+    /// Compute the element-wise maximum for each sensor value.
+    ///
+    /// # Note
+    ///
+    /// This is an alias for [`Self::sup`].
+    pub fn max_per_sensor(&self, other: &FsrFoot) -> Self {
+        self.sup(other)
+    }
+
+    /// Compute the infimum (element-wise minimum) for each sensor value.
+    pub fn inf(&self, other: &FsrFoot) -> Self {
         Self {
             front_left: self.front_left.min(other.front_left),
             front_right: self.front_right.min(other.front_right),
             rear_left: self.rear_left.min(other.rear_left),
             rear_right: self.rear_right.min(other.rear_right),
+        }
+    }
+
+    /// Compute the element-wise minimum for each sensor value.
+    ///
+    /// # Note
+    ///
+    /// This is an alias for [`Self::inf`].
+    pub fn min_per_sensor(&self, other: &FsrFoot) -> Self {
+        self.inf(other)
+    }
+}
+
+impl Add for FsrFoot {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            front_left: self.front_left + rhs.front_left,
+            front_right: self.front_right + rhs.front_right,
+            rear_left: self.rear_left + rhs.rear_left,
+            rear_right: self.rear_right + rhs.rear_right,
+        }
+    }
+}
+
+impl Sub for FsrFoot {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            front_left: self.front_left - rhs.front_left,
+            front_right: self.front_right - rhs.front_right,
+            rear_left: self.rear_left - rhs.rear_left,
+            rear_right: self.rear_right - rhs.rear_right,
+        }
+    }
+}
+
+impl Mul for FsrFoot {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            front_left: self.front_left * rhs.front_left,
+            front_right: self.front_right * rhs.front_right,
+            rear_left: self.rear_left * rhs.rear_left,
+            rear_right: self.rear_right * rhs.rear_right,
+        }
+    }
+}
+
+impl Div for FsrFoot {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            front_left: self.front_left / rhs.front_left,
+            front_right: self.front_right / rhs.front_right,
+            rear_left: self.rear_left / rhs.rear_left,
+            rear_right: self.rear_right / rhs.rear_right,
+        }
+    }
+}
+
+impl Neg for FsrFoot {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self::Output {
+            front_left: -self.front_left,
+            front_right: -self.front_right,
+            rear_left: -self.rear_left,
+            rear_right: -self.rear_right,
         }
     }
 }
