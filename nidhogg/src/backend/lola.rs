@@ -3,8 +3,8 @@
 
 use crate::{
     types::{
-        Battery, ForceSensitiveResistorFoot, ForceSensitiveResistors, JointArray, LeftEar, LeftEye,
-        Rgb, RgbF32, RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch,
+        Battery, Fsr, FsrFoot, JointArray, LeftEar, LeftEye, Rgb, RgbF32, RightEar, RightEye,
+        Skull, SonarEnabled, SonarValues, Touch,
     },
     DisconnectExt, Error, HardwareInfo, NaoBackend, NaoControlMessage, NaoState, Result,
 };
@@ -417,7 +417,7 @@ impl FromLoLA<[f32; 4]> for Battery {
     }
 }
 
-impl FromLoLA<[f32; 8]> for ForceSensitiveResistors {
+impl FromLoLA<[f32; 8]> for Fsr {
     fn from_lola(value: [f32; 8]) -> Self {
         let left: [f32; 4] = value[..4].try_into().unwrap();
         let right: [f32; 4] = value[4..].try_into().unwrap();
@@ -429,7 +429,7 @@ impl FromLoLA<[f32; 8]> for ForceSensitiveResistors {
     }
 }
 
-impl FromLoLA<[f32; 4]> for ForceSensitiveResistorFoot {
+impl FromLoLA<[f32; 4]> for FsrFoot {
     fn from_lola(value: [f32; 4]) -> Self {
         Self {
             front_left: value[0],
@@ -530,7 +530,7 @@ impl From<LolaNaoState<'_>> for NaoState {
             gyroscope: value.gyroscope.into_nidhogg(),
             angles: value.angles.into_nidhogg(),
             sonar: value.sonar.into_nidhogg(),
-            force_sensitive_resistors: value.f_s_r.into_nidhogg(),
+            fsr: value.f_s_r.into_nidhogg(),
             touch: value.touch.into_nidhogg(),
             status: value.status.into_nidhogg(),
         }

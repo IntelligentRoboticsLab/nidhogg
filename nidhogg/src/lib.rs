@@ -42,8 +42,8 @@ pub use error::{Error, Result};
 use nalgebra::{Vector2, Vector3};
 use nidhogg_derive::Builder;
 use types::{
-    color::RgbF32, Battery, FillExt, ForceSensitiveResistors, JointArray, LeftEar, LeftEye,
-    RightEar, RightEye, Skull, SonarEnabled, SonarValues, Touch,
+    color::RgbF32, Battery, FillExt, Fsr, JointArray, LeftEar, LeftEye, RightEar, RightEye, Skull,
+    SonarEnabled, SonarValues, Touch,
 };
 
 #[cfg(feature = "serde")]
@@ -150,7 +150,7 @@ pub struct NaoState {
     ///
     /// A more detailed explanation of the different wave kinds can be found [here](http://doc.aldebaran.com/2-8/family/nao_technical/lola/actuator_sensor_names.html#sonars).
     pub sonar: SonarValues,
-    pub force_sensitive_resistors: ForceSensitiveResistors,
+    pub fsr: Fsr,
     pub touch: Touch,
 
     // Diagnostics
