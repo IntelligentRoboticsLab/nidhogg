@@ -496,14 +496,15 @@ impl<T> LeftLegJoints<T> {
     ///
     /// ```
     /// use nidhogg::types::LeftLegJoints;
+    /// use nidhogg::types::FillExt;
     ///
     /// let joints = LeftLegJoints::<u32>::default();
     ///
     /// let transformed = joints.map(|x| x + 1);
     ///
-    /// assert_eq!(transformed.head_yaw, 1);
+    /// assert_eq!(transformed, LeftLegJoints::fill(1));
     /// ```
-    pub fn map<F, U>(self, f: &mut F) -> LeftLegJoints<U>
+    pub fn map<F, U>(self, mut f: F) -> LeftLegJoints<U>
     where
         F: FnMut(T) -> U,
     {
@@ -523,11 +524,12 @@ impl<T> LeftLegJoints<T> {
     /// # Example
     ///
     /// ```
-    /// use nidhogg::types::JointArray;
+    /// use nidhogg::types::LeftLegJoints;
+    /// use nidhogg::types::FillExt;
     ///
-    /// let zipped = LeftLegJoints::<f32>::default().zip(LeftLegJoints::<f32>::default());
+    /// let zipped = LeftLegJoints::<u32>::default().zip(LeftLegJoints::<u32>::default());
     ///
-    /// assert_eq!(zipped.head_yaw, (0_u32, 0_f32));
+    /// assert_eq!(zipped, LeftLegJoints::<(u32, u32)>::fill((0_u32, 0_u32)));
     /// ```
     pub fn zip<U>(self, other: LeftLegJoints<U>) -> LeftLegJoints<(T, U)> {
         LeftLegJoints {
@@ -561,14 +563,15 @@ impl<T> RightLegJoints<T> {
     ///
     /// ```
     /// use nidhogg::types::RightLegJoints;
+    /// use nidhogg::types::FillExt;
     ///
     /// let joints = RightLegJoints::<u32>::default();
     ///
     /// let transformed = joints.map(|x| x + 1);
     ///
-    /// assert_eq!(transformed.head_yaw, 1);
+    /// assert_eq!(transformed, RightLegJoints::<u32>::fill(1));
     /// ```
-    pub fn map<F, U>(self, f: &mut F) -> RightLegJoints<U>
+    pub fn map<F, U>(self, mut f: F) -> RightLegJoints<U>
     where
         F: FnMut(T) -> U,
     {
@@ -587,11 +590,12 @@ impl<T> RightLegJoints<T> {
     /// # Example
     ///
     /// ```
-    /// use nidhogg::types::JointArray;
+    /// use nidhogg::types::RightLegJoints;
+    /// use nidhogg::types::FillExt;
     ///
-    /// let zipped = RightLegJoints::<f32>::default().zip(RightLegJoints::<f32>::default());
+    /// let zipped = RightLegJoints::<u32>::default().zip(RightLegJoints::<u32>::default());
     ///
-    /// assert_eq!(zipped.head_yaw, (0_u32, 0_f32));
+    /// assert_eq!(zipped, RightLegJoints::<(u32, u32)>::fill((0_u32, 0_u32)));
     /// ```
     pub fn zip<U>(self, other: RightLegJoints<U>) -> RightLegJoints<(T, U)> {
         RightLegJoints {
@@ -619,20 +623,21 @@ impl<T> LegJoints<T> {
     ///
     /// ```
     /// use nidhogg::types::LegJoints;
+    /// use nidhogg::types::FillExt;
     ///
     /// let joints = LegJoints::<u32>::default();
     ///
     /// let transformed = joints.map(|x| x + 1);
     ///
-    /// assert_eq!(transformed.head_yaw, 1);
+    /// assert_eq!(transformed, LegJoints::fill(1));
     /// ```
-    pub fn map<F, U>(self, mut f: F) -> LegJoints<U>
+    pub fn map<F, U>(self, f: F) -> LegJoints<U>
     where
-        F: FnMut(T) -> U,
+        F: FnMut(T) -> U + Clone,
     {
         LegJoints {
-            left_leg: self.left_leg.map(&mut f),
-            right_leg: self.right_leg.map(&mut f),
+            left_leg: self.left_leg.map(f.clone()),
+            right_leg: self.right_leg.map(f),
         }
     }
 
@@ -642,11 +647,12 @@ impl<T> LegJoints<T> {
     /// # Example
     ///
     /// ```
-    /// use nidhogg::types::JointArray;
+    /// use nidhogg::types::LegJoints;
+    /// use nidhogg::types::FillExt;
     ///
-    /// let zipped = LegJoints::<f32>::default().zip(LegJoints::<f32>::default());
+    /// let zipped = LegJoints::<u32>::default().zip(LegJoints::<u32>::default());
     ///
-    /// assert_eq!(zipped.head_yaw, (0_u32, 0_f32));
+    /// assert_eq!(zipped, LegJoints::<(u32, u32)>::fill((0_u32, 0_u32)));
     /// ```
     pub fn zip<U>(self, other: LegJoints<U>) -> LegJoints<(T, U)> {
         LegJoints {
@@ -674,6 +680,58 @@ pub struct SingleArmJoints<T> {
     pub elbow_roll: T,
     pub wrist_yaw: T,
     pub hand: T,
+}
+
+impl<T> SingleArmJoints<T> {
+    /// Transforms each element in the [`SingleArmJoints`] using the provided closure `f`,
+    /// producing a new [`SingleArmJoints`] with the transformed values.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::SingleArmJoints;
+    ///
+    /// let joints = SingleArmJoints::<u32>::default();
+    ///
+    /// let transformed = joints.map(&mut |x| x + 1);
+    /// ```
+    pub fn map<F, U>(self, f: &mut F) -> SingleArmJoints<U>
+    where
+        F: FnMut(T) -> U,
+    {
+        SingleArmJoints {
+            shoulder_pitch: f(self.shoulder_pitch),
+            shoulder_roll: f(self.shoulder_roll),
+            elbow_yaw: f(self.elbow_yaw),
+            elbow_roll: f(self.elbow_roll),
+            wrist_yaw: f(self.wrist_yaw),
+            hand: f(self.hand),
+        }
+    }
+
+    /// Zips two [`SingleArmJoints`] instances element-wise, creating a new [`SingleArmJoints`]
+    /// containing tuples of corresponding elements from the two arrays.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::SingleArmJoints;
+    /// use nidhogg::types::FillExt;
+    ///
+    /// let zipped = SingleArmJoints::<u32>::default().zip(SingleArmJoints::<u32>::default());
+    ///
+    /// assert_eq!(zipped, SingleArmJoints::<(u32, u32)>::fill((0_u32, 0_u32)));
+    /// ```
+    pub fn zip<U>(self, other: SingleArmJoints<U>) -> SingleArmJoints<(T, U)> {
+        SingleArmJoints {
+            shoulder_pitch: (self.shoulder_pitch, other.shoulder_pitch),
+            shoulder_roll: (self.shoulder_roll, other.shoulder_roll),
+            elbow_yaw: (self.elbow_yaw, other.elbow_yaw),
+            elbow_roll: (self.elbow_roll, other.elbow_roll),
+            wrist_yaw: (self.wrist_yaw, other.wrist_yaw),
+            hand: (self.hand, other.hand),
+        }
+    }
 }
 
 /// Type definition for the left arm joints of the robot.
