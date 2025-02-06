@@ -488,6 +488,31 @@ pub struct LeftLegJoints<T> {
     pub ankle_roll: T,
 }
 
+impl<T> LeftLegJoints<T> {
+    /// Zips two [`LeftLegJoints`] instances element-wise, creating a new [`LeftLegJoints`]
+    /// containing tuples of corresponding elements from the two arrays.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let zipped = LeftLegJoints::<f32>::default().zip(LeftLegJoints::<f32>::default());
+    ///
+    /// assert_eq!(zipped.head_yaw, (0_u32, 0_f32));
+    /// ```
+    pub fn zip<U>(self, other: LeftLegJoints<U>) -> LeftLegJoints<(T, U)> {
+        LeftLegJoints {
+            hip_yaw_pitch: (self.hip_yaw_pitch, other.hip_yaw_pitch),
+            hip_roll: (self.hip_roll, other.hip_roll),
+            hip_pitch: (self.hip_pitch, other.hip_pitch),
+            knee_pitch: (self.knee_pitch, other.knee_pitch),
+            ankle_pitch: (self.ankle_pitch, other.ankle_pitch),
+            ankle_roll: (self.ankle_roll, other.ankle_roll),
+        }
+    }
+}
+
 /// Wrapper struct containing right left leg joints of the robot.
 #[derive(Builder, Clone, Debug, Default, Filler, PartialEq, Eq)]
 pub struct RightLegJoints<T> {
@@ -500,11 +525,56 @@ pub struct RightLegJoints<T> {
     pub ankle_roll: T,
 }
 
+impl<T> RightLegJoints<T> {
+    /// Zips two [`RightLegJoints`] instances element-wise, creating a new [`RightLegJoints`]
+    /// containing tuples of corresponding elements from the two arrays.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let zipped = RightLegJoints::<f32>::default().zip(RightLegJoints::<f32>::default());
+    ///
+    /// assert_eq!(zipped.head_yaw, (0_u32, 0_f32));
+    /// ```
+    pub fn zip<U>(self, other: RightLegJoints<U>) -> RightLegJoints<(T, U)> {
+        RightLegJoints {
+            hip_roll: (self.hip_roll, other.hip_roll),
+            hip_pitch: (self.hip_pitch, other.hip_pitch),
+            knee_pitch: (self.knee_pitch, other.knee_pitch),
+            ankle_pitch: (self.ankle_pitch, other.ankle_pitch),
+            ankle_roll: (self.ankle_roll, other.ankle_roll),
+        }
+    }
+}
+
 /// Wrapper struct containing joint values for both legs of the robot.
 #[derive(Builder, Clone, Debug, Default, PartialEq, Eq)]
 pub struct LegJoints<T> {
     pub left_leg: LeftLegJoints<T>,
     pub right_leg: RightLegJoints<T>,
+}
+
+impl<T> LegJoints<T> {
+    /// Zips two [`LegJoints`] instances element-wise, creating a new [`LegJoints`]
+    /// containing tuples of corresponding elements from the two arrays.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let zipped = LegJoints::<f32>::default().zip(LegJoints::<f32>::default());
+    ///
+    /// assert_eq!(zipped.head_yaw, (0_u32, 0_f32));
+    /// ```
+    pub fn zip<U>(self, other: LegJoints<U>) -> LegJoints<(T, U)> {
+        LegJoints {
+            left_leg: self.left_leg.zip(other.left_leg),
+            right_leg: self.right_leg.zip(other.right_leg),
+        }
+    }
 }
 
 impl<T: Clone> FillExt<T> for LegJoints<T> {
