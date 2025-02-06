@@ -489,6 +489,34 @@ pub struct LeftLegJoints<T> {
 }
 
 impl<T> LeftLegJoints<T> {
+    /// Transforms each element in the [`LeftLegJoints`] using the provided closure `f`,
+    /// producing a new [`LeftLegJoints`] with the transformed values.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::LeftLegJoints;
+    ///
+    /// let joints = LeftLegJoints::<u32>::default();
+    ///
+    /// let transformed = joints.map(|x| x + 1);
+    ///
+    /// assert_eq!(transformed.head_yaw, 1);
+    /// ```
+    pub fn map<F, U>(self, f: &mut F) -> LeftLegJoints<U>
+    where
+        F: FnMut(T) -> U,
+    {
+        LeftLegJoints {
+            hip_yaw_pitch: f(self.hip_yaw_pitch),
+            hip_roll: f(self.hip_roll),
+            hip_pitch: f(self.hip_pitch),
+            knee_pitch: f(self.knee_pitch),
+            ankle_pitch: f(self.ankle_pitch),
+            ankle_roll: f(self.ankle_roll),
+        }
+    }
+
     /// Zips two [`LeftLegJoints`] instances element-wise, creating a new [`LeftLegJoints`]
     /// containing tuples of corresponding elements from the two arrays.
     ///
@@ -526,6 +554,33 @@ pub struct RightLegJoints<T> {
 }
 
 impl<T> RightLegJoints<T> {
+    /// Transforms each element in the [`RightLegJoints`] using the provided closure `f`,
+    /// producing a new [`RightLegJoints`] with the transformed values.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::RightLegJoints;
+    ///
+    /// let joints = RightLegJoints::<u32>::default();
+    ///
+    /// let transformed = joints.map(|x| x + 1);
+    ///
+    /// assert_eq!(transformed.head_yaw, 1);
+    /// ```
+    pub fn map<F, U>(self, mut f: F) -> RightLegJoints<U>
+    where
+        F: FnMut(T) -> U,
+    {
+        RightLegJoints {
+            hip_roll: f(self.hip_roll),
+            hip_pitch: f(self.hip_pitch),
+            knee_pitch: f(self.knee_pitch),
+            ankle_pitch: f(self.ankle_pitch),
+            ankle_roll: f(self.ankle_roll),
+        }
+    }
+
     /// Zips two [`RightLegJoints`] instances element-wise, creating a new [`RightLegJoints`]
     /// containing tuples of corresponding elements from the two arrays.
     ///
@@ -557,6 +612,30 @@ pub struct LegJoints<T> {
 }
 
 impl<T> LegJoints<T> {
+    /// Transforms each element in the [`LegJoints`] using the provided closure `f`,
+    /// producing a new [`LegJoints`] with the transformed values.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::LegJoints;
+    ///
+    /// let joints = LegJoints::<u32>::default();
+    ///
+    /// let transformed = joints.map(|x| x + 1);
+    ///
+    /// assert_eq!(transformed.head_yaw, 1);
+    /// ```
+    pub fn map<F, U>(self, f: &mut F) -> LegJoints<U>
+    where
+        F: FnMut(T) -> U,
+    {
+        LegJoints {
+            left_leg: self.left_leg.map(f),
+            right_leg: self.right_leg.map(f),
+        }
+    }
+
     /// Zips two [`LegJoints`] instances element-wise, creating a new [`LegJoints`]
     /// containing tuples of corresponding elements from the two arrays.
     ///
