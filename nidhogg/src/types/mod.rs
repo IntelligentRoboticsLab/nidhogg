@@ -568,7 +568,7 @@ impl<T> RightLegJoints<T> {
     ///
     /// assert_eq!(transformed.head_yaw, 1);
     /// ```
-    pub fn map<F, U>(self, mut f: F) -> RightLegJoints<U>
+    pub fn map<F, U>(self, f: &mut F) -> RightLegJoints<U>
     where
         F: FnMut(T) -> U,
     {
@@ -626,13 +626,13 @@ impl<T> LegJoints<T> {
     ///
     /// assert_eq!(transformed.head_yaw, 1);
     /// ```
-    pub fn map<F, U>(self, f: &mut F) -> LegJoints<U>
+    pub fn map<F, U>(self, mut f: F) -> LegJoints<U>
     where
         F: FnMut(T) -> U,
     {
         LegJoints {
-            left_leg: self.left_leg.map(f),
-            right_leg: self.right_leg.map(f),
+            left_leg: self.left_leg.map(&mut f),
+            right_leg: self.right_leg.map(&mut f),
         }
     }
 
