@@ -749,6 +749,50 @@ pub struct ArmJoints<T> {
     pub right_arm: SingleArmJoints<T>,
 }
 
+impl<T> ArmJoints<T> {
+    /// Transforms each element in the [`ArmJoints`] using the provided closure `f`,
+    /// producing a new [`ArmJoints`] with the transformed values.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::ArmJoints;
+    ///
+    /// let joints = ArmJoints::<u32>::default();
+    ///
+    /// let transformed = joints.map(|x| x + 1);
+    /// ```
+    pub fn map<F, U>(self, f: F) -> ArmJoints<U>
+    where
+        F: FnMut(T) -> U + Clone,
+    {
+        ArmJoints {
+            left_arm: self.left_arm.map(f.clone()),
+            right_arm: self.right_arm.map(f),
+        }
+    }
+
+    /// Zips two [`ArmJoints`] instances element-wise, creating a new [`ArmJoints`]
+    /// containing tuples of corresponding elements from the two arrays.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::ArmJoints;
+    /// use nidhogg::types::FillExt;
+    ///
+    /// let zipped = ArmJoints::<u32>::default().zip(ArmJoints::<u32>::default());
+    ///
+    /// assert_eq!(zipped, ArmJoints::<(u32, u32)>::fill((0_u32, 0_u32)));
+    /// ```
+    pub fn zip<U>(self, other: ArmJoints<U>) -> ArmJoints<(T, U)> {
+        ArmJoints {
+            left_arm: self.left_arm.zip(other.left_arm),
+            right_arm: self.right_arm.zip(other.right_arm),
+        }
+    }
+}
+
 impl<T: Clone> FillExt<T> for ArmJoints<T> {
     fn fill(value: T) -> ArmJoints<T> {
         ArmJoints {
