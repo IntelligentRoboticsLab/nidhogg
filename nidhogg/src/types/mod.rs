@@ -693,9 +693,9 @@ impl<T> SingleArmJoints<T> {
     ///
     /// let joints = SingleArmJoints::<u32>::default();
     ///
-    /// let transformed = joints.map(&mut |x| x + 1);
+    /// let transformed = joints.map(|x| x + 1);
     /// ```
-    pub fn map<F, U>(self, f: &mut F) -> SingleArmJoints<U>
+    pub fn map<F, U>(self, mut f: F) -> SingleArmJoints<U>
     where
         F: FnMut(T) -> U,
     {
