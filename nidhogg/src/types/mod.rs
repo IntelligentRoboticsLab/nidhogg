@@ -631,13 +631,13 @@ impl<T> LegJoints<T> {
     ///
     /// assert_eq!(transformed, LegJoints::fill(1));
     /// ```
-    pub fn map<F, U>(self, f: F) -> LegJoints<U>
+    pub fn map<F, U>(self, mut f: F) -> LegJoints<U>
     where
-        F: FnMut(T) -> U + Clone,
+        F: FnMut(T) -> U,
     {
         LegJoints {
-            left_leg: self.left_leg.map(f.clone()),
-            right_leg: self.right_leg.map(f),
+            left_leg: self.left_leg.map(&mut f),
+            right_leg: self.right_leg.map(&mut f),
         }
     }
 
@@ -762,13 +762,13 @@ impl<T> ArmJoints<T> {
     ///
     /// let transformed = joints.map(|x| x + 1);
     /// ```
-    pub fn map<F, U>(self, f: F) -> ArmJoints<U>
+    pub fn map<F, U>(self, mut f: F) -> ArmJoints<U>
     where
-        F: FnMut(T) -> U + Clone,
+        F: FnMut(T) -> U,
     {
         ArmJoints {
-            left_arm: self.left_arm.map(f.clone()),
-            right_arm: self.right_arm.map(f),
+            left_arm: self.left_arm.map(&mut f),
+            right_arm: self.right_arm.map(&mut f),
         }
     }
 
