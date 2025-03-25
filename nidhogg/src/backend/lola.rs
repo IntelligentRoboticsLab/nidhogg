@@ -149,7 +149,7 @@ impl ReadHardwareInfo for LolaBackend {
 
 impl LolaBackend {
     /// Read a [`LolaNaoState`] from the `LoLA` socket.
-    fn read_lola_nao_state<'a>(
+    pub fn read_lola_nao_state<'a>(
         &mut self,
         buf: &'a mut [u8; LOLA_BUFFER_SIZE],
     ) -> Result<LolaNaoState<'a>> {
@@ -501,7 +501,7 @@ impl FromLoLA<[f32; 3]> for Vector3<f32> {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
-struct LolaNaoState<'a> {
+pub struct LolaNaoState<'a> {
     stiffness: [f32; 25],
     position: [f32; 25],
     temperature: [f32; 25],
