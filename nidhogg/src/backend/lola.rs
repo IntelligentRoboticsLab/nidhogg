@@ -149,6 +149,11 @@ impl ReadHardwareInfo for LolaBackend {
 
 impl LolaBackend {
     /// Read a [`LolaNaoState`] from the `LoLA` socket.
+    ///
+    /// # Note
+    ///
+    /// This reads from the underlying `LoLA` unix socket, which consumes the message
+    /// sent by `LoLA`.
     pub fn read_lola_nao_state<'a>(
         &mut self,
         buf: &'a mut [u8; LOLA_BUFFER_SIZE],

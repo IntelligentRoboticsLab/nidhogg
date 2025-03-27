@@ -11,10 +11,7 @@ pub use coppelia::CoppeliaBackend;
 
 #[cfg(feature = "lola")]
 mod lola;
-pub use lola::LolaControlMsg;
-
-#[cfg(feature = "lola")]
-pub use lola::LolaBackend;
+pub use lola::{LolaBackend, LolaControlMsg, LolaNaoState};
 
 use std::any::type_name;
 use std::thread;
