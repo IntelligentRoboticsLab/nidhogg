@@ -182,47 +182,88 @@ impl<T> JointArray<T> {
         }
     }
 
-    /// Converts the [`JointArray<T>`] into a [`Vec<T>`]
+    /// Returns a reference to all joint values as a fixed-size array.
     ///
     /// # Example
     ///
     /// ```
     /// use nidhogg::types::JointArray;
-    /// use nidhogg::types::FillExt;
     ///
-    /// let joints = JointArray::<i32>::fill(5);
-    /// let vec = joints.to_vec();
-    ///
-    /// assert_eq!(vec.len(), 25);
-    /// assert!(vec.iter().all(|&v| v == 5));
+    /// let joints = JointArray::<i32>::default();
+    /// let values = joints.as_ref();
+    /// assert_eq!(values.len(), 25);
+    /// assert!(values.iter().all(|&v| v == 0));
     /// ```
-    pub fn to_vec(self) -> Vec<T> {
-        vec![
-            self.head_yaw,
-            self.head_pitch,
-            self.left_shoulder_pitch,
-            self.left_shoulder_roll,
-            self.left_elbow_yaw,
-            self.left_elbow_roll,
-            self.left_wrist_yaw,
-            self.left_hip_yaw_pitch,
-            self.left_hip_roll,
-            self.left_hip_pitch,
-            self.left_knee_pitch,
-            self.left_ankle_pitch,
-            self.left_ankle_roll,
-            self.right_shoulder_pitch,
-            self.right_shoulder_roll,
-            self.right_elbow_yaw,
-            self.right_elbow_roll,
-            self.right_wrist_yaw,
-            self.right_hip_roll,
-            self.right_hip_pitch,
-            self.right_knee_pitch,
-            self.right_ankle_pitch,
-            self.right_ankle_roll,
-            self.left_hand,
-            self.right_hand,
+    pub fn as_array(&self) -> [&T; 25] {
+        [
+            &self.head_yaw,
+            &self.head_pitch,
+            &self.left_shoulder_pitch,
+            &self.left_shoulder_roll,
+            &self.left_elbow_yaw,
+            &self.left_elbow_roll,
+            &self.left_wrist_yaw,
+            &self.left_hip_yaw_pitch,
+            &self.left_hip_roll,
+            &self.left_hip_pitch,
+            &self.left_knee_pitch,
+            &self.left_ankle_pitch,
+            &self.left_ankle_roll,
+            &self.right_shoulder_pitch,
+            &self.right_shoulder_roll,
+            &self.right_elbow_yaw,
+            &self.right_elbow_roll,
+            &self.right_wrist_yaw,
+            &self.right_hip_roll,
+            &self.right_hip_pitch,
+            &self.right_knee_pitch,
+            &self.right_ankle_pitch,
+            &self.right_ankle_roll,
+            &self.left_hand,
+            &self.right_hand,
+        ]
+    }
+
+    /// Returns a mutable reference to all joint values as a fixed-size array.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let mut joints = JointArray::<i32>::default();
+    /// for joint in joints.as_mut() {
+    ///     *joint = 42;
+    /// }
+    /// assert!(joints.as_ref().iter().all(|&v| v == 42));
+    /// ```
+    pub fn as_array_mut(&mut self) -> [&mut T; 25] {
+        [
+            &mut self.head_yaw,
+            &mut self.head_pitch,
+            &mut self.left_shoulder_pitch,
+            &mut self.left_shoulder_roll,
+            &mut self.left_elbow_yaw,
+            &mut self.left_elbow_roll,
+            &mut self.left_wrist_yaw,
+            &mut self.left_hip_yaw_pitch,
+            &mut self.left_hip_roll,
+            &mut self.left_hip_pitch,
+            &mut self.left_knee_pitch,
+            &mut self.left_ankle_pitch,
+            &mut self.left_ankle_roll,
+            &mut self.right_shoulder_pitch,
+            &mut self.right_shoulder_roll,
+            &mut self.right_elbow_yaw,
+            &mut self.right_elbow_roll,
+            &mut self.right_wrist_yaw,
+            &mut self.right_hip_roll,
+            &mut self.right_hip_pitch,
+            &mut self.right_knee_pitch,
+            &mut self.right_ankle_pitch,
+            &mut self.right_ankle_roll,
+            &mut self.left_hand,
+            &mut self.right_hand,
         ]
     }
 
@@ -404,6 +445,18 @@ impl<T> JointArray<T> {
             .map(|(curr, target)| (curr - target).abs())
     }
 
+    /// Creates a new [`JointArray`] containing references to each joint value.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let joints = JointArray::<i32>::default();
+    /// let refs = joints.as_ref();
+    /// assert_eq!(*refs.head_yaw, 0);
+    /// assert_eq!(*refs.left_hand, 0);
+    /// ```
     pub fn as_ref(&self) -> JointArray<&T> {
         JointArray {
             head_yaw: &self.head_yaw,
@@ -433,6 +486,22 @@ impl<T> JointArray<T> {
             right_hand: &self.right_hand,
         }
     }
+
+    /// Creates a new [`JointArray`] containing mutable references to each joint value.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let mut joints = JointArray::<i32>::default();
+    /// let mut refs = joints.as_mut();
+    /// *refs.head_yaw = 42;
+    /// *refs.left_hand = 17;
+    ///
+    /// assert_eq!(joints.head_yaw, 42);
+    /// assert_eq!(joints.left_hand, 17);
+    /// ```
     pub fn as_mut(&mut self) -> JointArray<&mut T> {
         JointArray {
             head_yaw: &mut self.head_yaw,
@@ -461,6 +530,50 @@ impl<T> JointArray<T> {
             left_hand: &mut self.left_hand,
             right_hand: &mut self.right_hand,
         }
+    }
+
+    /// Converts the [`JointArray<T>`] into a [`Vec<T>`]
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    /// use nidhogg::types::FillExt;
+    ///
+    /// let joints = JointArray::<i32>::fill(5);
+    /// let vec = joints.to_vec();
+    ///
+    /// assert_eq!(vec.len(), 25);
+    /// assert!(vec.iter().all(|&v| v == 5));
+    /// ```
+    pub fn to_vec(self) -> Vec<T> {
+        vec![
+            self.head_yaw,
+            self.head_pitch,
+            self.left_shoulder_pitch,
+            self.left_shoulder_roll,
+            self.left_elbow_yaw,
+            self.left_elbow_roll,
+            self.left_wrist_yaw,
+            self.left_hip_yaw_pitch,
+            self.left_hip_roll,
+            self.left_hip_pitch,
+            self.left_knee_pitch,
+            self.left_ankle_pitch,
+            self.left_ankle_roll,
+            self.right_shoulder_pitch,
+            self.right_shoulder_roll,
+            self.right_elbow_yaw,
+            self.right_elbow_roll,
+            self.right_wrist_yaw,
+            self.right_hip_roll,
+            self.right_hip_pitch,
+            self.right_knee_pitch,
+            self.right_ankle_pitch,
+            self.right_ankle_roll,
+            self.left_hand,
+            self.right_hand,
+        ]
     }
 }
 
@@ -846,25 +959,28 @@ mod tests {
         assert_eq!(joints.right_shoulder_pitch, 20);
         assert!(joints.get_mut(25).is_none());
     }
+    #[test]
+    fn test_as_array() {
+        let joints = JointArray::<i32>::fill(3);
+        let array = joints.as_array();
+
+        assert_eq!(array.len(), 25);
+        assert!(array.iter().all(|&v| *v == 3));
+    }
 
     #[test]
     fn test_to_vec() {
-        let joints = JointArray::<i32>::fill(3);
-        let vec = joints.to_vec();
-
-        assert_eq!(vec.len(), 25);
-        assert!(vec.iter().all(|&v| v == 3));
-
         let custom_joints = JointArray::<i32> {
             head_yaw: 10,
             left_hand: 20,
             right_knee_pitch: 30,
             ..Default::default()
         };
-        let custom_vec = custom_joints.to_vec();
-        assert_eq!(custom_vec[0], 10); // head_yaw
-        assert_eq!(custom_vec[23], 20); // left_hand
-        assert_eq!(custom_vec[20], 30); // right_knee_pitch
+        let vec = custom_joints.to_vec();
+
+        assert_eq!(vec[0], 10); // head_yaw
+        assert_eq!(vec[23], 20); // left_hand
+        assert_eq!(vec[20], 30); // right_knee_pitch
     }
 
     #[test]
