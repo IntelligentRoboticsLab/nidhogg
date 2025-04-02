@@ -855,11 +855,12 @@ mod tests {
         assert_eq!(vec.len(), 25);
         assert!(vec.iter().all(|&v| v == 3));
 
-        let mut custom_joints = JointArray::<i32>::default();
-        custom_joints.head_yaw = 10;
-        custom_joints.left_hand = 20;
-        custom_joints.right_knee_pitch = 30;
-
+        let custom_joints = JointArray::<i32> {
+            head_yaw: 10,
+            left_hand: 20,
+            right_knee_pitch: 30,
+            ..Default::default()
+        };
         let custom_vec = custom_joints.to_vec();
         assert_eq!(custom_vec[0], 10); // head_yaw
         assert_eq!(custom_vec[23], 20); // left_hand
@@ -896,13 +897,14 @@ mod tests {
 
     #[test]
     fn test_get_specific_joints() {
-        let mut joints = JointArray::<i32>::default();
-
-        joints.head_yaw = 1;
-        joints.head_pitch = 2;
-        joints.left_shoulder_pitch = 3;
-        joints.left_hand = 4;
-        joints.right_hand = 5;
+        let joints = JointArray::<i32> {
+            head_yaw: 1,
+            head_pitch: 2,
+            left_shoulder_pitch: 3,
+            left_hand: 4,
+            right_hand: 5,
+            ..Default::default()
+        };
 
         assert_eq!(*joints.get(0).unwrap(), 1); // head_yaw
         assert_eq!(*joints.get(1).unwrap(), 2); // head_pitch
@@ -913,10 +915,12 @@ mod tests {
 
     #[test]
     fn test_to_vec_and_try_from_roundtrip() {
-        let mut original = JointArray::<i32>::default();
-        original.head_yaw = 42;
-        original.left_knee_pitch = 100;
-        original.right_hand = 200;
+        let original = JointArray::<i32> {
+            head_yaw: 42,
+            left_knee_pitch: 100,
+            right_hand: 200,
+            ..Default::default()
+        };
 
         let vec = original.clone().to_vec();
         let reconstructed = JointArray::<i32>::try_from(&vec[..]).unwrap();
