@@ -41,7 +41,6 @@ impl<B: ConnectWithRetry> App<B> {
 fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
 
-    // let mut app: App<CoppeliaBackend> = App::init()?;
     let mut app: App<LolaBackend> = App::init_with_retry(10, Duration::from_millis(500))?;
 
     let update = NaoControlMessage::builder()
