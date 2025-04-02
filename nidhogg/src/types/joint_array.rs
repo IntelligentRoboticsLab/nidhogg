@@ -92,6 +92,140 @@ pub struct JointArray<T> {
 }
 
 impl<T> JointArray<T> {
+    /// Returns a reference to the joint value at the specified index.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let joints = JointArray::<i32>::default();
+    /// assert_eq!(*joints.get(0).unwrap(), 0); // head_yaw
+    /// assert_eq!(*joints.get(1).unwrap(), 0); // head_pitch
+    /// assert!(joints.get(25).is_none()); // out of bounds
+    /// ```
+    pub fn get(&self, index: usize) -> Option<&T> {
+        match index {
+            0 => Some(&self.head_yaw),
+            1 => Some(&self.head_pitch),
+            2 => Some(&self.left_shoulder_pitch),
+            3 => Some(&self.left_shoulder_roll),
+            4 => Some(&self.left_elbow_yaw),
+            5 => Some(&self.left_elbow_roll),
+            6 => Some(&self.left_wrist_yaw),
+            7 => Some(&self.left_hip_yaw_pitch),
+            8 => Some(&self.left_hip_roll),
+            9 => Some(&self.left_hip_pitch),
+            10 => Some(&self.left_knee_pitch),
+            11 => Some(&self.left_ankle_pitch),
+            12 => Some(&self.left_ankle_roll),
+            13 => Some(&self.right_shoulder_pitch),
+            14 => Some(&self.right_shoulder_roll),
+            15 => Some(&self.right_elbow_yaw),
+            16 => Some(&self.right_elbow_roll),
+            17 => Some(&self.right_wrist_yaw),
+            18 => Some(&self.right_hip_roll),
+            19 => Some(&self.right_hip_pitch),
+            20 => Some(&self.right_knee_pitch),
+            21 => Some(&self.right_ankle_pitch),
+            22 => Some(&self.right_ankle_roll),
+            23 => Some(&self.left_hand),
+            24 => Some(&self.right_hand),
+            _ => None,
+        }
+    }
+
+    /// Returns a mutable reference to the joint value at the specified index.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let mut joints = JointArray::<i32>::default();
+    ///
+    /// if let Some(value) = joints.get_mut(0) {
+    ///     *value = 42;
+    /// }
+    ///
+    /// assert_eq!(joints.head_yaw, 42);
+    /// assert!(joints.get_mut(25).is_none()); // out of bounds
+    /// ```
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        match index {
+            0 => Some(&mut self.head_yaw),
+            1 => Some(&mut self.head_pitch),
+            2 => Some(&mut self.left_shoulder_pitch),
+            3 => Some(&mut self.left_shoulder_roll),
+            4 => Some(&mut self.left_elbow_yaw),
+            5 => Some(&mut self.left_elbow_roll),
+            6 => Some(&mut self.left_wrist_yaw),
+            7 => Some(&mut self.left_hip_yaw_pitch),
+            8 => Some(&mut self.left_hip_roll),
+            9 => Some(&mut self.left_hip_pitch),
+            10 => Some(&mut self.left_knee_pitch),
+            11 => Some(&mut self.left_ankle_pitch),
+            12 => Some(&mut self.left_ankle_roll),
+            13 => Some(&mut self.right_shoulder_pitch),
+            14 => Some(&mut self.right_shoulder_roll),
+            15 => Some(&mut self.right_elbow_yaw),
+            16 => Some(&mut self.right_elbow_roll),
+            17 => Some(&mut self.right_wrist_yaw),
+            18 => Some(&mut self.right_hip_roll),
+            19 => Some(&mut self.right_hip_pitch),
+            20 => Some(&mut self.right_knee_pitch),
+            21 => Some(&mut self.right_ankle_pitch),
+            22 => Some(&mut self.right_ankle_roll),
+            23 => Some(&mut self.left_hand),
+            24 => Some(&mut self.right_hand),
+            _ => None,
+        }
+    }
+
+    /// Converts the [`JointArray<T>`] into a [`Vec<T>`]
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    /// use nidhogg::types::FillExt;
+    ///
+    /// let joints = JointArray::<i32>::fill(5);
+    /// let vec = joints.to_vec();
+    ///
+    /// assert_eq!(vec.len(), 25);
+    /// assert!(vec.iter().all(|&v| v == 5));
+    /// ```
+    pub fn to_vec(self) -> Vec<T> {
+        vec![
+            self.head_yaw,
+            self.head_pitch,
+            self.left_shoulder_pitch,
+            self.left_shoulder_roll,
+            self.left_elbow_yaw,
+            self.left_elbow_roll,
+            self.left_wrist_yaw,
+            self.left_hip_yaw_pitch,
+            self.left_hip_roll,
+            self.left_hip_pitch,
+            self.left_knee_pitch,
+            self.left_ankle_pitch,
+            self.left_ankle_roll,
+            self.right_shoulder_pitch,
+            self.right_shoulder_roll,
+            self.right_elbow_yaw,
+            self.right_elbow_roll,
+            self.right_wrist_yaw,
+            self.right_hip_roll,
+            self.right_hip_pitch,
+            self.right_knee_pitch,
+            self.right_ankle_pitch,
+            self.right_ankle_roll,
+            self.left_hand,
+            self.right_hand,
+        ]
+    }
+
     /// Transforms each element in the [`JointArray`] using the provided closure `f`,
     /// producing a new [`JointArray`] with the transformed values.
     ///
@@ -447,6 +581,44 @@ impl<T: Clone> FillExt<T> for JointArray<T> {
     }
 }
 
+impl<T: Clone> TryFrom<&[T]> for JointArray<T> {
+    type Error = &'static str;
+
+    fn try_from(values: &[T]) -> Result<Self, Self::Error> {
+        if values.len() != 25 {
+            return Err("Slice must contain exactly 25 elements to convert to JointArray");
+        }
+
+        Ok(JointArray {
+            head_yaw: values[0].clone(),
+            head_pitch: values[1].clone(),
+            left_shoulder_pitch: values[2].clone(),
+            left_shoulder_roll: values[3].clone(),
+            left_elbow_yaw: values[4].clone(),
+            left_elbow_roll: values[5].clone(),
+            left_wrist_yaw: values[6].clone(),
+            left_hip_yaw_pitch: values[7].clone(),
+            left_hip_roll: values[8].clone(),
+            left_hip_pitch: values[9].clone(),
+            left_knee_pitch: values[10].clone(),
+            left_ankle_pitch: values[11].clone(),
+            left_ankle_roll: values[12].clone(),
+            right_shoulder_pitch: values[13].clone(),
+            right_shoulder_roll: values[14].clone(),
+            right_elbow_yaw: values[15].clone(),
+            right_elbow_roll: values[16].clone(),
+            right_wrist_yaw: values[17].clone(),
+            right_hip_roll: values[18].clone(),
+            right_hip_pitch: values[19].clone(),
+            right_knee_pitch: values[20].clone(),
+            right_ankle_pitch: values[21].clone(),
+            right_ankle_roll: values[22].clone(),
+            left_hand: values[23].clone(),
+            right_hand: values[24].clone(),
+        })
+    }
+}
+
 impl<T> JointArrayBuilder<T> {
     /// Set all the joint values to the corresponding values from the provided [`JointArray`].
     pub fn joints(mut self, joints: JointArray<T>) -> Self {
@@ -573,7 +745,7 @@ impl<'a, T> IntoIterator for &'a JointArray<T> {
 
     fn into_iter(self) -> Self::IntoIter {
         JointArrayIterator {
-            jointarray: self,
+            inner: self,
             index: 0,
         }
     }
@@ -581,7 +753,7 @@ impl<'a, T> IntoIterator for &'a JointArray<T> {
 
 #[derive(Debug)]
 pub struct JointArrayIterator<'a, T> {
-    jointarray: &'a JointArray<T>,
+    inner: &'a JointArray<T>,
     index: usize,
 }
 
@@ -589,31 +761,31 @@ impl<'a, T> Iterator for JointArrayIterator<'a, T> {
     type Item = &'a T;
     fn next(&mut self) -> Option<&'a T> {
         let result = match self.index {
-            0 => &self.jointarray.head_yaw,
-            1 => &self.jointarray.head_pitch,
-            2 => &self.jointarray.left_shoulder_pitch,
-            3 => &self.jointarray.left_shoulder_roll,
-            4 => &self.jointarray.left_elbow_yaw,
-            5 => &self.jointarray.left_elbow_roll,
-            6 => &self.jointarray.left_wrist_yaw,
-            7 => &self.jointarray.left_hip_yaw_pitch,
-            8 => &self.jointarray.left_hip_roll,
-            9 => &self.jointarray.left_hip_pitch,
-            10 => &self.jointarray.left_knee_pitch,
-            11 => &self.jointarray.left_ankle_pitch,
-            12 => &self.jointarray.left_ankle_roll,
-            13 => &self.jointarray.right_shoulder_pitch,
-            14 => &self.jointarray.right_shoulder_roll,
-            15 => &self.jointarray.right_elbow_yaw,
-            16 => &self.jointarray.right_elbow_roll,
-            17 => &self.jointarray.right_wrist_yaw,
-            18 => &self.jointarray.right_hip_roll,
-            19 => &self.jointarray.right_hip_pitch,
-            20 => &self.jointarray.right_knee_pitch,
-            21 => &self.jointarray.right_ankle_pitch,
-            22 => &self.jointarray.right_ankle_roll,
-            23 => &self.jointarray.left_hand,
-            24 => &self.jointarray.right_hand,
+            0 => &self.inner.head_yaw,
+            1 => &self.inner.head_pitch,
+            2 => &self.inner.left_shoulder_pitch,
+            3 => &self.inner.left_shoulder_roll,
+            4 => &self.inner.left_elbow_yaw,
+            5 => &self.inner.left_elbow_roll,
+            6 => &self.inner.left_wrist_yaw,
+            7 => &self.inner.left_hip_yaw_pitch,
+            8 => &self.inner.left_hip_roll,
+            9 => &self.inner.left_hip_pitch,
+            10 => &self.inner.left_knee_pitch,
+            11 => &self.inner.left_ankle_pitch,
+            12 => &self.inner.left_ankle_roll,
+            13 => &self.inner.right_shoulder_pitch,
+            14 => &self.inner.right_shoulder_roll,
+            15 => &self.inner.right_elbow_yaw,
+            16 => &self.inner.right_elbow_roll,
+            17 => &self.inner.right_wrist_yaw,
+            18 => &self.inner.right_hip_roll,
+            19 => &self.inner.right_hip_pitch,
+            20 => &self.inner.right_knee_pitch,
+            21 => &self.inner.right_ankle_pitch,
+            22 => &self.inner.right_ankle_roll,
+            23 => &self.inner.left_hand,
+            24 => &self.inner.right_hand,
             _ => return None,
         };
         self.index += 1;
@@ -642,5 +814,121 @@ mod tests {
         let t3 = t1.zip(t2);
         assert_eq!(t3.head_pitch, (1, 2));
         assert_eq!(t3.left_elbow_yaw, (1, 2));
+    }
+
+    #[test]
+    fn test_get() {
+        let joints = JointArray::<i32>::fill(5);
+
+        // Test valid indices
+        assert_eq!(*joints.get(0).unwrap(), 5); // head_yaw
+        assert_eq!(*joints.get(7).unwrap(), 5); // left_hip_yaw_pitch
+        assert_eq!(*joints.get(24).unwrap(), 5); // right_hand
+
+        assert_eq!(*joints.get(0).unwrap(), 5); // First element
+        assert_eq!(*joints.get(24).unwrap(), 5); // Last element
+        assert!(joints.get(25).is_none()); // Out of bounds
+        assert!(joints.get(100).is_none()); // Far out of bounds
+    }
+
+    #[test]
+    fn test_get_mut() {
+        let mut joints = JointArray::<i32>::fill(5);
+
+        if let Some(value) = joints.get_mut(0) {
+            *value = 10;
+        }
+        assert_eq!(joints.head_yaw, 10);
+        if let Some(value) = joints.get_mut(13) {
+            *value = 20;
+        }
+
+        assert_eq!(joints.right_shoulder_pitch, 20);
+        assert!(joints.get_mut(25).is_none());
+    }
+
+    #[test]
+    fn test_to_vec() {
+        let joints = JointArray::<i32>::fill(3);
+        let vec = joints.to_vec();
+
+        assert_eq!(vec.len(), 25);
+        assert!(vec.iter().all(|&v| v == 3));
+
+        let mut custom_joints = JointArray::<i32>::default();
+        custom_joints.head_yaw = 10;
+        custom_joints.left_hand = 20;
+        custom_joints.right_knee_pitch = 30;
+
+        let custom_vec = custom_joints.to_vec();
+        assert_eq!(custom_vec[0], 10); // head_yaw
+        assert_eq!(custom_vec[23], 20); // left_hand
+        assert_eq!(custom_vec[20], 30); // right_knee_pitch
+    }
+
+    #[test]
+    fn test_try_from_slice_too_long() {
+        let long_slice = [3; 26];
+        let long_result = JointArray::<i32>::try_from(&long_slice[..]);
+        assert!(long_result.is_err());
+        assert_eq!(
+            long_result.unwrap_err(),
+            "Slice must contain exactly 25 elements to convert to JointArray"
+        );
+    }
+
+    #[test]
+    fn test_try_from_slice_custom_values() {
+        // Test with custom values
+        let custom_slice = [
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+            32, 33, 34,
+        ];
+        let custom_result = JointArray::<i32>::try_from(&custom_slice[..]);
+        assert!(custom_result.is_ok());
+        let custom_joints = custom_result.unwrap();
+
+        assert_eq!(custom_joints.head_yaw, 10);
+        assert_eq!(custom_joints.head_pitch, 11);
+        assert_eq!(custom_joints.left_shoulder_pitch, 12);
+        assert_eq!(custom_joints.right_hand, 34);
+    }
+
+    #[test]
+    fn test_get_specific_joints() {
+        let mut joints = JointArray::<i32>::default();
+
+        joints.head_yaw = 1;
+        joints.head_pitch = 2;
+        joints.left_shoulder_pitch = 3;
+        joints.left_hand = 4;
+        joints.right_hand = 5;
+
+        assert_eq!(*joints.get(0).unwrap(), 1); // head_yaw
+        assert_eq!(*joints.get(1).unwrap(), 2); // head_pitch
+        assert_eq!(*joints.get(2).unwrap(), 3); // left_shoulder_pitch
+        assert_eq!(*joints.get(23).unwrap(), 4); // left_hand
+        assert_eq!(*joints.get(24).unwrap(), 5); // right_hand
+    }
+
+    #[test]
+    fn test_to_vec_and_try_from_roundtrip() {
+        let mut original = JointArray::<i32>::default();
+        original.head_yaw = 42;
+        original.left_knee_pitch = 100;
+        original.right_hand = 200;
+
+        let vec = original.clone().to_vec();
+        let reconstructed = JointArray::<i32>::try_from(&vec[..]).unwrap();
+
+        // Verify the reconstructed array matches the original
+        assert_eq!(reconstructed.head_yaw, 42);
+        assert_eq!(reconstructed.left_knee_pitch, 100);
+        assert_eq!(reconstructed.right_hand, 200);
+
+        // Verify all fields are equal
+        for i in 0..25 {
+            assert_eq!(original.get(i), reconstructed.get(i));
+        }
     }
 }
