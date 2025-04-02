@@ -3,12 +3,6 @@
 //! This module provides support for various NAO backends.
 //! It also includes several traits that enhance the functionality of types that implement [`NaoBackend`].
 
-#[cfg(feature = "coppelia")]
-mod coppelia;
-
-#[cfg(feature = "coppelia")]
-pub use coppelia::CoppeliaBackend;
-
 #[cfg(feature = "lola")]
 mod lola;
 pub use lola::{LolaBackend, LolaControlMsg, LolaNaoState};

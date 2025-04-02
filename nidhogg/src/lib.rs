@@ -14,7 +14,6 @@
 //! | Backend | Supported | Feature name |
 //! |-|-|-|
 //! | `LoLA` | ✅ | `lola` |
-//! | `CoppeliaSim` | 🚧 | `coppelia` |
 //!
 //! ✅: Fully supported!
 //! 🚧: Work in progress
