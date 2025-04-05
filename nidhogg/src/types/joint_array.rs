@@ -182,6 +182,48 @@ impl<T> JointArray<T> {
         }
     }
 
+    /// Returns all joint values as a fixed-size array.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nidhogg::types::JointArray;
+    ///
+    /// let joints = JointArray::<i32>::default();
+    /// let values = joints.as_array();
+    /// assert_eq!(values.len(), 25);
+    /// assert!(values.iter().all(|&v| v == 0));
+    /// ```
+    pub fn as_array(self) -> [T; 25] {
+        [
+            self.head_yaw,
+            self.head_pitch,
+            self.left_shoulder_pitch,
+            self.left_shoulder_roll,
+            self.left_elbow_yaw,
+            self.left_elbow_roll,
+            self.left_wrist_yaw,
+            self.left_hip_yaw_pitch,
+            self.left_hip_roll,
+            self.left_hip_pitch,
+            self.left_knee_pitch,
+            self.left_ankle_pitch,
+            self.left_ankle_roll,
+            self.right_shoulder_pitch,
+            self.right_shoulder_roll,
+            self.right_elbow_yaw,
+            self.right_elbow_roll,
+            self.right_wrist_yaw,
+            self.right_hip_roll,
+            self.right_hip_pitch,
+            self.right_knee_pitch,
+            self.right_ankle_pitch,
+            self.right_ankle_roll,
+            self.left_hand,
+            self.right_hand,
+        ]
+    }
+
     /// Returns a reference to all joint values as a fixed-size array.
     ///
     /// # Example
@@ -190,11 +232,11 @@ impl<T> JointArray<T> {
     /// use nidhogg::types::JointArray;
     ///
     /// let joints = JointArray::<i32>::default();
-    /// let values = joints.as_ref();
+    /// let values = joints.as_array_ref();
     /// assert_eq!(values.len(), 25);
     /// assert!(values.iter().all(|&v| v == 0));
     /// ```
-    pub fn as_array(&self) -> [&T; 25] {
+    pub fn as_array_ref(&self) -> [&T; 25] {
         [
             &self.head_yaw,
             &self.head_pitch,
@@ -852,57 +894,21 @@ impl<T> JointArrayBuilder<T> {
     }
 }
 
-impl<'a, T> IntoIterator for &'a JointArray<T> {
-    type Item = &'a T;
-    type IntoIter = JointArrayIterator<'a, T>;
+impl<T> IntoIterator for JointArray<T> {
+    type Item = T;
+    type IntoIter = std::array::IntoIter<T, 25>;
 
     fn into_iter(self) -> Self::IntoIter {
-        JointArrayIterator {
-            inner: self,
-            index: 0,
-        }
+        self.as_array().into_iter()
     }
 }
 
-#[derive(Debug)]
-pub struct JointArrayIterator<'a, T> {
-    inner: &'a JointArray<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for JointArrayIterator<'a, T> {
+impl<'a, T> IntoIterator for &'a JointArray<T> {
     type Item = &'a T;
-    fn next(&mut self) -> Option<&'a T> {
-        let result = match self.index {
-            0 => &self.inner.head_yaw,
-            1 => &self.inner.head_pitch,
-            2 => &self.inner.left_shoulder_pitch,
-            3 => &self.inner.left_shoulder_roll,
-            4 => &self.inner.left_elbow_yaw,
-            5 => &self.inner.left_elbow_roll,
-            6 => &self.inner.left_wrist_yaw,
-            7 => &self.inner.left_hip_yaw_pitch,
-            8 => &self.inner.left_hip_roll,
-            9 => &self.inner.left_hip_pitch,
-            10 => &self.inner.left_knee_pitch,
-            11 => &self.inner.left_ankle_pitch,
-            12 => &self.inner.left_ankle_roll,
-            13 => &self.inner.right_shoulder_pitch,
-            14 => &self.inner.right_shoulder_roll,
-            15 => &self.inner.right_elbow_yaw,
-            16 => &self.inner.right_elbow_roll,
-            17 => &self.inner.right_wrist_yaw,
-            18 => &self.inner.right_hip_roll,
-            19 => &self.inner.right_hip_pitch,
-            20 => &self.inner.right_knee_pitch,
-            21 => &self.inner.right_ankle_pitch,
-            22 => &self.inner.right_ankle_roll,
-            23 => &self.inner.left_hand,
-            24 => &self.inner.right_hand,
-            _ => return None,
-        };
-        self.index += 1;
-        Some(result)
+    type IntoIter = std::array::IntoIter<&'a T, 25>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.as_array_ref().into_iter()
     }
 }
 
@@ -965,7 +971,7 @@ mod tests {
         let array = joints.as_array();
 
         assert_eq!(array.len(), 25);
-        assert!(array.iter().all(|&v| *v == 3));
+        assert!(array.iter().all(|&v| v == 3));
     }
 
     #[test]
